@@ -5,8 +5,8 @@ import gym
 
 
 # parameters
-EPISODE_NUM = 
-STEP_NUM =
+EPISODE_NUM = 100
+STEP_NUM = 400
 
 
 """

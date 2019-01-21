@@ -9,6 +9,8 @@ class copy_QL:
         self.epsilon = 0.9
 
     def choose_action(self, observation):
+
+        
         
         if np.random.rand() > self.epsilon:
             action = np.random.choice(self.actions)
