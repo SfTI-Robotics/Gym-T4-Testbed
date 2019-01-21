@@ -1,12 +1,13 @@
 
 import numpy as np
 import gym
-
+import os
+import time
 
 
 # parameters
 EPISODE_NUM = 100
-STEP_NUM = 400
+STEP_NUM = 40
 
 
 """
@@ -15,10 +16,10 @@ STEP_NUM = 400
     RL = algorithm object from python file
 
  """
-
-def run_QL(GAME , RL):
+def run_QL(env , RL):
+# def run_QL(GAME , RL):
     
-    env = gym.make(GAME)
+    # env = gym.make(GAME)
 
     
 
@@ -29,13 +30,15 @@ def run_QL(GAME , RL):
 
         for step in range(STEP_NUM):
 
+            os.system('clear')
             env.render()
+            # time.sleep(0.1)
 
-            action = RL.choose_action(observation)
+            action = RL.choose_action(env, observation)
 
             observation_, reward, done, info = env.step(action)
 
-            RL.learn(observation, action, reward, observation_ )
+            RL.learn(observation, action, reward, observation_, done)
 
             episode_rewards += reward
 
@@ -47,7 +50,7 @@ def run_QL(GAME , RL):
                 break
                 
     print('game over')
-    env.destroy()
+    env.close()
 
             
 
