@@ -4,7 +4,8 @@ trying to write our own algorithms for gym environments
 
 ### Environments 
 
-Toy text Copy-v0
+Toy text
+- Copy-v0
 
 
 Atari 
