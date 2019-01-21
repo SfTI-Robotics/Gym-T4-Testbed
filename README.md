@@ -12,16 +12,12 @@ Atari
 - Pong-v0
 - SpaceInvaders-v0
 - MsPacman-v0
-
-
+- Enduro-v0
+- Super mario
 
 
 ----------------
 Box 2d
-
-Pac man
-
-Super mario
 
 DOOM
 
