@@ -38,7 +38,8 @@ do
 
 
 # checking if the entire file has been read
-done < "$1"
+done < "$line"
+# done < $words
 
 
 #Run the bash file ./NAME_OF_BASH_FILE

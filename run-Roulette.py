@@ -24,7 +24,11 @@ for episode in range(EPISODE_NUM):
         # os.system('clear')
         # time.sleep(0.1)
 
+<<<<<<< Updated upstream
         action = QLearning.choose_action(observation,EPISODE_NUM, env)
+=======
+        action = QLearning.choose_action(observation,EPISODE_NUM)
+>>>>>>> Stashed changes
         # print(action)
         observation_, reward, done, _ = env.step(action)
 

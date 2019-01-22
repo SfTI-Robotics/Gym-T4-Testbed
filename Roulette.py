@@ -22,8 +22,12 @@ class QLearning:
     def choose_action(self, state, episode, env):
 
         if np.random.rand() > self.epsilon :
+<<<<<<< Updated upstream
             # action = np.random.choice(self.q_table[state,:])
             action = env.action_space.sample()
+=======
+            action = np.random.choice(self.q_table[state,:])
+>>>>>>> Stashed changes
         else :
             action = np.argmax(self.q_table[state,:])
 
