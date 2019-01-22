@@ -14,7 +14,7 @@ env = gym.make(Game)
 
 if hasattr(env.action_space, 'spaces'):
     dims = [d.n for d in env.action_space.spaces]
-else:
+else:   
     dims = [env.action_space.n]
 
 actions=np.prod(dims)
