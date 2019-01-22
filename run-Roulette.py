@@ -24,7 +24,7 @@ for episode in range(EPISODE_NUM):
         # os.system('clear')
         # time.sleep(0.1)
 
-        action = QLearning.choose_action(observation,EPISODE_NUM)
+        action = QLearning.choose_action(observation,EPISODE_NUM, env)
         # print(action)
         observation_, reward, done, _ = env.step(action)
 

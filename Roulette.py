@@ -19,10 +19,11 @@ class QLearning:
         self.gamma = 0.99
         self.epsilon = 1.0
     
-    def choose_action(self, state, episode):
+    def choose_action(self, state, episode, env):
 
         if np.random.rand() > self.epsilon :
-            action = np.random.choice(self.q_table[state,:])
+            # action = np.random.choice(self.q_table[state,:])
+            action = env.action_space.sample()
         else :
             action = np.argmax(self.q_table[state,:])
 
