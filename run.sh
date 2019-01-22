@@ -33,11 +33,13 @@ do
 
 	#Running the python script
 	#hard code the link 
+	python3 copy_v0_easy.py ${words[0]} ${words[1]} ${words[2]}
 	python3 run-Roulette.py ${words[0]} ${words[1]} ${words[2]}
 
 
 # checking if the entire file has been read
-done < "$1"
+done < "$line"
+# done < $words
 
 #Run the bash file ./NAME_OF_BASH_FILE
 #if you cant run this just go chmod +x the_file_name
