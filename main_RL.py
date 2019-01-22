@@ -2,9 +2,16 @@ import gym
 import sys 
 from run_QL import run_QL
 # from Yonghui.test import brain_yonghui
+<<<<<<< Updated upstream
 from copy_QL import brain_QL
 import numpy as np
 
+=======
+#from copy_QL import brain_QL
+import numpy as np
+
+
+>>>>>>> Stashed changes
 # RL1 = brain_yonghui()
 # print(RL1.print_one())
 # RL2 = brain_kevin()
@@ -23,6 +30,7 @@ states = env.observation_space.n
 print(actions)
 print(states)
 
+<<<<<<< Updated upstream
 qVals = np.zeros((states, actions))
 print(qVals)
 
@@ -34,4 +42,10 @@ RL = brain_QL(actions, states)
 
 run_QL(env, RL)
 # run_QL(Game, RL2)
+=======
+qVals = np.zeros((states, actions), np.float32)
+print(qVals)
+
+
+>>>>>>> Stashed changes
 
