@@ -14,8 +14,9 @@ class brain_QL:
     def choose_action(self, env, observation):
 
         if np.random.rand() > self.epsilon:
-            action = np.random.choice(self.q_table[observation,:])
-
+            print('goes in')
+            # action = np.random.choice(self.q_table[observation,:])
+            action = env.action_space.sample()
         else:
             action = np.argmax(self.q_table[observation,:])
 
@@ -26,7 +27,7 @@ class brain_QL:
         # bellman
         #  Q[s][a] += alpha * ((r + gamma * np.max(Q[ns])) - Q[s][a])
         
-        self.q_table[observation][action] += self.alpha*((reward + self.gamma *np.max(self.q_table[observation_,:])) - self.q_table[observation, action])
+        self.q_table[observation, action] += self.alpha*((reward + self.gamma *np.max(self.q_table[observation_,:])) - self.q_table[observation, action])
         print(self.q_table)
 
 

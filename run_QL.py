@@ -6,8 +6,8 @@ import time
 
 
 # parameters
-EPISODE_NUM = 100
-STEP_NUM = 40
+EPISODE_NUM = 5000
+STEP_NUM = 100
 
 
 """
@@ -32,22 +32,24 @@ def run_QL(env , RL):
 
             os.system('clear')
             env.render()
-            # time.sleep(0.1)
+            time.sleep(0.1)
 
-            action = RL.choose_action(env, observation)
+            #action = RL.choose_action(env, observation)
+            action=(1,1, observation)
 
-            observation_, reward, done, info = env.step(action)
+            observation_, reward, done, _ = env.step(action)
 
-            RL.learn(observation, action, reward, observation_, done)
+            RL.learn(observation, action, reward, observation_)
 
             episode_rewards += reward
 
             observation = observation_
 
             if done:
-
-
+                    
+                print("Episode Completed")
                 break
+           
                 
     print('game over')
     env.close()

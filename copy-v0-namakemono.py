@@ -17,14 +17,25 @@ def run(alpha=0.3, gamma=0.9):
         X, A, R = [], [], [] # States, Actions, Rewards
         done = False
         while not done:
-            os.system('clear')
-            env.render()
-            time.sleep(0.08)
+            # os.system('clear')
+            # env.render()
+            # time.sleep(0.08)
 
             if (np.random.random() < 0.01) or (not x in Q):
                 a = env.action_space.sample()
             else:
+                # print("start")
+                # for key, value in Q[x].items():
+                #     print("%s: %s" % (key, value))
+                    
+
+                # print('====================================')
+                # for key, value in sorted(Q[x].items(), key=lambda _: -_[1]):
+                #     print("%s: %s" % (key, value))
+
                 a = sorted(Q[x].items(), key=lambda _: -_[1])[0][0]
+
+                print("used key")
             X.append(x)
             A.append(a)
             if not x in Q:
