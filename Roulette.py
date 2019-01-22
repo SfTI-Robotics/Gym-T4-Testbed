@@ -30,7 +30,7 @@ class QLearning:
 
     def learn(self, state, action, reward, state_, done):
 
-        if !done:
+        if != done:
             q_target = self.gamma * (reward + np.max(self.q_table[state_,:]) )
 
         else: 
