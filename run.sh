@@ -38,8 +38,8 @@ do
 
 
 # checking if the entire file has been read
-done < "$line"
-# done < $words
+done < "$1"
+
 
 #Run the bash file ./NAME_OF_BASH_FILE
 #if you cant run this just go chmod +x the_file_name
