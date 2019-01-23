@@ -33,7 +33,7 @@ do
 
 	#Running the python script
 	#hard code the link 
-	python3 copy_v0_easy.py ${words[0]} ${words[1]} ${words[2]}
+	# python3 copy_v0_easy.py ${words[0]} ${words[1]} ${words[2]}
 	python3 run-Roulette.py ${words[0]} ${words[1]} ${words[2]}
 
 

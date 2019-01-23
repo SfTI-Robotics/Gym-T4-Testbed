@@ -2,11 +2,30 @@
 import gym
 import numpy as np
 # from /home/lemon740/Gym-T4-Testbed import Roulette
-#this is importing the algorithm which is defined as a class from a diffeerent folder
+#this is importing the algorithm which is defined as a class from a diffeerent file
+# make sure file names do not contain '-', or else it will cause errors
 from Roulette import QLearning
+from summary import * 
 import os
 import time
+import datetime
 import sys
+
+# Graphing results
+now = datetime.datetime.now()
+
+graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward'], 
+            # the optimal step count of the optimal policy 
+            step_goal = 200, 
+            # the maximum reward for the optimal policy
+            reward_goal = 4, 
+            # maximum exploitation value
+            epsilon_goal = 0.99,
+            # desired name for file
+            NAME = "Roulette-v0-" + str(now), 
+            # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
+            SAVE_PATH = "/Gym-T4-Testbed/"
+    )
 
 #our bash file takes the arg.txt file that has a list of the different environments episodes and steps
 #when using sys.argv start by using 1 not 0 for the first agrument because 0 will be the python file name
@@ -26,6 +45,8 @@ for episode in range(EPISODE_NUM):
 
     episode_rewards = 0
     observation = env.reset()
+
+    start_time = time.time()
 
     for step in range(STEP_NUM):
 
@@ -49,9 +70,9 @@ for episode in range(EPISODE_NUM):
 
         if done:
             print('Episode =', episode, ',  reward =', episode_rewards)
-                
-            print("Episode Completed")
             break
+    
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards)
         
             
 print('game over')

@@ -4,6 +4,7 @@ import matplotlib.gridspec
 import os
 import time
 
+
 from PIL import Image
 
 from os.path import expanduser
@@ -13,16 +14,16 @@ home = expanduser("~")
 FREQUENCY = 5
 
 EPISODE_MIN = 0
-EPISODE_MAX = 200
+EPISODE_MAX = 500
 
 STEP_MIN_M = 0
-STEP_MAX_M = 500
+STEP_MAX_M = 100
 
 TIME_MIN_M = 0
-TIME_MAX_M = 1
+TIME_MAX_M = 0.02
 
-REWARD_MIN_M = -2
-REWARD_MAX_M = 2
+REWARD_MIN_M = -100
+REWARD_MAX_M = 100
 
 STEP_MIN_F = 3
 STEP_MAX_F = 12
@@ -192,7 +193,8 @@ class summary:
                     i += 1
 
             plt.tight_layout()
-            fig1.savefig(home + self.save_path + self.general_filename + "_summary.png")
+            
+            fig1.savefig(home + self.save_path + self.general_filename +  ".png")
             plt.close(fig1)
         if not self.num_focus_axes or self.start_focus == self.end_focus:
             return
