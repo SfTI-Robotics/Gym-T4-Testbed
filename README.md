@@ -26,3 +26,13 @@ MuJoCo
 Robotics
 
  
+| Envrionment   | Algorithm |
+| ------------- | ------------------- |
+| Toy text  |   |
+|- Copy-v0 ||
+|Atari ||
+|- Pong-v0 ||
+|- SpaceInvaders-v0 ||
+|- MsPacman-v0||
+|- Enduro-v0||
+|- Super mario||
