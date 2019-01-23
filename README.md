@@ -2,19 +2,6 @@
 trying to write our own algorithms for gym environments
 
 
-### Environments 
-
-Toy text
-- Copy-v0
-
-
-Atari 
-- Pong-v0
-- SpaceInvaders-v0
-- MsPacman-v0
-- Enduro-v0
-- Super mario
-
 
 ----------------
 Box 2d
@@ -28,11 +15,23 @@ Robotics
  
 | Envrionment   | Algorithm |
 | ------------- | ------------------- |
-| Toy text  |   |
-|- Copy-v0 ||
-|Atari ||
-|- Pong-v0 ||
-|- SpaceInvaders-v0 ||
+| { Toy text } |   NB. *many environments do not render*|
+|- Roulette-v0 |Q Learning|
+|   |  |
+|{ Atari } ||
+|- Pong-v0 | policy gradient|
+|- SpaceInvaders-v0 |DQN|
 |- MsPacman-v0||
 |- Enduro-v0||
 |- Super mario||
+|||
+|{ Algorithms } | NB. *difficuilt action spaces* |
+| - Copy-v0 | |
+|||
+|{ Box 2D }
+|||
+|VizDoom
+|||
+|{ MuJoCo }
+|||
+|{ Robotics } 
