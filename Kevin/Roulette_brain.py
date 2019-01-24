@@ -17,11 +17,11 @@ class Q_Learning:
         self.epsilon_max = 0.99
         self.epsilon_decay = 0.998
 
-    def learn(self, obs, action, reward, _obs, done):
+    def learn(self, obs, action, reward, obs_, done):
         if done:
             q_value = reward
         else:
-            q_value = reward + self.reward_decay * np.max(self.q_table[_obs,:])
+            q_value = reward + self.reward_decay * np.max(self.q_table[obs_,:])
 
         self.q_table[obs,action] = self.learning_rate * (self.q_table[obs,action] - q_value)
 

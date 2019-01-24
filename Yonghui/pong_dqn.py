@@ -1,14 +1,18 @@
 import tensorflow as tf
 import numpy as np
+<<<<<<< Updated upstream
 import gym
 from collections import deque
 from skimage import transform # Help us to preprocess the frames
 from skimage.color import rgb2gray # Help us to gray our frames
 
+=======
+>>>>>>> Stashed changes
 # from neural_network import tensorflowNet
 
 
 
+<<<<<<< Updated upstream
 def StateProcessor(frames_deque, state, is_new_episode):
     # Preprocess frame
     
@@ -61,11 +65,54 @@ class DeepQNetwork():
         self.state = tf.placeholder(tf.float32, [None, *state_size], name = 'state')
         self.action = tf.placeholder(tf.float32, [None, action_size], name = 'action')
         self.q_target = tf.placeholder(tf.float32, [None], name = 'q_target')
+=======
+class DQN:
+    def __init__(self, ):
+
+        # 1. initialise instance variables
+        self.alpha = 0.85
+        self.gamma = 0.98
+        self.epsilon = 1.0
+
+
+        # 2. call build net function
+        # 3. get parameters
+
+        # 4. instantiate session
+        sess = tf.Session()
+
+        # 5. launch session
+        sess.run(tf.global_variables_initializer)
+
+        
+        # preprocess frames
+
+        greyscale = rgb2gray(frame)
+
+        
+
+        
+
+        
+        # initialise placeholders for state, action and q-target
+        
+        state = tf.placeholder(tf.float32, [None, state_size], name = 'state')
+        action = tf.placeholder(tf.float32, [None, action_size], name = 'action')
+        q_target = tf.placeholder(tf.float32, [None], name = 'q_target')
+
+        # take a stack of 4 frames as input
+        
+
+>>>>>>> Stashed changes
 
 
         # pass frames through 3 convolutional neural networks (CNN or convnet)
         # (convolutional layers passed into an exponential or rectified linear unit network)
+<<<<<<< Updated upstream
         self.conv1 = tf.nn.elu(tf.layers.conv2d(inputs = self.state,
+=======
+        conv1 = tf.nn.elu(tf.layers.con2d(inputs = state,
+>>>>>>> Stashed changes
                                 filters = 32,
                                 kernel_size = [8, 8],
                                 strides = [4, 4],
@@ -74,7 +121,11 @@ class DeepQNetwork():
                                 )
         )
 
+<<<<<<< Updated upstream
         self.conv2 = tf.nn.elu(tf.layers.conv2d(inputs = self.conv1,
+=======
+        conv2 = tf.nn.elu(tf.layers.con2d(inputs = conv1,
+>>>>>>> Stashed changes
                                 filters = 64,
                                 kernel_size = [4, 4],
                                 strides = [2, 2],
@@ -83,7 +134,11 @@ class DeepQNetwork():
                                 )
         )
 
+<<<<<<< Updated upstream
         self.conv3 = tf.nn.elu(tf.layers.conv2d(inputs = self.conv2,
+=======
+        conv3 = tf.nn.elu(tf.layers.con2d(inputs = conv2,
+>>>>>>> Stashed changes
                                 filters = 64,
                                 kernel_size = [2, 2],
                                 strides = [1, 1],
@@ -95,22 +150,34 @@ class DeepQNetwork():
         
         # flatten 4 frames to 1
         #  ----- not sure which one works
+<<<<<<< Updated upstream
         self.flatten_frame = tf.contrib.layers.flatten(self.conv3)
         
         # pass frame data through 2 fibre channel (FC) layers
         self.fc1 = tf.layers.dense(inputs = self.flatten_frame,
+=======
+        flatten_frame = tf.contrib.layers.flatten(conv3)
+        
+        # pass frame data through 2 fibre channel (FC) layers
+        fc1 = tf.layers.dense(inputs = flatten_frame,
+>>>>>>> Stashed changes
                             units = 784,
                             activation = tf.nn.elu,
                             kernel_initializer=tf.contrib.layers.xavier_initializer()
                             )
 
+<<<<<<< Updated upstream
         self.fc2 = tf.layers.dense(inputs = self.fc1,
+=======
+        fc2 = tf.layers.dense(inputs = fc1,
+>>>>>>> Stashed changes
                             units = action_size,
                             kernel_initializer=tf.contrib.layers.xavier_initializer()
                             )
 
         # output a Q value for each action
 
+<<<<<<< Updated upstream
         self.q_prediction = tf.reduce_sum(tf.multiply(self.fc2, self.action))
 
         self.loss = tf.reduce_mean(tf.square(self.q_target - self.q_prediction))
@@ -229,6 +296,29 @@ if __name__ == "__main__":
         
 
 
+=======
+        q_prediction = tf.reduce_sum(tf.multiply(fc2, action))
+
+        loss = tf. 
+        
+
+    
+
+
+
+
+
+
+
+
+    def choose_action(self):
+
+
+    def learn(self):
+
+
+    def update_target(self, ):
+>>>>>>> Stashed changes
 
 
 

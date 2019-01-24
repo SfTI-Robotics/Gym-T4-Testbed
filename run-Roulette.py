@@ -1,24 +1,26 @@
 
 import gym
 import numpy as np
-# from /home/lemon740/Gym-T4-Testbed import Roulette
-#this is importing the algorithm which is defined as a class from a diffeerent file
-# make sure file names do not contain '-', or else it will cause errors
-from Roulette import QLearning
-from summary import * 
 import os
 import time
 import datetime
 import sys
 
+# from /home/lemon740/Gym-T4-Testbed import Roulette
+#this is importing the algorithm which is defined as a class from a diffeerent file
+# make sure file names do not contain '-', or else it will cause errors
+from Roulette_brain import Q_Learning
+from summary import * 
+
+
 # Graphing results
 now = datetime.datetime.now()
 
-graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward'], 
+graph = summary(summary_types = ['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'], 
             # the optimal step count of the optimal policy 
-            step_goal = 200, 
+            step_goal = 0, 
             # the maximum reward for the optimal policy
-            reward_goal = 4, 
+            reward_goal = 0, 
             # maximum exploitation value
             epsilon_goal = 0.99,
             # desired name for file
@@ -39,7 +41,7 @@ actions=env.action_space.n
 states=env.observation_space.n
 # the class doesn't take in any parameters but to pass in the action and state space in your class
 #  use the name __init__ with double underscores
-QLearning = QLearning(states, actions)
+QLearning = Q_Learning(states, actions)
 
 for episode in range(EPISODE_NUM):
 
@@ -56,7 +58,7 @@ for episode in range(EPISODE_NUM):
         # roulete doesn't have env.render
 
         #each step you choose action by calling the choose action function in our algorithm file
-        action = QLearning.choose_action(observation,EPISODE_NUM, env)
+        action = QLearning.choose_action(observation, EPISODE_NUM, env) # 
 
         # apply action
         observation_, reward, done, _ = env.step(action)
@@ -69,12 +71,12 @@ for episode in range(EPISODE_NUM):
         observation = observation_
 
         if done:
-            print('Episode =', episode, ',  reward =', episode_rewards)
+            # print('Episode =', episode, ' step =', step,  'reward =', episode_rewards)
             break
     
-    graph.summarize(episode, step, time.time() - start_time, episode_rewards)
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards, QLearning.epsilon)
         
-            
+print(QLearning.q_table)     
 print('game over')
 env.close()
 
