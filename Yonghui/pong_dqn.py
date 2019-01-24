@@ -26,10 +26,10 @@ def StateProcessor(frames_deque, state, is_new_episode):
     # 110x84x1 frame
     frame = transform.resize(normalized_frame, [110,84])
 
-    
+    # 4 frames stacked together as one state
     if is_new_episode:
         # Clear our frames_deque
-        frames_deque = deque([np.zeros((110,84), dtype=np.int) for i in range(stack_size)], maxlen=4)
+        frames_deque = deque([np.zeros((110,84), dtype=np.int) for i in range(4)], maxlen=4)
         
         # Because we're in a new episode, copy the same frame 4x
         frames_deque.append(frame)
@@ -53,19 +53,19 @@ def StateProcessor(frames_deque, state, is_new_episode):
 
 
     
-class DQN():
+class DeepQNetwork():
     def __init__(self, state_size, action_size):
         
         # initialise placeholders for state, action and q-target
         
-        self.state = tf.placeholder(tf.float32, [None, state_size], name = 'state')
+        self.state = tf.placeholder(tf.float32, [None, *state_size], name = 'state')
         self.action = tf.placeholder(tf.float32, [None, action_size], name = 'action')
         self.q_target = tf.placeholder(tf.float32, [None], name = 'q_target')
 
 
         # pass frames through 3 convolutional neural networks (CNN or convnet)
         # (convolutional layers passed into an exponential or rectified linear unit network)
-        self.conv1 = tf.nn.elu(tf.layers.con2d(inputs = self.state,
+        self.conv1 = tf.nn.elu(tf.layers.conv2d(inputs = self.state,
                                 filters = 32,
                                 kernel_size = [8, 8],
                                 strides = [4, 4],
@@ -74,7 +74,7 @@ class DQN():
                                 )
         )
 
-        self.conv2 = tf.nn.elu(tf.layers.con2d(inputs = self.conv1,
+        self.conv2 = tf.nn.elu(tf.layers.conv2d(inputs = self.conv1,
                                 filters = 64,
                                 kernel_size = [4, 4],
                                 strides = [2, 2],
@@ -83,7 +83,7 @@ class DQN():
                                 )
         )
 
-        self.conv3 = tf.nn.elu(tf.layers.con2d(inputs = self.conv2,
+        self.conv3 = tf.nn.elu(tf.layers.conv2d(inputs = self.conv2,
                                 filters = 64,
                                 kernel_size = [2, 2],
                                 strides = [1, 1],
@@ -127,21 +127,25 @@ class trainAgent():
         self.epsilon = 1.0
         self.action_array = [0, 1, 2, 3, 4, 5]
         self.memory_capacity = 1000000 
+        self.batch_size = 64
+        self.gamma = 0.9
 
         env = gym.make('Pong-v0')
+        state_size = [210, 160, 3]
+        action_size = 6
 
-        model = DQN(state_size, action_size)
+        DQN = DeepQNetwork(state_size, action_size)
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
         # Initialize deque with zero-images one array for each image
         frames_deque  =  deque([np.zeros((110,84), dtype=np.int) for i in range(4)], maxlen=4)
-        memory = deque(self.memory_capacity)
+        memory = deque(maxlen = self.memory_capacity)
 
         for episode in range(10000):
 
             state = env.reset()
-            state, frames_deque = StateProcessor(frames_deque, state)
+            state, frames_deque = StateProcessor(frames_deque, state, True)
             
             episode_reward = 0
 
@@ -149,14 +153,14 @@ class trainAgent():
 
                 env.render()
 
-                action = choose_action(state)
+                action = self.choose_action(state, episode)
 
                 next_state, reward, done, _ = env.step(action)
 
                 episode_reward += reward
 
                 if not done: 
-                    next_state, frames_deque = StateProcessor(frames_deque, next_state)
+                    next_state, frames_deque = StateProcessor(frames_deque, next_state, False)
 
                     state = next_state
 
@@ -165,7 +169,7 @@ class trainAgent():
 
                 else: 
                     next_state = np.zeros(state.shape)
-                    next_state, frames_deque = StateProcessor(frames_deque, next_state)
+                    next_state, frames_deque = StateProcessor(frames_deque, next_state, False)
 
                     # store experience transition in memory
                     memory.append( (state, action, reward, next_state, done) )
@@ -189,10 +193,39 @@ class trainAgent():
 
 
     def learn(self):
+        # experience replay
+        batch = memory.sample(batch_size)
 
+        # extract variables from transition
+        states = np.array([each[0] for each in batch])
+        actions = np.array([each[1] for each in batch])
+        rewards = np.array([each[2] for each in batch])
+        next_states = np.array([each[3] for each in batch])
+        done_array = np.array([each[4] for each in batch])
+        q_target_array = []
+        next_q_value = sess.run(DQN.fc2, feed_dict = {DQN.states: next_states})
 
-    def update_target(self, ):
+        # update q_target
+        for sample in range(batch_size):
+            done = done_array[sample]
 
+            if done:
+                q_target_array.append(rewards[sample])
+            else:
+                q_target = rewards[sample] + self.gamma * np.max(next_q_value[sample])
+                q_target_array.append(q_target)
+        
+        q_target = np.array([each for each in q_target_array])
+        loss, optimizer = sess.run([DQN.loss, DQN.optimizer],
+                                        feed_dict={DQN.state: states,
+                                                   DQN.q_target: q_target,
+                                                   DQN.actions: actions})
+
+                      
+    # def update_target(self, ):
+
+if __name__ == "__main__":
+    trainAgent = trainAgent()
         
 
 
