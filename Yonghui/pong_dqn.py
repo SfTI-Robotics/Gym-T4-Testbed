@@ -22,22 +22,25 @@ class DQN:
         # 5. launch session
         sess.run(tf.global_variables_initializer)
 
-        self.neuralNetwork = tensorflowNet()
+        
+        # preprocess frames
 
+        greyscale = rgb2gray(frame)
 
-    # [build network with tf]
-    def tensorflowNet(state_size, 
-                        action_size = 6, ):
+        
 
-        # \\ evaluation net
+        
+
+        
         # initialise placeholders for state, action and q-target
         
-        state = tf.placeholder(tf.float32, [None, *state_size], name = 'state')
+        state = tf.placeholder(tf.float32, [None, state_size], name = 'state')
         action = tf.placeholder(tf.float32, [None, action_size], name = 'action')
         q_target = tf.placeholder(tf.float32, [None], name = 'q_target')
 
         # take a stack of 4 frames as input
         
+
 
 
         # pass frames through 3 convolutional neural networks (CNN or convnet)
@@ -87,6 +90,10 @@ class DQN:
                             )
 
         # output a Q value for each action
+
+        q_prediction = tf.reduce_sum(tf.multiply(fc2, action))
+
+        loss = tf. 
         
 
     

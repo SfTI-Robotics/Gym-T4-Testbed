@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Deep Q Learning with Atari© Space Invaders© 🕹️👾
-
 
 # ## Step 1: Import the libraries 📚
 
@@ -31,7 +29,7 @@ warnings.filterwarnings('ignore')
 # Our Environment is the famous game Atari Space Invaders.
 # 
 # Create our environment
-env = retro.make(game='SpaceInvaders-Atari2600')
+env = gym.make('Pong-v0')
 
 
 print("The size of our frame is: ", env.observation_space)
@@ -51,8 +49,6 @@ possible_actions = np.array(np.identity(env.action_space.n,dtype=int).tolist())
 # - Crop the screen (in our case we remove the part below the player because it does not add any useful information)
 # - We normalize pixel values
 # - Finally we resize the preprocessed frame
-
-# In[3]:
 
 
 """
@@ -116,7 +112,7 @@ def preprocess_frame(frame):
 # <img src="https://raw.githubusercontent.com/simoninithomas/Deep_reinforcement_learning_Course/master/DQN/Space%20Invaders/assets/stack_frames.png" alt="stack">
 # - If we're done, **we create a new stack with 4 new frames (because we are in a new episode)**.
 
-# In[4]:
+# /4]:
 
 
 stack_size = 4 # We stack 4 frames
@@ -157,12 +153,12 @@ def stack_frames(stacked_frames, state, is_new_episode):
 # - First, you begin by defining the neural networks hyperparameters when you implement the model.
 # - Then, you'll add the training hyperparameters when you implement the training algorithm.
 
-# In[5]:
+# /5]:
 
 
 ### MODEL HYPERPARAMETERS
-state_size = [110, 84, 4]      # Our input is a stack of 4 frames hence 110x84x4 (Width, height, channels) 
-action_size = env.action_space.n # 8 possible actions
+state_size = [210, 160, 4]      # Our input is a stack of 4 frames hence 210x160x4 (Width, height, channels) 
+action_size = env.action_space.n # 6 possible actions
 learning_rate =  0.00025      # Alpha (aka learning rate)
 
 ### TRAINING HYPERPARAMETERS
@@ -189,7 +185,7 @@ stack_size = 4                 # Number of frames stacked
 training = False
 
 ## TURN THIS TO TRUE IF YOU WANT TO RENDER THE ENVIRONMENT
-episode_render = False
+episode_render = True
 
 
 # ## Step 5: Create our Deep Q-learning Neural Network model 🧠
@@ -201,7 +197,7 @@ episode_render = False
 # - Finally it passes through 2 FC layers
 # - It outputs a Q value for each actions
 
-# In[6]:
+# /6]:
 
 
 class DQNetwork:
@@ -291,7 +287,7 @@ class DQNetwork:
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
 
-# In[7]:
+# /7]:
 
 
 # Reset the graph
@@ -307,7 +303,7 @@ DQNetwork = DQNetwork(state_size, action_size, learning_rate)
 # 
 # This part was taken from Udacity : <a href="https://github.com/udacity/deep-learning/blob/master/reinforcement/Q-learning-cart.ipynb" Cartpole DQN</a>
 
-# In[8]:
+# /8]:
 
 
 class Memory():
@@ -328,7 +324,7 @@ class Memory():
 
 # Here we'll **deal with the empty memory problem**: we pre-populate our memory by taking random actions and storing the experience (state, action, reward, next_state).
 
-# In[9]:
+# /9]:
 
 
 # Instantiate memory
@@ -343,6 +339,7 @@ for i in range(pretrain_length):
     # Get the next_state, the rewards, done by taking a random action
     choice = random.randint(1,len(possible_actions))-1
     action = possible_actions[choice]
+    print(action)
     next_state, reward, done, _ = env.step(action)
     
     #env.render()
@@ -377,7 +374,7 @@ for i in range(pretrain_length):
 # For more information about tensorboard, please watch this <a href="https://www.youtube.com/embed/eBbEDRsCmv4">excellent 30min tutorial</a> <br><br>
 # To launch tensorboard : `tensorboard --logdir=/tensorboard/dqn/1`
 
-# In[10]:
+# /10]:
 
 
 # Setup TensorBoard Writer
@@ -572,7 +569,7 @@ if training == True:
 # ## Step 9: Test and Watch our Agent play 👀
 # Now that we trained our agent, we can test it
 
-# In[ ]:
+# / ]:
 
 
 with tf.Session() as sess:

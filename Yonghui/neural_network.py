@@ -14,7 +14,6 @@ action space = 6
 def tensorflowNet(state_size, 
                     action_size = 6, ):
 
-    # \\ evaluation net
     # initialise placeholders for state, action and q-target
     
     state = tf.placeholder(tf.float32, [None, *state_size], name = 'state')
