@@ -12,7 +12,7 @@ class neural_net():
     # https://github.com/mtrazzi/spinning-up-a-Pong-AI-with-deep-RL/blob/master/train.ipynb
     # https://github.com/mkturkcan/Keras-Pong/blob/master/keras_pong.py
     def build_dqn(self):
-        model = Sequential(self)
+        model = Sequential()
         model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))
         model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
         model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
