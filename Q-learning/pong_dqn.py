@@ -34,7 +34,7 @@ def StateProcessor(frames_deque, state, is_new_episode):
         # Because we're in a new episode, copy the same frame 4x
         frames_deque.append(frame)
         frames_deque.append(frame)
-        frames_deque.append(frame)
+        frames_deque.append(frame)with-deep-RL/blob/master/train.ipynb
         frames_deque.append(frame)
         
         # Stack the frames
