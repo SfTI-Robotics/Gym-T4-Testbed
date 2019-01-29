@@ -3,15 +3,15 @@
 - setting up benchmark system to run algorithms on various OpenAI environments
 ----------------
 
- 
+
 | Envrionment   | Algorithm |
 | --------------------- | ------------------- |
 | { Toy text } |   NB. *many environments do not render*|
-|- Roulette-v0 |Q Learning|
+|- Roulette-v0      |Q Learning|
 |   |  |
-|{ Atari } ||
-|- Pong-v0 | policy gradient|
-|- SpaceInvaders-v0 |DQN|
+|{ Atari }      ||
+|- Pong-v0        | policy gradient|
+|- SpaceInvaders-v0       |DQN|
 |- MsPacman-v0||
 |- Enduro-v0||
 |- Super mario||
@@ -25,4 +25,4 @@
 |||
 |{ MuJoCo }
 |||
-|{ Robotics } 
+|{ Robotics }
