@@ -1,19 +1,20 @@
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Conv2D
+from abstract_brain import *
 
 
 
-class neural_net():
+class neural_net(AbstractNeuralNetwork):
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space
         self.action_space = action_space
 
-        self.build_dqn()
+        neural_net.build_network(self)
 
     # https://github.com/mtrazzi/spinning-up-a-Pong-AI-with-deep-RL/blob/master/train.ipynb
     # https://github.com/mkturkcan/Keras-Pong/blob/master/keras_pong.py
-    def build_dqn(self):
+    def build_network(self):
         model = Sequential()
         model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))
         model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))

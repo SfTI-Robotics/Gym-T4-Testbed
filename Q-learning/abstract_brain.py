@@ -29,7 +29,13 @@ class AbstractBrainPreProcess(ABC):
     @abstractmethod
     def four_frames_to_state(self, state, is_new_episode): raise NotImplementedError
 
-              
+
+#Neural network abstract class
+class AbstractNeuralNetwork(ABC):
+
+    @abstractmethod
+    def build_network(self): raise NotImplementedError
+            
 
 
 

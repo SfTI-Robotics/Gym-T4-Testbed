@@ -11,7 +11,7 @@ MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 500
-batch_size=80
+BATCH=80
 
                              
 # initialise network
@@ -34,7 +34,7 @@ class Processing(AbstractBrainPreProcess):
 
     def four_frames_to_state(self, state, is_new_episode):
         
-        frame = self.Preprocessing(state)
+        frame = Processing.Preprocessing(state)
 
         if is_new_episode:
             # all frames in new deque are of same state
@@ -60,7 +60,7 @@ class Learning(AbstractBrainLearning):
     def __init__(self, actions):
         
         model = neural_net((80, 80, 1), actions)
-        model.build_dqn()
+        model.build_network()
 
         self.epsilon = 0.1
         self.gamma = 0.95
