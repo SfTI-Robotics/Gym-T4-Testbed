@@ -20,7 +20,7 @@ class neural_net(AbstractNeuralNetwork):
         model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
         model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
         model.add(Flatten())
-    
+
         # hidden layer takes a pre-processed frame as input, and has 200 units
         model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
 
@@ -31,6 +31,4 @@ class neural_net(AbstractNeuralNetwork):
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         # print graph info
-        model.summary()
-
-     
+        # model.summary()
