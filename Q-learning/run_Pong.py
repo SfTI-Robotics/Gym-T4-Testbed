@@ -1,5 +1,5 @@
 import gym
-from Pong_Brain import Processing
+from Pong_Brain import *
 from Pong_Network import *
 
 
@@ -26,8 +26,14 @@ for episode in range(1000):
         next_observation, reward, done, _ = env.step(action)
         next_observation = processor.four_frames_to_state(next_observation)
         learner.transitions.append([observation], action, reward, [next_observation])
-
+                    
+        if done:
+            #call the memory replay function to learn at the end of every episode
+            learner.memory_replay()                                        
+            break
+                
         observation = next_observation
+
 
 
 

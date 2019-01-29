@@ -49,7 +49,7 @@ class Processing():
 
         return stacked_state
 
-    def four_frames_to_nn():
+    # def four_frames_to_nn():
         
                        
 
@@ -58,8 +58,8 @@ class Learning():
 
     def __init__(self, actions):
         
-        nn = neural_net((80, 80, 1), actions)
-        nn.build_dqn()
+        model = neural_net((80, 80, 1), actions)
+        model.build_dqn()
 
         self.epsilon = 0.1
         self.gamma = 0.95
@@ -116,7 +116,7 @@ class Learning():
         done_array = np.array([each[4] for each in batch])
         # q_target_array = []
         next_q_value = 1
-        target = self.model.predict
+        target = self.model.predict()
 
         for sample in range(batch_size):
             done = done_array[sample]
@@ -129,7 +129,7 @@ class Learning():
 
         # calculates loss and does optimisation 
         self.model.fit(state, target, batch_size=self.batch_size,
-                       epochs=1, verbose=0)
+            epochs=1, verbose=0)
 
         
 
