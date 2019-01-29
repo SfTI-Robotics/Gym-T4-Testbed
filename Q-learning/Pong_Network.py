@@ -2,6 +2,8 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Conv2D
 
+
+
 class neural_net():
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space

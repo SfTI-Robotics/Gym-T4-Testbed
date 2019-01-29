@@ -16,16 +16,16 @@ learner = Learning(action_space)
 
 for episode in range(1000):
     observation = env.reset()
-    observation = processor.four_frames_to_state(observation)
+    observation = processor.four_frames_to_state(observation, True)
 
     for step in range(200):
         env.render()
         
-        action= learner.choose_action(observation)
+        action= learner.choose_action(observation, episode)
         
         next_observation, reward, done, _ = env.step(action)
-        next_observation = processor.four_frames_to_state(next_observation)
-        learner.transitions.append([observation], action, reward, [next_observation])
+        next_observation = processor.four_frames_to_state(next_observation, False)
+        learner.transitions.append((observation, action, reward, next_observation))
                     
         if done:
             #call the memory replay function to learn at the end of every episode

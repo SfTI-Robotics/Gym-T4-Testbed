@@ -40,11 +40,7 @@ do
 # checking if the entire file has been readb
 done < "$1"
 
-<<<<<<< Updated upstream
 
 
 #Run the bash file ./NAME_OF_BASH_FILE
-=======
-#Run the bash file, Name of the Bash file with the run command
->>>>>>> Stashed changes
 #if you cant run this just go chmod +x the_file_name

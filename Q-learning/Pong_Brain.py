@@ -5,6 +5,7 @@ from skimage import transform # Help us to preprocess the frames
 from skimage.color import rgb2gray # Help us to gray our frames
 import random
 from Pong_Network import *
+from abstract_brain import *
 
 MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
@@ -18,14 +19,14 @@ batch_size=80
 
 
 
-class Processing():
+class Processing(AbstractBrainPreProcess):
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
 
     def Preproccesing(self, state):
         # grayscale
         frame = rgb2gray(state)   
-        frame=frame[35:195]                    
+        frame=frame[35:195]              #preprocesssing isn'      
         frame = frame / 255.0
         frame= transform.resize(frame,[80,80])                    
 
@@ -53,7 +54,7 @@ class Processing():
         
                        
 
-class Learning():
+class Learning(AbstractBrainLearning):
     
 
     def __init__(self, actions):
