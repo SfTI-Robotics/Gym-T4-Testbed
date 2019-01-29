@@ -5,20 +5,29 @@ from Pong_Network import *
 
 env = gym.make('Pong-v0')
 
+observation_space = env.observation_space.shape[:]
+action_space = env.action_space.shape[:]
 
-# Processing.Preproccesing(env.observation_space.shape[:])
+# initialise 
+processor = Processing()
+learner = Learning(action_space)
 
-nn = neural_net((80, 80, 1), env.action_space.shape[:])
-# nn.build_dqn()
+
 
 for episode in range(1000):
     observation = env.reset()
-
+    observation = processor.four_frames_to_state(observation)
 
     for step in range(200):
         env.render()
         
+        action= learner.choose_action(observation)
         
+        next_observation, reward, done, _ = env.step(action)
+        next_observation = processor.four_frames_to_state(next_observation)
+        learner.transitions.append([observation], action, reward, [next_observation])
+
+        observation = next_observation
 
 
 

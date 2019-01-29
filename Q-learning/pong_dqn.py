@@ -34,7 +34,7 @@ def StateProcessor(frames_deque, state, is_new_episode):
         # Because we're in a new episode, copy the same frame 4x
         frames_deque.append(frame)
         frames_deque.append(frame)
-        frames_deque.append(frame)with-deep-RL/blob/master/train.ipynb
+        frames_deque.append(frame)
         frames_deque.append(frame)
         
         # Stack the frames
@@ -58,7 +58,7 @@ class DeepQNetwork():
         
         # initialise placeholders for state, action and q-target
         
-        self.state = tf.placeholder(tf.float32, [None, *state_size], name = 'state')
+        self.state = tf.placeholder(tf.float32, [None, state_size], name = 'state')
         self.action = tf.placeholder(tf.float32, [None, action_size], name = 'action')
         self.q_target = tf.placeholder(tf.float32, [None], name = 'q_target')
 
