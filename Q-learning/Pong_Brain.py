@@ -3,7 +3,7 @@ import gym
 from collections import deque
 from skimage import transform # Help us to preprocess the frames
 from skimage.color import rgb2gray # Help us to gray our frames
-
+import random
 class Processing():
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
@@ -34,7 +34,30 @@ class Processing():
         stacked_state = np.stack(self.deque, axis = 2)
 
         return stacked_state                        
-            
+
+class Learning():
+
+    def __init__(self, ):
+        
+        self.epsilon = 1.0
+
+
+    def choose_action(self, state, episode):
+        if random.random() < self.epsilon: 
+            action = 0
+        else: 
+            action = 0
+
+        # decay epsilon
+        self.epsilon = 0.1 + (0.99+0.1) * np.exp(-0.995 * episode)
+
+        return action
+
+
+
+    def memory_replay(self, ):
+
+                        
 
 
 
