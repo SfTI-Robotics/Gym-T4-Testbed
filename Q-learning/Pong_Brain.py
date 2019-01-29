@@ -23,7 +23,7 @@ class Processing(AbstractBrainPreProcess):
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
 
-    def Preproccesing(self, state):
+    def Preprocessing(self, state):
         # grayscale
         frame = rgb2gray(state)
         frame=frame[35:195]              #preprocesssing isn'
@@ -34,7 +34,7 @@ class Processing(AbstractBrainPreProcess):
 
     def four_frames_to_state(self, state, is_new_episode):
 
-        frame = Processing.Preprocessing(state)
+        frame = self.Preprocessing(state)
         # frame = self.Preprocessing(self, state)
 
         if is_new_episode:
@@ -47,7 +47,7 @@ class Processing(AbstractBrainPreProcess):
         else:
             self.deque.append(frame)
         # reshape the deque
-        stacked_state = np.stack(self.deque, axis = 2)
+        stacked_state = np.stack(self.deque, axis = 0)
 
         return stacked_state
 

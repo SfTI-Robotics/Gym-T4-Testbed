@@ -1,7 +1,7 @@
 import abc
 
 class AbstractAnimal(object):
-    __metaclass__ = abc.ABCMeta
+    # __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def walk(self):
