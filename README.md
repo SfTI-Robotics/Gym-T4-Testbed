@@ -1,20 +1,11 @@
 # Gym-T4-Testbed
-trying to write our own algorithms for gym environments
-
-
-
+- trying to write our own algorithms for gym environments
+- setting up benchmark system to run algorithms on various OpenAI environments
 ----------------
-Box 2d
-
-DOOM
-
-MuJoCo
-
-Robotics
 
  
 | Envrionment   | Algorithm |
-| ------------- | ------------------- |
+| --------------------- | ------------------- |
 | { Toy text } |   NB. *many environments do not render*|
 |- Roulette-v0 |Q Learning|
 |   |  |
