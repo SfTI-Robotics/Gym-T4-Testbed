@@ -11,7 +11,7 @@ MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 500
-BATCH=80
+batch_size=80
 
 class Processing(AbstractBrainPreProcess):
     def __init__(self):
@@ -54,6 +54,7 @@ class Learning(AbstractBrainLearning):
 
     def __init__(self, actions):
         self.observation_space = (80, 80, 1)
+        # self.state_space = (4, 80, 80, 1)
         self.action_space = actions
 
         self.net = neural_net(self.observation_space, self.action_space)
@@ -86,13 +87,21 @@ class Learning(AbstractBrainLearning):
         # experience replay
         batch = random.sample(self.transitions, batch_size)
 
+        print(type(batch))
 #Option 1
 ###############################################################################################
         
         # initialise arrays
-        states = np.zeros((batch_size, self.observation_space))
-        next_states = np.zeros((batch_size, self.observation_space))
+        states = np.zeros((batch_size, *self.observation_space))
+        next_states = np.zeros((batch_size, *self.observation_space))
         action, reward, done = [], [], []
+
+        print('state:')
+        print(np.shape(states))
+
+        print('batch:')
+        print(np.shape(batch))
+
 
         # extract variables from transition
         # extract seperate s,a,r.s'
