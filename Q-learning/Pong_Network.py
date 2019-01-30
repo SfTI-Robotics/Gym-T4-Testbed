@@ -15,7 +15,7 @@ class neural_net(AbstractNeuralNetwork):
 
     def build_network(self):
         
-        
+
         # 3 layers of convolutional networks
         # padding is added so that information is not loss when the kernal size is smaller
         self.model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))

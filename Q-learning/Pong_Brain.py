@@ -20,17 +20,17 @@ class Processing(AbstractBrainPreProcess):
     def Preprocessing(self, state):
         # grayscale
         frame = rgb2gray(state)
-        frame=frame[35:195]              #preprocesssing isn'
+        frame=frame[35:195]              
         frame = frame / 255.0
-        frame= transform.resize(frame,[80,80])
+        frame= transform.resize(frame,[80,80,1])
 
+        return frame
 
 
     def four_frames_to_state(self, state, is_new_episode):
-
+        
         frame = self.Preprocessing(state)
         # frame = self.Preprocessing(self, state)
-
         if is_new_episode:
             # all frames in new deque are of same state
             self.deque.append(frame)
@@ -40,6 +40,7 @@ class Processing(AbstractBrainPreProcess):
 
         else:
             self.deque.append(frame)
+            
         # reshape the deque
         stacked_state = np.stack(self.deque, axis = 0)
 
@@ -65,8 +66,6 @@ class Learning(AbstractBrainLearning):
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
-        print(state)
-        # e-greedy algorithm to choose actions
         if random.random() < self.epsilon:
             action = random.randrange(self.action_space)
         else:
