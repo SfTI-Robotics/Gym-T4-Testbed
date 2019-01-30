@@ -13,12 +13,6 @@ REWARD_DECAY = 0.9
 START_TRAINING = 500
 BATCH=80
 
-
-# initialise network
-
-
-
-
 class Processing(AbstractBrainPreProcess):
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
@@ -58,10 +52,11 @@ class Learning(AbstractBrainLearning):
 
 
     def __init__(self, actions):
+        self.observation_space = (80, 80, 1)
+        self.action_space = actions
 
-        model = neural_net((80, 80, 1), actions)
-        # model.build_network()
-
+        self.net = neural_net(self.observation_space, self.action_space)
+        
         self.epsilon = 0.1
         self.gamma = 0.95
         self.alpha = 0.86
@@ -70,12 +65,12 @@ class Learning(AbstractBrainLearning):
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
-
+        print(state)
         # e-greedy algorithm to choose actions
         if random.random() < self.epsilon:
-            action = 0
+            action = random.randrange(self.action_space)
         else:
-            action = 0
+            action = np.argmax(self.net.model.predict(state))
 
         # decay epsilon
         self.epsilon = 0.01 + (0.99+0.01) * np.exp(-0.995 * episode)
@@ -89,45 +84,56 @@ class Learning(AbstractBrainLearning):
         if len(self.transitions) < START_TRAINING:
             return
 
-        # extract seperate s,a,r.s'
-        # q target update
-        # run graph
-
         # experience replay
         batch = random.sample(self.transitions, batch_size)
 
-
-        update_input = np.zeros((BATCH_SIZE, self.observation_space))
-        update_target = np.zeros((BATCH_SIZE, self.observation_space))
+#Option 1
+###############################################################################################
+        
+        # initialise arrays
+        states = np.zeros((batch_size, self.observation_space))
+        next_states = np.zeros((batch_size, self.observation_space))
         action, reward, done = [], [], []
 
-        # for i in range(BATCH_SIZE):
-        #     update_input[i] = batch[i][0]
-        #     action.append(batch[i][1])
-        #     reward.append(batch[i][2])
-        #     update_target[i] = batch[i][3]
-        #     done.append(batch[i][4])
-
-
         # extract variables from transition
-        states = np.array([each[0] for each in batch])
-        actions = np.array([each[1] for each in batch])
-        rewards = np.array([each[2] for each in batch])
-        next_states = np.array([each[3] for each in batch])
-        done_array = np.array([each[4] for each in batch])
-        # q_target_array = []
-        next_q_value = 1
-        target = self.model.predict()
+        # extract seperate s,a,r.s'
+        for i in range(batch_size):
+            states[i] = batch[i][0]
+            action.append(batch[i][1])
+            reward.append(batch[i][2])
+            next_states[i] = batch[i][3]
+            done.append(batch[i][4])
 
+         # q target update
+        
+        target = self.net.model.predict(states)
+        target_next = self.net.model.predict(next_states)
+###############################################################################################
+
+#Option 2
+###############################################################################################
+        
+        # states = np.array([each[0] for each in batch])
+        # actions = np.array([each[1] for each in batch])
+        # rewards = np.array([each[2] for each in batch])
+        # next_states = np.array([each[3] for each in batch])
+        # done_array = np.array([each[4] for each in batch])
+        # q_target_array = []
+        # next_q_value = 1
+
+        # target = self.model.predict(states)
+        # target_next = self.model.predict(next_states)
+###############################################################################################
         for sample in range(batch_size):
+            # check if transition was at end of episode
             done = done_array[sample]
             if done:
-                q_target_array.append(rewards[sample])
-                self.model.fit()
+                target[sample][action[sample]] = rewards[sample]
             else:
-                q_target = rewards[sample] + self.gamma * np.max(next_q_value[sample])
-                q_target_array.append(q_target)
+                # Bellman Equation
+                target[sample][action[sample]] = rewards[sample] + self.gamma * np.max(target_next[sample])
 
         # calculates loss and does optimisation
-        self.model.fit(state, target, batch_size=self.batch_size,
+        # run graph
+        self.net.model.fit(state, target, batch_size=self.batch_size,
             epochs=1, verbose=0)

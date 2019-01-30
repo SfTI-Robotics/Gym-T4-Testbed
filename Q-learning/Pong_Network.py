@@ -9,26 +9,30 @@ class neural_net(AbstractNeuralNetwork):
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space
         self.action_space = action_space
-
+        self.model = Sequential()
+        # initialise network object
         neural_net.build_network(self)
 
-    # https://github.com/mtrazzi/spinning-up-a-Pong-AI-with-deep-RL/blob/master/train.ipynb
-    # https://github.com/mkturkcan/Keras-Pong/blob/master/keras_pong.py
     def build_network(self):
-        model = Sequential()
-        model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))
-        model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
-        model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
-        model.add(Flatten())
+        
+        
+        # 3 layers of convolutional networks
+        # padding is added so that information is not loss when the kernal size is smaller
+        self.model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))
+        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
+        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
+        # convert image from 3D to 1D
+        self.model.add(Flatten())
 
         # hidden layer takes a pre-processed frame as input, and has 200 units
-        model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
+        #  fibre channel layer 1
+        self.model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
-        model.add(Dense(units=1, activation='sigmoid', kernel_initializer='RandomNormal'))
+        self.model.add(Dense(units=1, activation='sigmoid', kernel_initializer='RandomNormal'))
 
         # compile the model using traditional Machine Learning losses and optimizers
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         # print graph info
-        # model.summary()
+        # self.model.summary()
