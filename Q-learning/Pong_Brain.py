@@ -11,7 +11,7 @@ MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 500
-batch_size=80
+batch_size=32
 
 class Processing(AbstractBrainPreProcess):
     def __init__(self):
@@ -54,7 +54,7 @@ class Learning(AbstractBrainLearning):
 
     def __init__(self, actions):
         self.observation_space = (80, 80, 1)
-        # self.state_space = (4, 80, 80, 1)
+        self.state_space = (4, 80, 80, 1)
         self.action_space = actions
 
         self.net = neural_net(self.observation_space, self.action_space)
@@ -92,10 +92,10 @@ class Learning(AbstractBrainLearning):
 ###############################################################################################
         
         # initialise arrays
-        states = np.zeros((batch_size, *self.observation_space))
-        next_states = np.zeros((batch_size, *self.observation_space))
+        states = np.zeros((batch_size, *self.state_space)) 
+        next_states = np.zeros((batch_size, *self.state_space))
         action, reward, done = [], [], []
-
+        target, target_next = [], []
         print('state:')
         print(np.shape(states))
 
@@ -110,12 +110,17 @@ class Learning(AbstractBrainLearning):
             action.append(batch[i][1])
             reward.append(batch[i][2])
             next_states[i] = batch[i][3]
-            done.append(batch[i][4])
-
+            done.append(batch[i][4])  
+            q = self.net.model.predict(states[i])
+            print(q)
+            target.append(q)
+            target_next.append(self.net.model.predict(next_states[i]))
          # q target update
         
-        target = self.net.model.predict(states)
-        target_next = self.net.model.predict(next_states)
+        print(np.shape(target))
+        print('CHECK POINT')
+        # target = self.net.model.predict(states)
+        # target_next = self.net.model.predict(next_states)
 ###############################################################################################
 
 #Option 2
@@ -134,12 +139,12 @@ class Learning(AbstractBrainLearning):
 ###############################################################################################
         for sample in range(batch_size):
             # check if transition was at end of episode
-            done = done_array[sample]
-            if done:
-                target[sample][action[sample]] = rewards[sample]
+            is_done = done[sample]
+            if is_done:
+                target[sample][action[sample]] = reward[sample]
             else:
                 # Bellman Equation
-                target[sample][action[sample]] = rewards[sample] + self.gamma * np.max(target_next[sample])
+                target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
 
         # calculates loss and does optimisation
         # run graph
