@@ -11,7 +11,7 @@ MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 500
-batch_size=32
+batch_size=10
 
 class Processing(AbstractBrainPreProcess):
     def __init__(self):
@@ -68,7 +68,7 @@ class Learning(AbstractBrainLearning):
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
         if random.random() < self.epsilon:
-            action = random.randrange(self.action_space)
+            action = random.randrange(0, 4)#self.action_space
         else:
             action = np.argmax(self.net.model.predict(state))
 
@@ -107,6 +107,8 @@ class Learning(AbstractBrainLearning):
         # extract seperate s,a,r.s'
         for i in range(batch_size):
             states[i] = batch[i][0]
+            print('action: ')
+            print(batch[i][1])
             action.append(batch[i][1])
             reward.append(batch[i][2])
             next_states[i] = batch[i][3]
@@ -146,7 +148,8 @@ class Learning(AbstractBrainLearning):
                 # Bellman Equation
                 target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
 
+            self.net.model.fit(states[sample], target[sample], batch_size=batch_size,
+            epochs=1, verbose=0)
         # calculates loss and does optimisation
         # run graph
-        self.net.model.fit(state, target, batch_size=self.batch_size,
-            epochs=1, verbose=0)
+        
