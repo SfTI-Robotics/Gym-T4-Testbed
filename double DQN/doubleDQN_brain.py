@@ -19,7 +19,8 @@ class Processing(AbstractBrainPreProcess):
         frame = rgb2gray(state)
         frame=frame[8:-12,4:-12]            
         frame = frame / 255.0
-        frame= transform.resize(frame,[80,80])
+        frame= transform.resize(frame,[frame_size])
+        return frame 
 
     def four_frame_to_state(self, frame, is_new_episode):
         frame = self.Preprocessing(state)
