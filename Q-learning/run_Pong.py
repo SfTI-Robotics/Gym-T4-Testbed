@@ -23,6 +23,7 @@ for episode in range(1000):
     while True:
         env.render()
       
+        print(observation.shape[:])
         action= learner.choose_action(observation, episode)
 
         next_observation, reward, done, _ = env.step(action)

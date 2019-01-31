@@ -18,9 +18,9 @@ class neural_net(AbstractNeuralNetwork):
 
         # 3 layers of convolutional networks
         # padding is added so that information is not loss when the kernal size is smaller
-        self.model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space))
-        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
-        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu'))
+        self.model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_last'))
+        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu', data_format='channels_last'))
+        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu', data_format='channels_last'))
         # convert image from 3D to 1D
         self.model.add(Flatten())
 
@@ -29,7 +29,7 @@ class neural_net(AbstractNeuralNetwork):
         self.model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
-        self.model.add(Dense(units=1, activation='sigmoid', kernel_initializer='RandomNormal'))
+        self.model.add(Dense(units=self.action_space, activation='sigmoid', kernel_initializer='RandomNormal'))
 
         # compile the model using traditional Machine Learning losses and optimizers
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])

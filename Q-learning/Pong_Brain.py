@@ -22,7 +22,8 @@ class Processing(AbstractBrainPreProcess):
         frame = rgb2gray(state)
         frame=frame[35:195]              
         frame = frame / 255.0
-        frame= transform.resize(frame,[80,80,1])
+        frame= transform.resize(frame,[80,80])
+        # frame = np.expand_dims(frame, axis=2)
 
         return frame
 
@@ -30,6 +31,7 @@ class Processing(AbstractBrainPreProcess):
     def four_frames_to_state(self, state, is_new_episode):
         
         frame = self.Preprocessing(state)
+        print(frame.shape[:])
         # frame = self.Preprocessing(self, state)
         if is_new_episode:
             # all frames in new deque are of same state
@@ -42,7 +44,7 @@ class Processing(AbstractBrainPreProcess):
             self.deque.append(frame)
             
         # reshape the deque
-        stacked_state = np.stack(self.deque, axis = 0)
+        stacked_state = np.stack(self.deque, axis = 2)
 
         return stacked_state
 
@@ -53,8 +55,8 @@ class Learning(AbstractBrainLearning):
 
 
     def __init__(self, actions):
-        self.observation_space = (80, 80, 1)
-        self.state_space = (4, 80, 80, 1)
+        self.observation_space = (80, 80, 4)
+        self.state_space = (80, 80, 4)
         self.action_space = actions
 
         self.net = neural_net(self.observation_space, self.action_space)
@@ -68,9 +70,9 @@ class Learning(AbstractBrainLearning):
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
         if random.random() < self.epsilon:
-            action = random.randrange(0, 4)#self.action_space
+            action = random.randrange(self.action_space)#self.action_space
         else:
-            action = np.argmax(self.net.model.predict(state))
+            action = np.argmax(self.net.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
         self.epsilon = 0.01 + (0.99+0.01) * np.exp(-0.995 * episode)
@@ -94,35 +96,35 @@ class Learning(AbstractBrainLearning):
         # initialise arrays
         states = np.zeros((batch_size, *self.state_space)) 
         next_states = np.zeros((batch_size, *self.state_space))
+        # states = []
+        # next_states = []
         action, reward, done = [], [], []
-        target, target_next = [], []
+        # target, target_next = [], []
+        
+
+
+        # extract variables from transition
+        # extract seperate s,a,r.s'
+        for i in range(batch_size):
+            states[i] = np.array(batch[i][0])
+            action.append(batch[i][1])
+            reward.append(batch[i][2])
+            next_states[i] = np.array(batch[i][3])
+            done.append(batch[i][4])  
+         # q target update
+        
         print('state:')
         print(np.shape(states))
 
         print('batch:')
         print(np.shape(batch))
 
-
-        # extract variables from transition
-        # extract seperate s,a,r.s'
-        for i in range(batch_size):
-            states[i] = batch[i][0]
-            print('action: ')
-            print(batch[i][1])
-            action.append(batch[i][1])
-            reward.append(batch[i][2])
-            next_states[i] = batch[i][3]
-            done.append(batch[i][4])  
-            q = self.net.model.predict(states[i])
-            print(q)
-            target.append(q)
-            target_next.append(self.net.model.predict(next_states[i]))
-         # q target update
-        
-        print(np.shape(target))
+        # print(np.shape(target))
         print('CHECK POINT')
-        # target = self.net.model.predict(states)
-        # target_next = self.net.model.predict(next_states)
+        target = self.net.model.predict(states, batch_size=batch_size)
+        target_next = self.net.model.predict(next_states, batch_size=batch_size)
+        print(target)
+        print("CHECK POINT 2")
 ###############################################################################################
 
 #Option 2
@@ -148,8 +150,9 @@ class Learning(AbstractBrainLearning):
                 # Bellman Equation
                 target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
 
-            self.net.model.fit(states[sample], target[sample], batch_size=batch_size,
-            epochs=1, verbose=0)
+            
+        print(target.shape[:])
         # calculates loss and does optimisation
         # run graph
-        
+        self.net.model.fit(states, target, batch_size=batch_size,
+        epochs=1, verbose=0)
