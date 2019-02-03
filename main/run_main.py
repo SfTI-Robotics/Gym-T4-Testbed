@@ -4,10 +4,13 @@ this is the universal run script for all environments
 """
 # print("enter -h for options you can enter")
 from summary import summary 
+import time
+import datetime
 # Graphing results
+results = True
 now = datetime.datetime.now()
 
-graph = summary(summary_types = ['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'], 
+graph = summary(summary_types = ['sumiz_time', 'sumiz_step', 'sumiz_reward'], 
             # the optimal step count of the optimal policy 
             step_goal = 0, 
             # the maximum reward for the optimal policy
@@ -17,7 +20,7 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'],
             # desired name for file
             NAME = "Pong-v0-" + str(now), 
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/main"
+            SAVE_PATH = "/Gym-T4-Testbed/main/"
     )
 
 import argparse
@@ -97,9 +100,13 @@ for episode in range(1000):
 
     observation  = processor.four_frames_to_state(observation, True)
     
-    if summary == True:
+    if results == True:
         start_time = time.time()
         episode_rewards = 0
+        start_time = time.time()
+    
+    step = 0
+
 
     while True:
         env.render()
@@ -117,8 +124,11 @@ for episode in range(1000):
             break
 
         observation = next_observation
+        step += 1
 
-# ================
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards)
+   
+env.close()
 
 
 

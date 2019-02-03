@@ -11,7 +11,7 @@ from os.path import expanduser
 home = expanduser("~")
 
 # update frequency
-FREQUENCY = 5
+FREQUENCY = 1
 
 EPISODE_MIN = 0
 EPISODE_MAX = 500
