@@ -1,14 +1,23 @@
+import numpy as np
+import random
+from collections import deque
 
 
-class Learning(AbstractBrainLearning):
+MAX_MEMORY_LENGTH = 5000
+LEARNING_RATE = 0.01
+REWARD_DECAY = 0.9
+START_TRAINING = 500
+batch_size=10
+
+class Learning():
 
 
-    def __init__(self, actions):
-        self.observation_space = (80, 80, 4)
-        self.state_space = (80, 80, 4)
+    def __init__(self,observations, actions, network):
+        self.state_space = observations 
         self.action_space = actions
 
-        self.net = neural_net(self.observation_space, self.action_space)
+        self.network = network
+        # self.net = neural_net(self.observation_space, self.action_space)
         
         self.epsilon = 0.1
         self.gamma = 0.95
@@ -21,7 +30,9 @@ class Learning(AbstractBrainLearning):
         if random.random() < self.epsilon:
             action = random.randrange(self.action_space)#self.action_space
         else:
-            action = np.argmax(self.net.model.predict(np.expand_dims(state, axis = 0)))
+            print('state=', np.shape(state))
+            print('predict =', np.shape(np.expand_dims(state, axis = 0)))
+            action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
         self.epsilon = 0.01 + (0.99+0.01) * np.exp(-0.995 * episode)
@@ -37,8 +48,10 @@ class Learning(AbstractBrainLearning):
 
         # experience replay
         batch = random.sample(self.transitions, batch_size)
+        # print("batch = ", np.shape(batch))
 ###############################################################################################
         
+        # print("STATE_SPACE=", self.state_space)
         # initialise arrays
         states = np.zeros((batch_size, *self.state_space)) 
         next_states = np.zeros((batch_size, *self.state_space))
@@ -50,13 +63,14 @@ class Learning(AbstractBrainLearning):
         # extract seperate s,a,r.s'
         for i in range(batch_size):
             states[i] = np.array(batch[i][0])
+            # print('state_batch=', np.shape(states[i]))
             action.append(batch[i][1])
             reward.append(batch[i][2])
             next_states[i] = np.array(batch[i][3])
             done.append(batch[i][4])  
 
-        target = self.net.model.predict(states, batch_size=batch_size)
-        target_next = self.net.model.predict(next_states, batch_size=batch_size)
+        target = self.network.model.predict(states, batch_size=batch_size)
+        target_next = self.network.model.predict(next_states, batch_size=batch_size)
 ###############################################################################################
 
         for sample in range(batch_size):
@@ -72,5 +86,5 @@ class Learning(AbstractBrainLearning):
         # print(target.shape[:])
         # calculates loss and does optimisation
         # run graph
-        self.net.model.fit(states, target, batch_size=batch_size,
+        self.network.model.fit(states, target, batch_size=batch_size,
         epochs=1, verbose=0)

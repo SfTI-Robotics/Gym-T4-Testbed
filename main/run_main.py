@@ -4,6 +4,8 @@ this is the universal run script for all environments
 """
 print("enter -h for options you can enter")
 import argparse
+import sys
+import numpy as np
 from argparse import RawTextHelpFormatter
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument("-algorithm", help="select a algorithm: \n QLearning \n DQN \n DoubleDQN \n DuellingDQN \n DDDQN")
@@ -19,7 +21,7 @@ if args.environment == 'Pong-v0':
     import Preprocess.Pong_Preprocess as preprocess
     print('Pong works')
 elif args.environment == 'SpaceInvaders-v0':
-    import Preprocess.SpaceInvaders_Preprocess as preprocess
+    import Preprocess.SpaceInvadersneural_net_Preprocess as preprocess
     print('SpaceInvaders works')
 elif args.environment == 'MsPacman-v0':
     import Preprocess.MsPacman_Preprocess as preprocess
@@ -56,23 +58,25 @@ else :
 # 
 import gym
 
-env = gym.make('Pong-v0')
+env = gym.make(args.environment)
 
-observation_space = env.observation_space.shape[:]
-action_space = (env.action_space.n)
+action_space = env.action_space.n
 
 
 # initialise objects
-processor = Processing()
-learner = Learning(action_space)
+processor = preprocess.Processing()
+state_space = processor.get_state_space()
+# print('state=', state_space)
+neuralNet = network.neural_net(state_space, action_space)
+learner = brain.Learning(state_space, action_space, neuralNet)
 
-
+print("initialisation complete, start training")
 
 for episode in range(1000):
     observation = env.reset()
 
-    observation = processor.four_frames_to_state(observation, True)
-  
+    observation  = processor.four_frames_to_state(observation, True)
+    # print('OBS=', np.shape(observation))
     while True:
         env.render()
       

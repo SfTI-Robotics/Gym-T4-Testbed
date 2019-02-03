@@ -35,4 +35,4 @@ class neural_net(AbstractNeuralNetwork):
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         # print graph info
-        # self.model.summary()
+        self.model.summary()
