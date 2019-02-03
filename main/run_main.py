@@ -16,13 +16,13 @@ args = parser.parse_args()
 
 # Preprocessing folder
 if args.environment == 'Pong-v0':
-    import Preprocess.Pong_Preprocess
+    import Preprocess.Pong_Preprocess as preprocess
     print('Pong works')
 elif args.environment == 'SpaceInvaders-v0':
-    import Preprocess.SpaceInvaders_Preprocess
+    import Preprocess.SpaceInvaders_Preprocess as preprocess
     print('SpaceInvaders works')
 elif args.environment == 'MsPacman-v0':
-    import Preprocess.MsPacman_Preprocess
+    import Preprocess.MsPacman_Preprocess as preprocess
     print('MsPacman works')
 else :
 
@@ -30,24 +30,63 @@ else :
 
 # # Brain and Network folder
 if args.algorithm == 'QLearning':
-    import Q_table.Brain
-    import Q_table.Network
+    import Q_table.Brain as brain
+    import Q_table.Network as network
     print('Q tables work')
 elif args.algorithm == 'DQN':
-    import DQN.Brain
-    import DQN.Network
+    import DQN.Brain as brain
+    import DQN.Network as network
     print('DQN works')
 elif args.algorithm == 'DoubleDQN':
-    import Double_DQN.Brain
-    import Double_DQN.Network
+    import Double_DQN.Brain as brain
+    import Double_DQN.Network as network
     print('Double works')
 elif args.algorithm == 'DuellingDQN':
-    import Dueling_DQN.Brain
-    import Dueling_DQN.Network
+    import Dueling_DQN.Brain as brain
+    import Dueling_DQN.Network as network
     print('Dueling works')
 elif args.algorithm == 'DDDQN':
-    import DDDQN_PER.Brain
-    import DDDQN_PER.Network
+    import DDDQN_PER.Brain as brain
+    import DDDQN_PER.Network as network
     print('PER works')
 else :
     print("Algorithm not found")
+
+# ==================================================
+# 
+import gym
+
+env = gym.make('Pong-v0')
+
+observation_space = env.observation_space.shape[:]
+action_space = (env.action_space.n)
+
+
+# initialise objects
+processor = Processing()
+learner = Learning(action_space)
+
+
+
+for episode in range(1000):
+    observation = env.reset()
+
+    observation = processor.four_frames_to_state(observation, True)
+  
+    while True:
+        env.render()
+      
+        print(observation.shape[:])
+        action= learner.choose_action(observation, episode)
+
+        next_observation, reward, done, _ = env.step(action)
+        next_observation = processor.four_frames_to_state(next_observation, False)
+        learner.transitions.append((observation, action, reward, next_observation, done))
+
+        if done:
+            print('Completed Episode ' + str(episode))
+            #call the memory replay function to learn at the end of every episode
+            learner.memory_replay()
+            break
+
+        observation = next_observation
