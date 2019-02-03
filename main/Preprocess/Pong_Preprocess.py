@@ -15,15 +15,11 @@ class Processing:
         frame=frame[35:195]              
         frame = frame / 255.0
         frame= transform.resize(frame,[80,80])
-        # print('frame=', frame.shape[:])
         return frame
 
 
     def four_frames_to_state(self, state, is_new_episode):
-        # print('state  ', np.shape(state))
         frame = self.Preprocessing(state)
-        # print('frame = ', frame.shape[:])
-        # frame = self.Preprocessing(self, state)
         if is_new_episode:
             # all frames in new deque are of same state
             self.deque.append(frame)
@@ -33,12 +29,10 @@ class Processing:
 
         else:
             self.deque.append(frame)
-        # print('deque=', np.shape(self.deque))
         # reshape the deque
         stacked_state = np.stack(self.deque, axis = 0)
-        # print('stack=', np.shape(stacked_state))
         return stacked_state
 
     def get_state_space(self):
         return np.shape(self.deque) 
-        # .shape[:]
+ 

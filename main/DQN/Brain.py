@@ -28,10 +28,8 @@ class Learning():
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
         if random.random() < self.epsilon:
-            action = random.randrange(self.action_space)#self.action_space
+            action = random.randrange(self.action_space)
         else:
-            print('state=', np.shape(state))
-            print('predict =', np.shape(np.expand_dims(state, axis = 0)))
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
@@ -48,10 +46,7 @@ class Learning():
 
         # experience replay
         batch = random.sample(self.transitions, batch_size)
-        # print("batch = ", np.shape(batch))
 ###############################################################################################
-        
-        # print("STATE_SPACE=", self.state_space)
         # initialise arrays
         states = np.zeros((batch_size, *self.state_space)) 
         next_states = np.zeros((batch_size, *self.state_space))
@@ -63,7 +58,6 @@ class Learning():
         # extract seperate s,a,r.s'
         for i in range(batch_size):
             states[i] = np.array(batch[i][0])
-            # print('state_batch=', np.shape(states[i]))
             action.append(batch[i][1])
             reward.append(batch[i][2])
             next_states[i] = np.array(batch[i][3])
@@ -82,8 +76,6 @@ class Learning():
                 # Bellman Equation
                 target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
 
-            
-        # print(target.shape[:])
         # calculates loss and does optimisation
         # run graph
         self.network.model.fit(states, target, batch_size=batch_size,
