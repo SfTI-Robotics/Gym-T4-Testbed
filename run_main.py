@@ -113,7 +113,7 @@ for episode in range(1000):
     while True:
         env.render()
 
-        action= learner.choose_action(observation, step)
+        action= learner.choose_action(observation, episode)
 
         next_observation, reward, done, _ = env.step(action)
         next_observation = processor.four_frames_to_state(next_observation, False)
