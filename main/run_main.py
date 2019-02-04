@@ -7,10 +7,9 @@ from summary import summary
 import time
 import datetime
 # Graphing results
-results = True
 now = datetime.datetime.now()
 
-graph = summary(summary_types = ['sumiz_time', 'sumiz_step', 'sumiz_reward'], 
+graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'], 
             # the optimal step count of the optimal policy 
             step_goal = 0, 
             # the maximum reward for the optimal policy
@@ -97,17 +96,12 @@ print("initialisation complete, start training")
 for episode in range(1000):
     
     observation = env.reset()
-
     observation  = processor.four_frames_to_state(observation, True)
     
-    if results == True:
-        start_time = time.time()
-        episode_rewards = 0
-        start_time = time.time()
-    
+    start_time = time.time()
+    episode_rewards = 0
     step = 0
-
-
+    
     while True:
         env.render()
 
@@ -129,7 +123,7 @@ for episode in range(1000):
         observation = next_observation
         
 
-    graph.summarize(episode, step, time.time() - start_time, episode_rewards)
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
    
 env.close()
 

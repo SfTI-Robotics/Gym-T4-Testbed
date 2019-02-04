@@ -14,16 +14,16 @@ home = expanduser("~")
 FREQUENCY = 1
 
 EPISODE_MIN = 0
-EPISODE_MAX = 5000
+EPISODE_MAX = 30
 
-STEP_MIN_M = 0
-STEP_MAX_M = 1500
+STEP_MIN_M = -1
+STEP_MAX_M = 3000
 
 TIME_MIN_M = 0
-TIME_MAX_M = 5
+TIME_MAX_M = 40
 
-REWARD_MIN_M = -22
-REWARD_MAX_M = 22
+REWARD_MIN_M = -35
+REWARD_MAX_M = 35
 
 STEP_MIN_F = 3
 STEP_MAX_F = 12
@@ -101,10 +101,10 @@ class summary:
             return
 
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if len(os.listdir(home + self.save_path) ) != 0:
-            filelist = [ f for f in os.listdir(home + self.save_path) if f.endswith(".png") ]
-            for f in filelist:
-                os.remove(os.path.join(home + self.save_path, f))
+        # if len(os.listdir(home + self.save_path) ) != 0:
+        #     filelist = [ f for f in os.listdir(home + self.save_path) if f.endswith(".png") ]
+        #     for f in filelist:
+        #         os.remove(os.path.join(home + self.save_path, f))
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         self.num_focus_axes = 0
