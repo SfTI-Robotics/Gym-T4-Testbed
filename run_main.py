@@ -85,7 +85,7 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # desired name for file
             NAME = "Pong-v0-" + str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/",
+            SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs",
 
             EPISODE_MAX = int(args.episodes),
 
