@@ -27,7 +27,7 @@ class Learning():
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
-        if random.random() < self.epsilon:
+        if random.random() > self.epsilon:
             action = random.randrange(self.action_space)
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))

@@ -121,6 +121,19 @@ for episode in range(1000):
 
         step += 1
         episode_rewards += reward
+
+        # store model weights and parameters when episode rewards are above a certain amount 
+        # and after every number of episodes
+        #  === change reward threshold
+        if (episode_rewards >= -1) or (episode % 5 == 0):
+            # neuralNet.save(
+            #     neuralNet.model,
+            #     "./temp_Models/",
+            #     overwrite=True,
+            #     include_optimizer=True
+            # )
+            neuralNet.model.save_weights('./temp_Models/model.h5')
+
         if done:
             print('Completed Episode ' + str(episode))
             print('reward =', episode_rewards, 'steps =', step)
