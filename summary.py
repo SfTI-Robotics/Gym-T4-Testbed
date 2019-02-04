@@ -14,16 +14,10 @@ home = expanduser("~")
 FREQUENCY = 1
 
 EPISODE_MIN = 0
-EPISODE_MAX = 30
 
 STEP_MIN_M = -1
-STEP_MAX_M = 3000
 
 TIME_MIN_M = 0
-TIME_MAX_M = 40
-
-REWARD_MIN_M = -35
-REWARD_MAX_M = 35
 
 STEP_MIN_F = 3
 STEP_MAX_F = 12
@@ -53,7 +47,17 @@ class summary:
             # desired name for file
             NAME = "default_image", 
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = home
+            SAVE_PATH = home,
+
+            EPISODE_MAX = 100,
+
+            STEP_MAX_M = 500,
+
+            TIME_MAX_M = 120,
+
+            REWARD_MIN_M = -100,
+
+            REWARD_MAX_M = 100
     ):
 
         self.summary_types = summary_types

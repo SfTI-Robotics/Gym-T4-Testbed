@@ -4,10 +4,14 @@ from skimage.color import rgb2gray # Help us to gray our frames
 import numpy as np
 
 
-
 class Processing:
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
+        self.step_max = 3000
+        self.time_max = 40
+        self.reward_min = -35                        
+        self.reward_max= 35
+
 
     def Preprocessing(self, state):
         # grayscale
@@ -35,4 +39,6 @@ class Processing:
 
     def get_state_space(self):
         return np.shape(self.deque) 
+
+    
  

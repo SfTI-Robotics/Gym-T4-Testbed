@@ -3,24 +3,7 @@ this is the universal run script for all environments
 
 """
 # print("enter -h for options you can enter")
-from summary import summary 
-import time
-import datetime
-# Graphing results
-now = datetime.datetime.now()
 
-graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'], 
-            # the optimal step count of the optimal policy 
-            step_goal = 0, 
-            # the maximum reward for the optimal policy
-            reward_goal = 0, 
-            # maximum exploitation value
-            epsilon_goal = 0.99,
-            # desired name for file
-            NAME = "Pong-v0-" + str(now),   
-            # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/main/"
-    )
 
 import argparse
 import sys
@@ -30,11 +13,14 @@ import gym
 
 from argparse import RawTextHelpFormatter
 
+from summary import summary 
+import time
+import datetime
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
 parser.add_argument("-algorithm", help="select a algorithm: \n QLearning \n DQN \n DoubleDQN \n DuellingDQN \n DDDQN")
 parser.add_argument("-environment", help="select a environment: \n Pong-v0 \n SpaceInvaders-v0 \n MsPacman-v0")
 # add global variables
-# parser.add_argument("-episodes", help="select number of episodes")
+parser.add_argument("-episodes", help="select number of episodes to graph")
 # parser.add_argument("-steps", help="select number of steps")
 
 args = parser.parse_args()
@@ -77,19 +63,45 @@ elif args.algorithm == 'DDDQN':
 else :
     print("Algorithm not found")
 
+# initialise objects
+processor = preprocess.Processing()
+state_space = processor.get_state_space()
+neuralNet = network.neural_net(state_space, action_space)
+learner = brain.Learning(state_space, action_space, neuralNet)
+
+# Graphing results
+now = datetime.datetime.now()
+
+
+
+graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'], 
+            # the optimal step count of the optimal policy 
+            step_goal = 0, 
+            # the maximum reward for the optimal policy
+            reward_goal = 0, 
+            # maximum exploitation value
+            epsilon_goal = 0.99,
+            # desired name for file
+            NAME = "Pong-v0-" + str(now),   
+            # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
+            SAVE_PATH = "/Gym-T4-Testbed/Gym-T4-Testbed/",
+
+            EPISODE_MAX = args.episodes,
+
+            STEP_MAX_M = processor.step_max,
+
+            TIME_MAX_M = processor.time_max,
+
+            REWARD_MIN_M = processor.reward_min,
+
+            REWARD_MAX_M = processor.reward_max
+    )
 # ==================================================
 # 
 
 env = gym.make(args.environment)
 
 action_space = env.action_space.n
-
-
-# initialise objects
-processor = preprocess.Processing()
-state_space = processor.get_state_space()
-neuralNet = network.neural_net(state_space, action_space)
-learner = brain.Learning(state_space, action_space, neuralNet)
 
 print("initialisation complete, start training")
 
@@ -105,7 +117,7 @@ for episode in range(1000):
     while True:
         env.render()
 
-        action= learner.choose_action(observation, episode)
+        action= learner.choose_action(observation, step)
 
         next_observation, reward, done, _ = env.step(action)
         next_observation = processor.four_frames_to_state(next_observation, False)

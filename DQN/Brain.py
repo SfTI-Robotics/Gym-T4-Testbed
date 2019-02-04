@@ -19,21 +19,21 @@ class Learning():
         self.network = network
         # self.net = neural_net(self.observation_space, self.action_space)
         
-        self.epsilon = 0.1
+        self.epsilon = 1.0
         self.gamma = 0.95
         self.alpha = 0.86
         #transitions is where we store memory of max memory length
         self.transitions = deque(maxlen = MAX_MEMORY_LENGTH)
 
     # the processed state is used in choosing action
-    def choose_action(self, state, episode):
+    def choose_action(self, state, step):
         if random.random() < self.epsilon:
             action = random.randrange(self.action_space)
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
-        self.epsilon = 0.01 + (0.99-0.01) * np.exp(-0.4 * episode)
+        self.epsilon = 0.01 + (0.99-0.01) * np.exp(-0.00001 * step)
 
         return action
 
