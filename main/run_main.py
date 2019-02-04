@@ -18,7 +18,7 @@ graph = summary(summary_types = ['sumiz_time', 'sumiz_step', 'sumiz_reward'],
             # maximum exploitation value
             epsilon_goal = 0.99,
             # desired name for file
-            NAME = "Pong-v0-" + str(now), 
+            NAME = "Pong-v0-" + str(now),   
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
             SAVE_PATH = "/Gym-T4-Testbed/main/"
     )
@@ -117,14 +117,17 @@ for episode in range(1000):
         next_observation = processor.four_frames_to_state(next_observation, False)
         learner.transitions.append((observation, action, reward, next_observation, done))
 
+        step += 1
+        episode_rewards += reward
         if done:
             print('Completed Episode ' + str(episode))
+            print('reward =', episode_rewards, 'steps =', step)
             #call the memory replay function to learn at the end of every episode
             learner.memory_replay()
             break
 
         observation = next_observation
-        step += 1
+        
 
     graph.summarize(episode, step, time.time() - start_time, episode_rewards)
    
