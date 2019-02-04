@@ -9,7 +9,6 @@ REWARD_DECAY = 0.9
 START_TRAINING = 500
 batch_size=10
 
-
 class Learning():
 
 
@@ -28,13 +27,13 @@ class Learning():
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
-        if random.random() > self.epsilon:
+        if random.random() < self.epsilon:
             action = random.randrange(self.action_space)
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
-        self.epsilon = 0.4 + 0.6 * np.exp(-0.003 * episode)
+        self.epsilon =1 - 0.6 * 10 ** (-0.003 * episode)
 
         return action
 

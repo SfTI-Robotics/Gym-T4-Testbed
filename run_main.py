@@ -83,9 +83,9 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # maximum exploitation value
             epsilon_goal = 0.99,
             # desired name for file
-            NAME = "Pong-v0-" + str(now),
+            NAME = str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs",
+            SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",
 
             EPISODE_MAX = int(args.episodes),
 
