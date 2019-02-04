@@ -22,7 +22,7 @@ class neural_net():
 
         # hidden layer takes a pre-processed frame as input, and has 200 units
         #  fibre channel layer 1
-        self.model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
+        self.model.add(Dense(units=40,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
         self.model.add(Dense(units=self.action_space, activation='sigmoid', kernel_initializer='RandomNormal'))

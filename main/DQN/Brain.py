@@ -33,7 +33,7 @@ class Learning():
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
-        self.epsilon = 0.01 + (0.99+0.01) * np.exp(-0.995 * episode)
+        self.epsilon = 0.01 + (0.99-0.01) * np.exp(-0.4 * episode)
 
         return action
 
