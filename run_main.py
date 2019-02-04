@@ -13,7 +13,7 @@ import gym
 
 from argparse import RawTextHelpFormatter
 
-from summary import summary 
+from summary import summary
 import time
 import datetime
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -62,6 +62,10 @@ elif args.algorithm == 'DDDQN':
     print('PER works')
 else :
     print("Algorithm not found")
+# ==================================================
+#
+env = gym.make(args.environment)
+action_space = env.action_space.n
 
 # initialise objects
 processor = preprocess.Processing()
@@ -71,22 +75,19 @@ learner = brain.Learning(state_space, action_space, neuralNet)
 
 # Graphing results
 now = datetime.datetime.now()
-
-
-
-graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'], 
-            # the optimal step count of the optimal policy 
-            step_goal = 0, 
+graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'],
+            # the optimal step count of the optimal policy
+            step_goal = 0,
             # the maximum reward for the optimal policy
-            reward_goal = 0, 
+            reward_goal = 0,
             # maximum exploitation value
             epsilon_goal = 0.99,
             # desired name for file
-            NAME = "Pong-v0-" + str(now),   
+            NAME = "Pong-v0-" + str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/Gym-T4-Testbed/",
+            SAVE_PATH = "/Gym-T4-Testbed/",
 
-            EPISODE_MAX = args.episodes,
+            EPISODE_MAX = int(args.episodes),
 
             STEP_MAX_M = processor.step_max,
 
@@ -96,24 +97,19 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
 
             REWARD_MAX_M = processor.reward_max
     )
+print("\n ==== initialisation complete, start training ==== \n")
+
 # ==================================================
-# 
-
-env = gym.make(args.environment)
-
-action_space = env.action_space.n
-
-print("initialisation complete, start training")
-
+#
 for episode in range(1000):
-    
+
     observation = env.reset()
     observation  = processor.four_frames_to_state(observation, True)
-    
+
     start_time = time.time()
     episode_rewards = 0
     step = 0
-    
+
     while True:
         env.render()
 
@@ -133,15 +129,8 @@ for episode in range(1000):
             break
 
         observation = next_observation
-        
+
 
     graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
-   
+
 env.close()
-
-
-
-
-
-
-
