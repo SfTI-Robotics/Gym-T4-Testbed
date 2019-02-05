@@ -125,6 +125,9 @@ for episode in range(1000):
         next_observation = processor.Preprocessing(next_observation, False)
         learner.transitions.append((observation, action, reward, next_observation, done))
 
+        # if episode > 1:
+        #     learner.memory_replay()
+
         step += 1
         episode_rewards += reward
 
