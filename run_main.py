@@ -41,23 +41,23 @@ else :
 # # Brain and Network folder
 if args.algorithm == 'QLearning':
     import Q_table.Brain as brain
-    import Q_table.Network as network
+    # import Q_table.Network as network
     print('Q tables work')
 elif args.algorithm == 'DQN':
     import DQN.Brain as brain
-    import DQN.Network as network
+    # import DQN.Network as network
     print('DQN works')
 elif args.algorithm == 'DoubleDQN':
     import Double_DQN.Brain as brain
-    import Double_DQN.Network as network
+    # import Double_DQN.Network as network
     print('Double works')
 elif args.algorithm == 'DuellingDQN':
     import Dueling_DQN.Brain as brain
-    import Dueling_DQN.Network as network
+    # import Dueling_DQN.Network as network
     print('Dueling works')
 elif args.algorithm == 'DDDQN':
     import DDDQN_PER.Brain as brain
-    import DDDQN_PER.Network as network
+    # import DDDQN_PER.Network as network
     print('PER works')
 else :
     print("Algorithm not found")
@@ -73,8 +73,9 @@ action_space = env.action_space.n
 # initialise objects
 processor = preprocess.Processing()
 state_space = processor.get_state_space()
-neuralNet = network.neural_net(state_space, action_space)
-learner = brain.Learning(state_space, action_space, neuralNet)
+# neuralNet = network.neural_net(state_space, action_space)
+# learner = brain.Learning(state_space, action_space, neuralNet)
+learner = brain.Learning(state_space, action_space)
 
 # if LOAD_MODEL == True:
 #     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
@@ -89,7 +90,7 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # maximum exploitation value
             epsilon_goal = 0.99,
             # desired name for file
-            NAME = str(now),
+            NAME = MODEL_FILENAME + str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
             # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
             SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",

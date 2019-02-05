@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from collections import deque
-
+from DQN.Network import neural_net
 
 MAX_MEMORY_LENGTH = 50000
 LEARNING_RATE = 0.01
@@ -12,12 +12,11 @@ batch_size=1500
 class Learning():
 
 
-    def __init__(self,observations, actions, network):
+    def __init__(self,observations, actions):
         self.state_space = observations 
         self.action_space = actions
 
-        self.network = network
-        # self.net = neural_net(self.observation_space, self.action_space)
+        self.network = neural_net(self.state_space, self.action_space)
         
         self.epsilon = 1.0
         self.gamma = 0.95

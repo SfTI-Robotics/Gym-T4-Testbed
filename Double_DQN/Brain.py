@@ -15,12 +15,12 @@ batch_size=32
 class Learning():
 
 
-    def __init__(self,observations, actions, network):
+    def __init__(self,observations, actions):
         self.state_space = observations 
         self.action_space = actions
 
         # behaviour network instantiated in the run_main.py file
-        self.network = network
+        self.network = neural_net(self.state_space, self.action_space)
         # create a new network object for the target network
         self.target_network = neural_net(self.state_space, self.action_space)
         # copy over weights from behaviour to target
