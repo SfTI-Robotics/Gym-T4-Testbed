@@ -29,7 +29,7 @@ if args.environment == 'Pong-v0':
     import Preprocess.Pong_Preprocess as preprocess
     print('Pong works')
 elif args.environment == 'SpaceInvaders-v0':
-    import Preprocess.SpaceInvadersneural_net_Preprocess as preprocess
+    import Preprocess.SpaceInvaders_Preprocess as preprocess
     print('SpaceInvaders works')
 elif args.environment == 'MsPacman-v0':
     import Preprocess.MsPacman_Preprocess as preprocess
@@ -91,7 +91,7 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # desired name for file
             NAME = str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",
+            SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
 
             EPISODE_MAX = int(args.episodes),
 
