@@ -1,7 +1,9 @@
 import numpy as np
 import random
+import keras
+import keras.models
 from collections import deque
-import Network
+from Double_DQN.Network import neural_net
 
 
 MAX_MEMORY_LENGTH = 5000
@@ -17,8 +19,11 @@ class Learning():
         self.state_space = observations 
         self.action_space = actions
 
+        # behaviour network instantiated in the run_main.py file
         self.network = network
-        self.target_network = Network.neural_net(self.observation_space, self.action_space)
+        # create a new network object for the target network
+        self.target_network = neural_net(self.state_space, self.action_space)
+        # copy over weights from behaviour to target
         self.update_target_model()
         
         self.epsilon = 1.0
@@ -83,6 +88,6 @@ class Learning():
         self.update_target_model()
         
     def update_target_model(self):
-            self.target_network.set_weights(self.network.get_weights())
+            self.target_network.model.set_weights(self.network.model.get_weights())
 
 
