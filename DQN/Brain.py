@@ -6,8 +6,8 @@ from collections import deque
 MAX_MEMORY_LENGTH = 5000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
-START_TRAINING = 500
-batch_size=10
+START_TRAINING = 2000
+batch_size=64
 
 class Learning():
 

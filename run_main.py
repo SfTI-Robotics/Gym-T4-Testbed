@@ -110,7 +110,7 @@ print("\n ==== initialisation complete, start training ==== \n")
 for episode in range(1000):
 
     observation = env.reset()
-    observation = processor.four_frames_to_state(observation, True)
+    observation = processor.Preprocessing(observation, True)
 
     start_time = time.time()
     episode_rewards = 0
@@ -122,7 +122,7 @@ for episode in range(1000):
         action= learner.choose_action(observation, episode)
 
         next_observation, reward, done, _ = env.step(action)
-        next_observation = processor.four_frames_to_state(next_observation, False)
+        next_observation = processor.Preprocessing(next_observation, False)
         learner.transitions.append((observation, action, reward, next_observation, done))
 
         step += 1

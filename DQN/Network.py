@@ -14,9 +14,9 @@ class neural_net():
     def build_network(self):
         # 3 layers of convolutional networks
         # padding is added so that information is not loss when the kernal size is smaller
-        self.model.add(Conv2D(32, kernel_size=(3, 3), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
-        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu', data_format='channels_first'))
-        self.model.add(Conv2D(64, kernel_size=(5, 5), padding='valid', activation = 'relu', data_format='channels_first'))
+        self.model.add(Conv2D(32, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
+        self.model.add(Conv2D(64, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
+        self.model.add(Conv2D(64, kernel_size=(3, 3), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
         # convert image from 3D to 1D
         self.model.add(Flatten())
 

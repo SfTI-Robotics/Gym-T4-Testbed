@@ -6,30 +6,30 @@ import numpy as np
 
 class Processing:
     def __init__(self):
-        self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(4)], maxlen=4)
+        self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(1)], maxlen=1)
         self.step_max = 3000
         self.time_max = 40
         self.reward_min = -35                        
         self.reward_max= 35
 
 
-    def Preprocessing(self, state):
+    def Preprocessing(self, frame, is_new_episode):
         # grayscale
-        frame = rgb2gray(state)
-        frame=frame[35:195]              
-        frame = frame / 255.0
-        frame= transform.resize(frame,[80,80])
-        return frame
+        frame = rgb2gray(frame)
+        frame = frame[35:195]              
+        # frame = frame / 255.0
+        frame = transform.resize(frame,[80,80])
+        state = self.four_frames_to_state(frame, is_new_episode)
+        return state
 
 
-    def four_frames_to_state(self, state, is_new_episode):
-        frame = self.Preprocessing(state)
+    def four_frames_to_state(self, frame, is_new_episode):
         if is_new_episode:
             # all frames in new deque are of same state
             self.deque.append(frame)
-            self.deque.append(frame)
-            self.deque.append(frame)
-            self.deque.append(frame)
+            # self.deque.append(frame)
+            # self.deque.append(frame)
+            # self.deque.append(frame)
 
         else:
             self.deque.append(frame)
