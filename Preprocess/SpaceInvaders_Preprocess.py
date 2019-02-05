@@ -13,18 +13,18 @@ class Processing:
         self.reward_min = -10         
         self.reward_max= 1000 
 
-    def Preprocessing(self, state):
+    def Preprocessing(self, state, is_new_episode):
         # grayscale
         frame = rgb2gray(state)
         frame=frame[8:-12,4:-12]              
         frame = frame / 255.0 
         frame= transform.resize(frame,[110,84])
+        frame = self.four_frames_to_state(frame, is_new_episode)
         return frame
 
 
-    def four_frames_to_state(self, state, is_new_episode):
-        
-        frame = self.Preprocessing(state)
+    def four_frames_to_state(self, frame, is_new_episode):
+
         print(frame.shape[:])
         # frame = self.Preprocessing(self, state)
         if is_new_episode:
