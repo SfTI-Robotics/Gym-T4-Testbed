@@ -4,7 +4,6 @@ this is the universal run script for all environments
 """
 # print("enter -h for options you can enter")
 
-
 import argparse
 import sys
 import numpy as np
@@ -62,8 +61,12 @@ elif args.algorithm == 'DDDQN':
     print('PER works')
 else :
     print("Algorithm not found")
-# ==================================================
-#
+# ============================================
+SAVE_MODEL = True
+LOAD_MODEL = True
+MODEL_FILENAME = args.environment + '_' + args.algorithm
+# ============================================
+
 env = gym.make(args.environment)
 action_space = env.action_space.n
 
@@ -72,6 +75,9 @@ processor = preprocess.Processing()
 state_space = processor.get_state_space()
 neuralNet = network.neural_net(state_space, action_space)
 learner = brain.Learning(state_space, action_space, neuralNet)
+
+# if LOAD_MODEL == True:
+#     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
 
 # Graphing results
 now = datetime.datetime.now()
@@ -104,7 +110,7 @@ print("\n ==== initialisation complete, start training ==== \n")
 for episode in range(1000):
 
     observation = env.reset()
-    observation  = processor.four_frames_to_state(observation, True)
+    observation = processor.four_frames_to_state(observation, True)
 
     start_time = time.time()
     episode_rewards = 0
@@ -134,15 +140,9 @@ for episode in range(1000):
     # store model weights and parameters when episode rewards are above a certain amount 
     # and after every number of episodes
     #  === change reward threshold
-    if (episode % 5 == 0):
-        # neuralNet.save(
-        #     neuralNet.model,
-        #     "./temp_Models/",
-        #     overwrite=True,
-        #     include_optimizer=True
-        # )
-        file_name = args.environment + '_' + args.algorithm 
-        neuralNet.model.save_weights('./temp_Models/' + file_name + 'model.h5', overwrite = True)
+    
+    # if (SAVE_MODEL == True and episode % 5 == 0):
+    #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
 
     graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
 
