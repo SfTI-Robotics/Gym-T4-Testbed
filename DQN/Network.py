@@ -31,3 +31,5 @@ class neural_net():
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
         # self.model.summary()
+
+    

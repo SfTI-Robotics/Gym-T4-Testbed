@@ -25,7 +25,7 @@ class Processing:
 
     def four_frames_to_state(self, frame, is_new_episode):
 
-        print(frame.shape[:])
+        # print(frame.shape[:])
         # frame = self.Preprocessing(self, state)
         if is_new_episode:
             # all frames in new deque are of same state
