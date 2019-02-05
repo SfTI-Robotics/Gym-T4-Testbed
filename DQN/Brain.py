@@ -3,11 +3,11 @@ import random
 from collections import deque
 
 
-MAX_MEMORY_LENGTH = 1000000
+MAX_MEMORY_LENGTH = 50000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 5000
-batch_size=1000
+batch_size=1500
 
 class Learning():
 
