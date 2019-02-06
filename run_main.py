@@ -131,12 +131,13 @@ for episode in range(1000):
 
         step += 1
         episode_rewards += reward
+        #call the memory replay function to learn at the end of every episode
+        learner.memory_replay()
 
         if done:
             print('Completed Episode ' + str(episode))
             print('reward =', episode_rewards, 'steps =', step)
-            #call the memory replay function to learn at the end of every episode
-            learner.memory_replay()
+            
             break
 
         observation = next_observation
