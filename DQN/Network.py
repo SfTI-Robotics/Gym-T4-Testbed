@@ -28,7 +28,8 @@ class neural_net():
         self.model.add(Dense(units=self.action_space, activation='sigmoid', kernel_initializer='RandomNormal'))
 
         # compile the model using traditional Machine Learning losses and optimizers
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
         # self.model.summary()
 
