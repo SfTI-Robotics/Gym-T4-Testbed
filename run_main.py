@@ -92,8 +92,8 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # desired name for file
             NAME = MODEL_FILENAME + str(now),
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
-            #SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",
+            # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
+            SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",
             EPISODE_MAX = int(args.episodes),
 
             STEP_MAX_M = processor.step_max,
@@ -108,7 +108,7 @@ print("\n ==== initialisation complete, start training ==== \n")
 
 # ==================================================
 #
-for episode in range(1000):
+for episode in range(10000):
 
     observation = env.reset()
     observation = processor.Preprocessing(observation, True)
@@ -132,12 +132,12 @@ for episode in range(1000):
         step += 1
         episode_rewards += reward
         #call the memory replay function to learn at the end of every episode
-        learner.memory_replay()
 
         if done:
             print('Completed Episode ' + str(episode))
             print('reward =', episode_rewards, 'steps =', step)
-            
+            learner.memory_replay()
+
             break
 
         observation = next_observation

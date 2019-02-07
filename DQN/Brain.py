@@ -7,7 +7,7 @@ MAX_MEMORY_LENGTH = 50000
 LEARNING_RATE = 0.01
 REWARD_DECAY = 0.9
 START_TRAINING = 5000
-batch_size=20
+batch_size=1200
 
 class Learning():
 
@@ -43,14 +43,14 @@ class Learning():
         if len(self.transitions) < START_TRAINING:
             return
 
-        if len(self.transitions) > MAX_MEMORY_LENGTH:
-            sample_index = np.random.choice(self.memory_size, size=self.batch_size)
-        else:
-            sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
-        batch = self.memory[sample_index, :]
+        # if len(self.transitions) > MAX_MEMORY_LENGTH:
+        #     sample_index = np.random.choice(self.memory_size, size=self.batch_size)
+        # else:
+        #     sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
+        # batch = self.memory[sample_index, :]
 
         # experience replay
-        # batch = random.sample(self.transitions, batch_size)
+        batch = random.sample(self.transitions, batch_size)
         # print('batch =', np.shape(batch))
         ###############################################################################################
         # initialise arrays
@@ -91,10 +91,10 @@ class Learning():
         # extract variables from transition
         # extract seperate s,a,r.s'
         for i in range(batch_size):
-            states[i] = np.array(batch[i][0])
+            states[i] = batch[i][0]
             action.append(batch[i][1])
             reward.append(batch[i][2])
-            next_states[i] = np.array(batch[i][3])
+            next_states[i] = batch[i][3]
             done.append(batch[i][4])  
 
         target = self.network.model.predict(states, batch_size=batch_size)
