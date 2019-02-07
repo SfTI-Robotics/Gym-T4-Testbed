@@ -19,7 +19,7 @@ class Learning():
         self.network = neural_net(self.state_space, self.action_space)
         
         self.epsilon = 1.0
-        self.gamma = 0.95
+        self.gamma = REWARD_DECAY
         self.alpha = 0.86
         #transitions is where we store memory of max memory length
         self.transitions = deque(maxlen = MAX_MEMORY_LENGTH)
@@ -43,15 +43,50 @@ class Learning():
         if len(self.transitions) < START_TRAINING:
             return
 
+        if len(self.transitions) > MAX_MEMORY_LENGTH:
+            sample_index = np.random.choice(self.memory_size, size=self.batch_size)
+        else:
+            sample_index = np.random.choice(self.memory_counter, size=self.batch_size)
+        batch = self.memory[sample_index, :]
+
         # experience replay
-        batch = random.sample(self.transitions, batch_size)
-###############################################################################################
+        # batch = random.sample(self.transitions, batch_size)
+        # print('batch =', np.shape(batch))
+        ###############################################################################################
         # initialise arrays
+
         states = np.zeros((batch_size, *self.state_space)) 
         next_states = np.zeros((batch_size, *self.state_space))
         action, reward, done = [], [], []
         
 
+        states = batch[:,:][0]
+        print('states =', np.shape(states))
+        action = batch[1][:]
+        reward = batch[2][:]
+        next_states = batch[3][:,:]
+        done = batch[4][:]
+        
+        # states = batch[:][0]
+        # print('states =', np.shape(states))
+        # action = batch[:][1]
+        # reward = batch[:][2]
+        # next_states = batch[:][3]
+        # done = batch[:][4]
+ 
+        # states = np.transpose(batch[0][:], axes = 3)
+        # print('states =', np.shape(states))
+        # action = np.transpose(batch[1][:], axes = 1)
+        # reward = np.transpose(batch[2][:], axes = 1)
+        # next_states = np.transpose(batch[3][:], axes = 1)
+        # done = np.transpose(batch[4][:], axes = 1)
+        
+        # states = np.transpose(batch[:][0])
+        # print('states =', np.shape(states))
+        # action = np.transpose(batch[:][1])
+        # reward = np.transpose(batch[:][2])
+        # next_states = np.transpose(batch[:][3])
+        # done = np.transpose(batch[:][4])
 
         # extract variables from transition
         # extract seperate s,a,r.s'
