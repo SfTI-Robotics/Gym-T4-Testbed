@@ -2,6 +2,7 @@ from collections import deque
 from skimage import transform # Help us to preprocess the frames
 from skimage.color import rgb2gray # Help us to gray our frames
 import numpy as np
+import cv2
 
 
 class Processing:
@@ -21,6 +22,10 @@ class Processing:
         frame = frame[::2, ::2]
         # frame = transform.resize(frame,[160,160])
         state = self.four_frames_to_state(frame, is_new_episode)
+        #img = cv2.imread(state,0)
+        cv2.imshow("image", state)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         return state
 
 

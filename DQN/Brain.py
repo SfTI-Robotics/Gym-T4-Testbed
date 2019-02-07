@@ -60,12 +60,12 @@ class Learning():
         action, reward, done = [], [], []
         
 
-        states = batch[:,:][0]
-        print('states =', np.shape(states))
-        action = batch[1][:]
-        reward = batch[2][:]
-        next_states = batch[3][:,:]
-        done = batch[4][:]
+        # states = batch[:,:][0]
+        # print('states =', np.shape(states))
+        # action = batch[1][:]
+        # reward = batch[2][:]
+        # next_states = batch[3][:,:]
+        # done = batch[4][:]
         
         # states = batch[:][0]
         # print('states =', np.shape(states))
