@@ -3,6 +3,7 @@ from skimage import transform # Help us to preprocess the frames
 from skimage.color import rgb2gray # Help us to gray our frames
 import numpy as np
 import cv2
+import time
 
 
 class Processing:
@@ -16,16 +17,23 @@ class Processing:
 
     def Preprocessing(self, frame, is_new_episode):
         # grayscale
+        cv2.imshow("image", frame)
+       #
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         frame = rgb2gray(frame)
+        
         frame = frame[35:195]              
         # frame = frame / 255.0
         frame = frame[::2, ::2]
         # frame = transform.resize(frame,[160,160])
-        state = self.four_frames_to_state(frame, is_new_episode)
-        #img = cv2.imread(state,0)
-        cv2.imshow("image", state)
+        cv2.imshow("image", frame)
+       #
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+        state = self.four_frames_to_state(frame, is_new_episode)
+        #img = cv2.imread(state,0)
+        
         return state
 
 
