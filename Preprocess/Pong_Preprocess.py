@@ -8,7 +8,7 @@ import time
 
 class Processing:
     def __init__(self):
-        self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=2)
+        self.deque = deque([np.zeros((160,160), dtype=np.int) for i in range(1)], maxlen=1)
         self.step_max = 3000
         self.time_max = 40
         self.reward_min = -35                        
@@ -22,30 +22,35 @@ class Processing:
         # cv2.destroyAllWindows()
         frame = rgb2gray(frame)
         
-        frame = frame[35:195]              
+        frame = frame[35:195]        
+
+        frame[frame == 144] = 0 # erase background (background type 1)
+        frame[frame == 109] = 0 # erase background (background type 2)
+        frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
+
         # frame = frame / 255.0
-        frame = frame[::2, ::2]
+        # frame = frame[::2, ::2]
         # frame = transform.resize(frame,[160,160])
     #     cv2.imshow("image", frame)
     #    #
     #     cv2.waitKey(0)
     #     cv2.destroyAllWindows()
+
         state = self.four_frames_to_state(frame, is_new_episode)
         #img = cv2.imread(state,0)
         
         return state
 
-        # frame[frame == 144] = 0 # erase background (background type 1)
-        # frame[frame == 109] = 0 # erase background (background type 2)
-        # frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
+      
         # return frame.astype(np.float).ravel()
 
 
     def four_frames_to_state(self, frame, is_new_episode):
+        
         if is_new_episode:
             # all frames in new deque are of same state
             self.deque.append(frame)
-            self.deque.append(frame)
+            # self.deque.append(frame)
             # self.deque.append(frame)
             # self.deque.append(frame)
 

@@ -63,62 +63,62 @@ class Learning():
         ###############################################################################################
         # initialise arrays
 
-        states = np.zeros((batch_size, *self.state_space)) 
-        next_states = np.zeros((batch_size, *self.state_space))
-        action, reward, done = [], [], []
+    #     states = np.zeros((batch_size, *self.state_space)) 
+    #     next_states = np.zeros((batch_size, *self.state_space))
+    #     action, reward, done = [], [], []
 
-        # extract variables from transition
-        # extract seperate s,a,r.s'
-        for i in range(batch_size):
-            states[i] = batch[i][0]
-            action.append(batch[i][1])
-            reward.append(batch[i][2])
-            next_states[i] = batch[i][3]
-            done.append(batch[i][4])  
+    #     # extract variables from transition
+    #     # extract seperate s,a,r.s'
+    #     for i in range(batch_size):
+    #         states[i] = batch[i][0]
+    #         action.append(batch[i][1])
+    #         reward.append(batch[i][2])
+    #         next_states[i] = batch[i][3]
+    #         done.append(batch[i][4])  
 
-            target = self.network.model.predict(states, batch_size=batch_size)
-            target_next = self.network.model.predict(next_states, batch_size=batch_size)
-            # print(np.shape(target))
-            # time.sleep(10)
-    ###############################################################################################
+    #         target = self.network.model.predict(states, batch_size=batch_size)
+    #         target_next = self.network.model.predict(next_states, batch_size=batch_size)
+    #         # print(np.shape(target))
+    #         # time.sleep(10)
+    # ###############################################################################################
 
-        for sample in range(batch_size):
-            # check if transition was at end of episode
-            is_done = done[sample]
-            if is_done:
-                target[sample][action[sample]] = reward[sample]
-            else:
-                # Bellman Equation
-                target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
+    #     for sample in range(batch_size):
+    #         # check if transition was at end of episode
+    #         is_done = done[sample]
+    #         if is_done:
+    #             target[sample][action[sample]] = reward[sample]
+    #         else:
+    #             # Bellman Equation
+    #             target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
         
-            #                                      A   
-            # [Obseravations -> [predicted , R or R + predicted% , predicted]]
+    #         #                                      A   
+    #         # [Obseravations -> [predicted , R or R + predicted% , predicted]]
 
-            # calculates loss and does optimisation
-            # run graph
-            # Predicted Q -> Actual Q
-            n = np.expand_dims(states[sample], axis= 0)
-            print(np.shape(n))
-            print(np.shape(target[sample]))
-            print(target[sample])
-            a = np.expand_dims(target[sample], axis= 1)
-            self.network.model.fit(n, target[sample], verbose=0)
+    #         # calculates loss and does optimisation
+    #         # run graph
+    #         # Predicted Q -> Actual Q
+    #         # n = np.expand_dims(states[sample], axis= 0)
+    #         # print(np.shape(n))
+    #         # print(np.shape(target[sample]))
+    #         # print(target[sample])
+    #         # a = np.expand_dims(target[sample], axis= 1)
+    #         self.network.model.train_on_batch(n, target[sample], verbose=0)
 
 
         # ======================================================================================
 
-        # for state, action, reward, next_state, done in batch:
-        #     target = reward
-        #     if not done:
-        #         next_state = np.expand_dims(next_state, axis= 0)
-        #         # print(np.shape(next_state))
-        #         # print(np.expand_dims(next_state, axis= 0))
-        #         target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+        for state, action, reward, next_state, done in batch:
+            target = reward
+            if not done:
+                next_state = np.expand_dims(next_state, axis= 0)
+                # print(np.shape(next_state))
+                # print(np.expand_dims(next_state, axis= 0))
+                target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
 
-        #     state = np.expand_dims(state, axis=0)
-        #     # print(np.shape(state))
-        #     target_f = self.network.model.predict(state)
-        #     target_f[0][action] = target
-        #     self.network.model.train_on_batch(state, target_f)
+            state = np.expand_dims(state, axis=0)
+            # print(np.shape(state))
+            target_f = self.network.model.predict(state)
+            target_f[0][action] = target
+            self.network.model.fit(state, target_f, verbose = 0)
 
