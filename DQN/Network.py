@@ -1,6 +1,7 @@
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Conv2D
+import numpy as np
 
 
 class neural_net():
@@ -14,18 +15,20 @@ class neural_net():
     def build_network(self):
         # 3 layers of convolutional networks
         # padding is added so that information is not loss when the kernal size is smaller
-        self.model.add(Conv2D(32, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
-        # self.model.add(Conv2D(64, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
-        # self.model.add(Conv2D(64, kernel_size=(3, 3), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
-        # convert image from 3D to 1D
+        print(self.obs_space)
+        self.model.add(Conv2D(16, kernel_size=(8, 8), strides = (4, 4), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
+        self.model.add(Conv2D(32, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
+        # self.model.add(Conv2D(64, kernel_size=(3, 3), strides = (1, 1), padding='valid', activation = 'relu', data_format='channels_first'))
+        # convert image from 2D to 1D
         self.model.add(Flatten())
 
         # hidden layer takes a pre-processed frame as input, and has 200 units
         #  fibre channel layer 1
-        self.model.add(Dense(units=100,input_dim=self.obs_space, activation='relu', kernel_initializer='glorot_uniform'))
+        self.model.add(Dense(units=200, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
-        self.model.add(Dense(units=self.action_space, activation='sigmoid', kernel_initializer='RandomNormal'))
+        print("output layer dimensions = ", self.action_space)
+        self.model.add(Dense(units=self.action_space, activation='softmax', kernel_initializer='RandomNormal'))
 
         # compile the model using traditional Machine Learning losses and optimizers
         # self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])

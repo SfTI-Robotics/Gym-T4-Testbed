@@ -8,12 +8,11 @@ import time
 
 class Processing:
     def __init__(self):
-        self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=1)
+        self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=2)
         self.step_max = 3000
         self.time_max = 40
         self.reward_min = -35                        
         self.reward_max= 35
-
 
     def Preprocessing(self, frame, is_new_episode):
         # grayscale
@@ -36,6 +35,11 @@ class Processing:
         
         return state
 
+        # frame[frame == 144] = 0 # erase background (background type 1)
+        # frame[frame == 109] = 0 # erase background (background type 2)
+        # frame[frame != 0] = 1 # everything else (paddles, ball) just set to 1
+        # return frame.astype(np.float).ravel()
+
 
     def four_frames_to_state(self, frame, is_new_episode):
         if is_new_episode:
@@ -52,7 +56,9 @@ class Processing:
         return stacked_state
 
     def get_state_space(self):
+        print('image size: ', np.shape(self.deque))
         return np.shape(self.deque) 
+        # return (2,80,80)
 
-    
+        # return 80*80
  

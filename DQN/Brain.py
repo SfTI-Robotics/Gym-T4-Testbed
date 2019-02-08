@@ -2,12 +2,13 @@ import numpy as np
 import random
 from collections import deque
 from DQN.Network import neural_net
+import time 
 
 MAX_MEMORY_LENGTH = 50000
-LEARNING_RATE = 0.01
-REWARD_DECAY = 0.9
+LEARNING_RATE = 0.1
+REWARD_DECAY = 0.8	
 START_TRAINING = 5000
-batch_size=1200
+batch_size=32
 
 class Learning():
 
@@ -18,7 +19,7 @@ class Learning():
 
         self.network = neural_net(self.state_space, self.action_space)
         
-        self.epsilon = 1.0
+        self.epsilon = 0
         self.gamma = REWARD_DECAY
         self.alpha = 0.86
         #transitions is where we store memory of max memory length
@@ -30,10 +31,16 @@ class Learning():
             action = random.randrange(self.action_space)
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
+            # if self.network.model.predict(np.expand_dims(state, axis = 0)).any() < 0:
+            # 	print('episode ', episode, ' has negative')
+            print('Episode ', episode, ': ', self.network.model.predict(np.expand_dims(state, axis = 0)))
 
         # decay epsilon
-        self.epsilon = 1 - 3 ** (-0.00023 * (episode - 3000))
+        # if episode > 3000:
+        	# self.epsilon = 1 - 3 ** (-0.00023 * (episode - 3000))
+        # self.epsilon = 1 - 3 ** (-0.00023 * episode)
 
+        self.epsilon = 1 - 5 ** (-0.003 * (episode - 50))
         return action
 
 
@@ -51,6 +58,7 @@ class Learning():
 
         # experience replay
         batch = random.sample(self.transitions, batch_size)
+        # print(np.shape(self.transitions))
         # print('batch =', np.shape(batch))
         ###############################################################################################
         # initialise arrays
@@ -58,35 +66,6 @@ class Learning():
         states = np.zeros((batch_size, *self.state_space)) 
         next_states = np.zeros((batch_size, *self.state_space))
         action, reward, done = [], [], []
-        
-
-        # states = batch[:,:][0]
-        # print('states =', np.shape(states))
-        # action = batch[1][:]
-        # reward = batch[2][:]
-        # next_states = batch[3][:,:]
-        # done = batch[4][:]
-        
-        # states = batch[:][0]
-        # print('states =', np.shape(states))
-        # action = batch[:][1]
-        # reward = batch[:][2]
-        # next_states = batch[:][3]
-        # done = batch[:][4]
- 
-        # states = np.transpose(batch[0][:], axes = 3)
-        # print('states =', np.shape(states))
-        # action = np.transpose(batch[1][:], axes = 1)
-        # reward = np.transpose(batch[2][:], axes = 1)
-        # next_states = np.transpose(batch[3][:], axes = 1)
-        # done = np.transpose(batch[4][:], axes = 1)
-        
-        # states = np.transpose(batch[:][0])
-        # print('states =', np.shape(states))
-        # action = np.transpose(batch[:][1])
-        # reward = np.transpose(batch[:][2])
-        # next_states = np.transpose(batch[:][3])
-        # done = np.transpose(batch[:][4])
 
         # extract variables from transition
         # extract seperate s,a,r.s'
@@ -97,9 +76,11 @@ class Learning():
             next_states[i] = batch[i][3]
             done.append(batch[i][4])  
 
-        target = self.network.model.predict(states, batch_size=batch_size)
-        target_next = self.network.model.predict(next_states, batch_size=batch_size)
-###############################################################################################
+            target = self.network.model.predict(states, batch_size=batch_size)
+            target_next = self.network.model.predict(next_states, batch_size=batch_size)
+            # print(np.shape(target))
+            # time.sleep(10)
+    ###############################################################################################
 
         for sample in range(batch_size):
             # check if transition was at end of episode
@@ -109,8 +90,35 @@ class Learning():
             else:
                 # Bellman Equation
                 target[sample][action[sample]] = reward[sample] + self.gamma * np.max(target_next[sample])
+        
+            #                                      A   
+            # [Obseravations -> [predicted , R or R + predicted% , predicted]]
 
-        # calculates loss and does optimisation
-        # run graph
-        self.network.model.fit(states, target, batch_size=batch_size,
-        epochs=1, verbose=0)
+            # calculates loss and does optimisation
+            # run graph
+            # Predicted Q -> Actual Q
+            n = np.expand_dims(states[sample], axis= 0)
+            print(np.shape(n))
+            print(np.shape(target[sample]))
+            print(target[sample])
+            a = np.expand_dims(target[sample], axis= 1)
+            self.network.model.fit(n, target[sample], verbose=0)
+
+
+        # ======================================================================================
+
+        # for state, action, reward, next_state, done in batch:
+        #     target = reward
+        #     if not done:
+        #         next_state = np.expand_dims(next_state, axis= 0)
+        #         # print(np.shape(next_state))
+        #         # print(np.expand_dims(next_state, axis= 0))
+        #         target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+
+
+        #     state = np.expand_dims(state, axis=0)
+        #     # print(np.shape(state))
+        #     target_f = self.network.model.predict(state)
+        #     target_f[0][action] = target
+        #     self.network.model.train_on_batch(state, target_f)
+

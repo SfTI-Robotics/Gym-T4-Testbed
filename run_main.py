@@ -73,6 +73,9 @@ action_space = env.action_space.n
 # initialise objects
 processor = preprocess.Processing()
 state_space = processor.get_state_space()
+
+print('state_space: ', env.observation_space.shape)
+
 # neuralNet = network.neural_net(state_space, action_space)
 # learner = brain.Learning(state_space, action_space, neuralNet)
 learner = brain.Learning(state_space, action_space)
@@ -108,7 +111,7 @@ print("\n ==== initialisation complete, start training ==== \n")
 
 # ==================================================
 #
-for episode in range(10000):
+for episode in range(500):
 
     observation = env.reset()
     observation = processor.Preprocessing(observation, True)
@@ -118,11 +121,15 @@ for episode in range(10000):
     step = 0
 
     while True:
-       # env.render()
+        env.render()
 
         action= learner.choose_action(observation, episode)
 
         next_observation, reward, done, _ = env.step(action)
+
+        ## Done s1 - s5 reward -1
+        ## Oterate s5- s1 s5 -> -1, s4 -> %-1 ... etc
+
         next_observation = processor.Preprocessing(next_observation, False)
         learner.transitions.append((observation, action, reward, next_observation, done))
 
@@ -141,6 +148,8 @@ for episode in range(10000):
             break
 
         observation = next_observation
+
+    #observation -> [UP, DOWN, NO_OP]
 
     # store model weights and parameters when episode rewards are above a certain amount 
     # and after every number of episodes
