@@ -112,37 +112,52 @@ print("\n ==== initialisation complete, start training ==== \n")
 # ==================================================
 #
 for episode in range(500):
-
+    episode_transitions = []
+    
     observation = env.reset()
     observation = processor.Preprocessing(observation, True)
 
     start_time = time.time()
     episode_rewards = 0
     step = 0
-
+    game_step = 0
     while True:
         env.render()
 
         action= learner.choose_action(observation, episode)
 
+        
         next_observation, reward, done, _ = env.step(action)
 
         ## Done s1 - s5 reward -1
-        ## Oterate s5- s1 s5 -> -1, s4 -> %-1 ... etc
+        ## Iterate s5- s1 s5 -> -1, s4 -> %-1 ... etc
 
         next_observation = processor.Preprocessing(next_observation, False)
-        learner.transitions.append((observation, action, reward, next_observation, done))
+        episode_transitions.append((observation, action, reward, next_observation, done))
+        # print(np.shape(episode_transitions))
+
+        
 
         # if episode > 1:
         #     learner.memory_replay()
-
+        game_step += 1  
         step += 1
         episode_rewards += reward
+        episode_transitions = list(episode_transitions)
+
+        if not reward == 0:
+            for i in reversed(range(step)):
+                print(episode_transitions[i][2])
+                #  find reward of observations before it, change it based on a percentage
+                episode_transitions[i][2] += reward * 0.2 ** (1/i)
         #call the memory replay function to learn at the end of every episode
+        episode_transitions = tuple(episode_transitions)
 
         if done:
             print('Completed Episode ' + str(episode))
             print('reward =', episode_rewards, 'steps =', step)
+            
+            learner.transitions.extend(episode_transitions)
             learner.memory_replay()
 
             break

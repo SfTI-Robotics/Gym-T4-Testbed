@@ -4,7 +4,7 @@ from collections import deque
 from DQN.Network import neural_net
 import time 
 
-MAX_MEMORY_LENGTH = 50000
+MAX_MEMORY_LENGTH = 6000
 LEARNING_RATE = 0.1
 REWARD_DECAY = 0.8	
 START_TRAINING = 5000
@@ -30,18 +30,24 @@ class Learning():
         if random.random() > self.epsilon:
             action = random.randrange(self.action_space)
         else:
-            action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
+            # action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
+            ACT_VALUES=self.network.model.predict(np.expand_dims(state, axis = 0))
+            action = np.argmax(ACT_VALUES[0])
             # if self.network.model.predict(np.expand_dims(state, axis = 0)).any() < 0:
             # 	print('episode ', episode, ' has negative')
-            print('Episode ', episode, ': ', self.network.model.predict(np.expand_dims(state, axis = 0)))
+            print('Episode ', episode, ': q values:  ', ACT_VALUES)
+            print('Episode ', episode, ': action:  ', action)
 
         # decay epsilon
         # if episode > 3000:
         	# self.epsilon = 1 - 3 ** (-0.00023 * (episode - 3000))
         # self.epsilon = 1 - 3 ** (-0.00023 * episode)
 
-        self.epsilon = 1 - 5 ** (-0.003 * (episode - 50))
+        self.epsilon = 1 - 5 ** (-0.003 * (episode - 6))
         return action
+
+    # def back_propagate(self):
+
 
 
 
@@ -67,8 +73,8 @@ class Learning():
     #     next_states = np.zeros((batch_size, *self.state_space))
     #     action, reward, done = [], [], []
 
-    #     # extract variables from transition
-    #     # extract seperate s,a,r.s'
+    # #     # extract variables from transition
+    # #     # extract seperate s,a,r.s'
     #     for i in range(batch_size):
     #         states[i] = batch[i][0]
     #         action.append(batch[i][1])
@@ -78,9 +84,9 @@ class Learning():
 
     #         target = self.network.model.predict(states, batch_size=batch_size)
     #         target_next = self.network.model.predict(next_states, batch_size=batch_size)
-    #         # print(np.shape(target))
-    #         # time.sleep(10)
-    # ###############################################################################################
+    # #         # print(np.shape(target))
+    # #         # time.sleep(10)
+    # # ###############################################################################################
 
     #     for sample in range(batch_size):
     #         # check if transition was at end of episode
@@ -97,12 +103,14 @@ class Learning():
     #         # calculates loss and does optimisation
     #         # run graph
     #         # Predicted Q -> Actual Q
-    #         # n = np.expand_dims(states[sample], axis= 0)
+    #         n = np.expand_dims(states[sample], axis= 0)
     #         # print(np.shape(n))
     #         # print(np.shape(target[sample]))
     #         # print(target[sample])
     #         # a = np.expand_dims(target[sample], axis= 1)
-    #         self.network.model.train_on_batch(n, target[sample], verbose=0)
+    #         # self.network.model.fit(n, target[sample],batch_size = batch_size, verbose=0)
+
+    #         self.network.model.fit(states, target,batch_size = batch_size, verbose=0)
 
 
         # ======================================================================================
