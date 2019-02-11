@@ -118,9 +118,21 @@ for episode in range(500):
     observation = processor.Preprocessing(observation, True)
 
     start_time = time.time()
-    episode_rewards = 0
-    step = 0
-    game_step = 0
+    episode_rewards = 0#total rewards
+    
+    #these arrays and variables are used to calculated and store discounted rewards
+    game_number = 0 # increases every time a someone scores a point
+    game_step = 0 #for discounted rewards
+    
+    # arrays emptied after every round in an episode 
+    reward_array=[]#for d_r
+    states=[]
+    actions=[]
+    next_states=[]
+    dones=[]
+
+    
+
     while True:
         env.render()
 
@@ -128,39 +140,84 @@ for episode in range(500):
 
         
         next_observation, reward, done, _ = env.step(action)
+        episode_rewards += reward
+        reward_array.append(reward)
+        states.append(observation)
+        actions.append(actions)
+        dones.append(done)
 
         ## Done s1 - s5 reward -1
         ## Iterate s5- s1 s5 -> -1, s4 -> %-1 ... etc
 
+        # rewards should be set up as a 1d array
+        # gamma as a float 
+        # these could be used as inputs to a function
+        
+        # discounted rewards could be set up in preprocessing 
+        # so our run main doesn't change in envs that don;t need it dis_rew=rewards
+
+        # In Pong rewards can be {-1,0,1}
+        # when -1 or 1 game has been reset
+        # have a running add variable that resets to 0 whenever this happens
+
+        # np.zeroes_like(rewards) creates an array the same shape as the input
+
         next_observation = processor.Preprocessing(next_observation, False)
-        episode_transitions.append((observation, action, reward, next_observation, done))
-        # print(np.shape(episode_transitions))
+        next_states.append(next_observation)
+        #append episode_transitions after dicounted rewards has been calculated
+        # perhaps create a function for it
+
+        #episode_transitions.append((observation, action, reward, next_observation, done))
+        ## print(np.shape(episode_transitions))
 
         
 
         # if episode > 1:
         #     learner.memory_replay()
-        game_step += 1  
-        step += 1
-        episode_rewards += reward
-        episode_transitions = list(episode_transitions)
+        
+        game_step += 1
+        #episode_transitions = list(episode_transitions)
+#########################################################################################################
+        if (not reward == 0) or (done) :
+            print(  'game_number =',   game_number , 'game_step = ', game_step)
+            #print('reward =', episode_rewards, 'steps =', game_step)
+            ## call discounted function here 
+            reward_array=processor.discounted_rewards(reward_array,learner.gamma)
+            print('reward array=', reward_array)
+                
+            #append to leraner.transitons
 
-        if not reward == 0:
-            for i in reversed(range(step)):
-                print(episode_transitions[i][2])
-                #  find reward of observations before it, change it based on a percentage
-                episode_transitions[i][2] += reward * 0.2 ** (1/i)
-        #call the memory replay function to learn at the end of every episode
-        episode_transitions = tuple(episode_transitions)
+            for i in range(game_step):
+                learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
 
-        if done:
-            print('Completed Episode ' + str(episode))
-            print('reward =', episode_rewards, 'steps =', step)
+
+            states, actions, reward_array,next_states,dones  = [], [], [], [], []
+            game_number += 1
+            game_step=0
             
-            learner.transitions.extend(episode_transitions)
-            learner.memory_replay()
+            if done:
+                print('Completed Episode ' + str(episode))
+                game_number = 0
+    
+                # learner.transitions.extend(episode_transitions)
+                learner.memory_replay()
 
-            break
+                break
+
+        
+
+
+#########################################################################################################
+        # if not reward == 0:
+        #     game_step += 1  
+        #     for i in reversed(range(step)):
+        #         print(episode_transitions[i][2])
+        #         #  find reward of observations before it, change it based on a percentage
+        #         episode_transitions[i][2] += reward * 0.2 ** (1/i)
+        # #call the memory replay function to learn at the end of every episode
+        # episode_transitions = tuple(episode_transitions)
+##########################################################################################################
+        
 
         observation = next_observation
 
@@ -173,6 +230,6 @@ for episode in range(500):
     # if (SAVE_MODEL == True and episode % 5 == 0):
     #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
 
-    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
+    graph.summarize(episode, game_step, time.time() - start_time, episode_rewards, learner.epsilon)
 
 env.close()

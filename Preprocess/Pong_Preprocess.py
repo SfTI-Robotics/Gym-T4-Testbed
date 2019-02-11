@@ -66,4 +66,17 @@ class Processing:
         # return (2,80,80)
 
         # return 80*80
+
+    def discounted_rewards(self, rewards, gamma):
+        discounted_r = np.zeros_like(rewards, dtype=np.float32)
+        running_add = 0
+        for i in reversed(range(len(rewards))):
+            if rewards[i] != 0:
+                running_add = 0
+            running_add = running_add * gamma + rewards[i]
+            discounted_r[i] = running_add
+
+        return discounted_r
+
+
  
