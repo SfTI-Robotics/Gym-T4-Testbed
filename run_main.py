@@ -68,13 +68,15 @@ MODEL_FILENAME = args.environment + '_' + args.algorithm
 # ============================================
 
 env = gym.make(args.environment)
-action_space = env.action_space.n
 
 # initialise objects
 processor = preprocess.Processing()
 state_space = processor.get_state_space()
+action_space = env.action_space.n 
+action_space=processor.new_action_space(action_space)
 
-print('state_space: ', env.observation_space.shape)
+
+# print('state_space: ', env.observation_space.shape)
 
 # neuralNet = network.neural_net(state_space, action_space)
 # learner = brain.Learning(state_space, action_space, neuralNet)
@@ -136,9 +138,9 @@ for episode in range(500):
     while True:
         env.render()
 
-        action= learner.choose_action(observation, episode)
-
-        
+        action = learner.choose_action(observation, episode)
+        action = processor.mapping_actions_to_keys(action)
+        print('action =',action)
         next_observation, reward, done, _ = env.step(action)
         episode_rewards += reward
         reward_array.append(reward)
@@ -183,7 +185,7 @@ for episode in range(500):
             #print('reward =', episode_rewards, 'steps =', game_step)
             ## call discounted function here 
             reward_array=processor.discounted_rewards(reward_array,learner.gamma)
-            print('reward array=', reward_array)
+            #print('reward array= \n', reward_array)
                 
             #append to leraner.transitons
 

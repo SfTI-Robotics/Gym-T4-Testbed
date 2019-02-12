@@ -30,11 +30,11 @@ class Learning():
         if random.random() > self.epsilon:
             action = random.randrange(self.action_space)
         else:
-            # action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
+            action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
             ACT_VALUES=self.network.model.predict(np.expand_dims(state, axis = 0))
-            action = np.argmax(ACT_VALUES[0])
+            # action = np.argmax(ACT_VALUES[0])
             # if self.network.model.predict(np.expand_dims(state, axis = 0)).any() < 0:
-            # 	print('episode ', episode, ' has negative')
+            # print('episode ', episode, ' has negative')
             print('Episode ', episode, ': q values:  ', ACT_VALUES)
             print('Episode ', episode, ': action:  ', action)
 
@@ -119,14 +119,15 @@ class Learning():
             target = reward
             if not done:
                 next_state = np.expand_dims(next_state, axis= 0)
-                # print(np.shape(next_state))
-                # print(np.expand_dims(next_state, axis= 0))
+                print(np.shape(next_state))
+                print(np.expand_dims(next_state, axis= 0))
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
 
             state = np.expand_dims(state, axis=0)
-            # print(np.shape(state))
+            print(np.shape(state))
             target_f = self.network.model.predict(state)
+            print(target_f)
             target_f[0][action] = target
             self.network.model.fit(state, target_f, verbose = 0)
 

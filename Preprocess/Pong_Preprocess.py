@@ -77,6 +77,17 @@ class Processing:
             discounted_r[i] = running_add
 
         return discounted_r
+    
+    def new_action_space(self,actions):
+        
+        return 3 
 
-
- 
+    def mapping_actions_to_keys(self,action_taken):
+        if action_taken == 0:
+            action = 0
+        elif action_taken == 1:
+            action = 2
+        elif action_taken == 2:
+            action = 3
+            
+        return action
