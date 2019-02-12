@@ -12,14 +12,14 @@ class Processing:
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=2)
         # This stuff is need for the graph this needs to be set up for each environment
         # We decided to put it in preprocess as for each environment:
-        #                                                            the range of steps a game takes changes 
-        #                                                            but the lowest is always zero so only max is entered here
-        #                                                            same for time min will always be zero while time max varies from env to env
-        #                                                            reward min and max both vary        
-        self.step_max = 3000
+        #             the range of steps a game takes changes 
+        #         but the lowest is always zero so only max is entered here
+        #   same for time min will always be zero while time max varies from env to env
+        #              reward min and max both vary        
+        self.step_max = 2200
         self.time_max = 40
-        self.reward_min = -35                        
-        self.reward_max= 35
+        self.reward_min = -30                        
+        self.reward_max= 30
 
     def Preprocessing(self, frame, is_new_episode):
         # this is to see if your processedframed looks alright

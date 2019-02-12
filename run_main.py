@@ -64,7 +64,7 @@ else :
 # global variables
 SAVE_MODEL = True
 LOAD_MODEL = True
-MODEL_FILENAME = args.environment + '_' + args.algorithm
+MODEL_FILENAME = args.environment + '_' + args.algorithm + '_'
 # ============================================
 
 # create gym env
@@ -129,7 +129,7 @@ for episode in range(int(args.episodes)):
    
     game_number = 0 # increases every time a someone scores a point
     game_step = 0 #for discounted rewards, steps for each round
-    step_for_printing=0 #count total steps for each episode for the graph
+    step=0 #count total steps for each episode for the graph
 
     # these arrays are used to calculated and store discounted rewards
     # arrays for other variable are needed for appending to transitions in our learner to work
@@ -163,7 +163,7 @@ for episode in range(int(args.episodes)):
         next_states.append(next_observation)
         
         game_step += 1
-        step_for_printing+=1        
+        step+=1        
 
 #########################################################################################################
         if (not reward == 0) or (done) :
@@ -183,7 +183,7 @@ for episode in range(int(args.episodes)):
             
             # when an agent's game score reaches 21
             if done:
-                print('\n Completed Episode ' + str(episode), 'steps = ', step_for_printing, '\n')
+                print('\n Completed Episode ' + str(episode), 'steps = ', step, '\n')
                 # train algorithm using experience replay
                 learner.memory_replay()
 
@@ -198,6 +198,6 @@ for episode in range(int(args.episodes)):
     #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
 
     # summarize plots the graph
-    graph.summarize(episode, step_for_printing, time.time() - start_time, episode_rewards, learner.epsilon)
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
 # killing environment to prevent memory leaks
 env.close()
