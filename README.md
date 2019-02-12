@@ -30,7 +30,7 @@
 |- Enduro-v0||
 |- Super mario||
 |||
-|{ Algorithms } | NB. *difficuilt action spaces* |
+|{ Algorithms } | NB. *difficult action spaces* |
 | - Copy-v0 | |
 |||
 |{ Box 2D }
