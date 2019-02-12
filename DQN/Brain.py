@@ -119,7 +119,7 @@ class Learning():
             target = reward
             if not done:
                 next_state = np.expand_dims(next_state, axis= 0)
-                print(np.shape(next_state))
+                print('np.shape(next_state) =', np.shape(next_state) )
                 print(np.expand_dims(next_state, axis= 0))
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
@@ -127,7 +127,7 @@ class Learning():
             state = np.expand_dims(state, axis=0)
             print(np.shape(state))
             target_f = self.network.model.predict(state)
-            print(target_f)
+            print('target_f =', target_f)
             target_f[0][action] = target
             self.network.model.fit(state, target_f, verbose = 0)
 
