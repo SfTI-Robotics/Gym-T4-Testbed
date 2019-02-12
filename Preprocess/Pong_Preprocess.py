@@ -9,7 +9,7 @@ import time
 class Processing:
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=2)
-        self.step_max = 3000
+        self.step_max = 200
         self.time_max = 40
         self.reward_min = -35                        
         self.reward_max= 35
@@ -77,12 +77,18 @@ class Processing:
             discounted_r[i] = running_add
 
         return discounted_r
-    
+
+    # according to the resource below, actions come in pairs, 
+    # therefore, we choose to only pass in one of each pair.
+    # this results in only threee actions
+    # https://ai.stackexchange.com/questions/2449/what-are-different-actions-in-action-space-of-environment-of-pong-v0-game-from
+
     def new_action_space(self,actions):
         
         return 3 
 
     def mapping_actions_to_keys(self,action_taken):
+        
         if action_taken == 0:
             action = 0
         elif action_taken == 1:

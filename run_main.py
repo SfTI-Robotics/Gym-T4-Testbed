@@ -138,14 +138,14 @@ for episode in range(500):
     while True:
         env.render()
 
-        action = learner.choose_action(observation, episode)
-        action = processor.mapping_actions_to_keys(action)
-        print('action =',action)
-        next_observation, reward, done, _ = env.step(action)
+        action = learner.choose_action(observation, episode)#action chooses from 3/3
+        action_mapped = processor.mapping_actions_to_keys(action) # actions returns to length 3/6 but can only choose 0,2,3
+        # print('action =',action)
+        next_observation, reward, done, _ = env.step(action_mapped)
         episode_rewards += reward
         reward_array.append(reward)
         states.append(observation)
-        actions.append(actions)
+        actions.append(action)
         dones.append(done)
 
         ## Done s1 - s5 reward -1

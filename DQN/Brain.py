@@ -65,7 +65,12 @@ class Learning():
         # experience replay
         batch = random.sample(self.transitions, batch_size)
         # print(np.shape(self.transitions))
-        # print('batch =', np.shape(batch))
+        # print('batch states =', batch[0][0])
+        # print('batch actions =', batch[0][1])
+        # print('batch rewards =', batch[0][2])
+        # print('batch next state =', batch[0][3])
+        # print('batch dones =', batch[0][4])
+        #print(np.shape(batch))
         ###############################################################################################
         # initialise arrays
 
@@ -119,15 +124,18 @@ class Learning():
             target = reward
             if not done:
                 next_state = np.expand_dims(next_state, axis= 0)
-                print('np.shape(next_state) =', np.shape(next_state) )
-                print(np.expand_dims(next_state, axis= 0))
+                #print('np.shape(next_state) =', np.shape(next_state) )
+                print('next_state) =',  np.expand_dims(next_state, axis= 0))
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
 
             state = np.expand_dims(state, axis=0)
-            print(np.shape(state))
+            #print('np.shape(state)', np.shape(state))
             target_f = self.network.model.predict(state)
-            print('target_f =', target_f)
+            
             target_f[0][action] = target
+            print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose = 0)
+
+        print("finish replay")
 
