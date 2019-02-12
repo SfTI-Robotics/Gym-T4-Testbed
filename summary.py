@@ -186,6 +186,7 @@ class summary:
 
                 if element == 'sumiz_epsilon':
                     ax4 = fig1.add_subplot(self.num_main_axes, 1, i)
+                    plt.axis([EPISODE_MIN,self.EPISODE_MAX, 0, 1])
                     ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary)
                     ax4.plot(range(len(self.epsilon_summary)), np.repeat(self.epsilon_goal, len(self.epsilon_summary)), 'r:')
                     ax4.set_title('Epsilon Greedy')

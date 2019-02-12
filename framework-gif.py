@@ -22,49 +22,7 @@ for i_episode in range(20):
         observation, reward, done, info = env.step(action)
         if done:
             print( "Episode finished after {} timesteps".format(t+1))
-            env = gym.wrappers.Monitor(env,directory='pong/',force=True,write_upon_reset=True)
+            env = gym.wrappers.Monitor(env,directory='/Gym-T4-Testbed/temp_Videos/pong/',force=True,write_upon_reset=True)
             break
 
 env.env.close()
-
-# env = gym.make('CartPole-v0')
-# env = Monitor(env, './video', force = True)
-# observation = env.reset()
-# cum_reward = 0
-# frames = []
-
-
-# env = gym.make('FrozenLake-v0')
-# # env = Monitor(env, './video')
-# # video = VideoRecorder(env)
-# env.monitor.start('/vid/cartpole-experiment-1')
-# try:
-#      env.reset()
-#      # video.capture_frame()
-#      # video.close()
-# finally:
-     # os.remove(video.path)
-
-
-# rec = video_recorder(env, )
-
-
-
-
-# for t in range(10):
-#     # Render into buffer.
-#     # You will still see the window.
-#     env.render()
-#     frames.append(env.render(mode = 'rgb_array'))
-# #     env = TraceRecordingWrapper(env)
-
-
-
-
-
-#     action = env.action_space.sample()
-#     observation, reward, done, info = env.step(action)
-
-#     if done:
-#      break
-
