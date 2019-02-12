@@ -9,7 +9,7 @@ import time
 class Processing:
     def __init__(self):
         self.deque = deque([np.zeros((80,80), dtype=np.int) for i in range(2)], maxlen=2)
-        self.step_max = 200
+        self.step_max = 300
         self.time_max = 40
         self.reward_min = -35                        
         self.reward_max= 35
@@ -68,6 +68,7 @@ class Processing:
         # return 80*80
 
     def discounted_rewards(self, rewards, gamma):
+        # initialise array
         discounted_r = np.zeros_like(rewards, dtype=np.float32)
         running_add = 0
         for i in reversed(range(len(rewards))):
@@ -84,11 +85,11 @@ class Processing:
     # https://ai.stackexchange.com/questions/2449/what-are-different-actions-in-action-space-of-environment-of-pong-v0-game-from
 
     def new_action_space(self,actions):
-        
+        # out of 6 actions, only use 3
         return 3 
 
     def mapping_actions_to_keys(self,action_taken):
-        
+        # maps the 3 unique actions to OpenAI's gym action space (6 actions)
         if action_taken == 0:
             action = 0
         elif action_taken == 1:

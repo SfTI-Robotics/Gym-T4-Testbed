@@ -29,21 +29,25 @@ class Learning():
     def choose_action(self, state, episode):
         if random.random() > self.epsilon:
             action = random.randrange(self.action_space)
+            print('EXPLORE')
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis = 0)))
             ACT_VALUES=self.network.model.predict(np.expand_dims(state, axis = 0))
             # action = np.argmax(ACT_VALUES[0])
             # if self.network.model.predict(np.expand_dims(state, axis = 0)).any() < 0:
             # print('episode ', episode, ' has negative')
-            print('Episode ', episode, ': q values:  ', ACT_VALUES)
-            print('Episode ', episode, ': action:  ', action)
+            # print('Episode ', episode, ': q values:  ', ACT_VALUES)
+            # print('Episode ', episode, ': action:  ', action)
+            print('EXPLOIT')
 
         # decay epsilon
         # if episode > 3000:
         	# self.epsilon = 1 - 3 ** (-0.00023 * (episode - 3000))
         # self.epsilon = 1 - 3 ** (-0.00023 * episode)
-
-        self.epsilon = 1 - 5 ** (-0.003 * (episode - 6))
+        
+        # increase epsilon
+        self.epsilon = 1 - 1.28 ** (-0.003 * (episode - 2000))
+        # self.epsilon = 1 - 1.4 ** (-0.003 * (1/episode))
         return action
 
     # def back_propagate(self):
@@ -125,7 +129,7 @@ class Learning():
             if not done:
                 next_state = np.expand_dims(next_state, axis= 0)
                 #print('np.shape(next_state) =', np.shape(next_state) )
-                print('next_state) =',  np.expand_dims(next_state, axis= 0))
+                # print('next_state) =',  np.expand_dims(next_state, axis= 0))
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
 
@@ -134,7 +138,7 @@ class Learning():
             target_f = self.network.model.predict(state)
             
             target_f[0][action] = target
-            print('target_f =', target_f)
+            # print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose = 0)
 
         print("finish replay")

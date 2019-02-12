@@ -113,7 +113,7 @@ print("\n ==== initialisation complete, start training ==== \n")
 
 # ==================================================
 #
-for episode in range(500):
+for episode in range(int(args.episodes)):
     episode_transitions = []
     
     observation = env.reset()
@@ -182,6 +182,7 @@ for episode in range(500):
 #########################################################################################################
         if (not reward == 0) or (done) :
             print(  'game_number =',   game_number , 'game_step = ', game_step)
+            print(' epsilon =', learner.epsilon)
             #print('reward =', episode_rewards, 'steps =', game_step)
             ## call discounted function here 
             reward_array=processor.discounted_rewards(reward_array,learner.gamma)
