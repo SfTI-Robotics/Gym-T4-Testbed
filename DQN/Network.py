@@ -9,7 +9,7 @@ class neural_net():
         self.obs_space = obs_space
         # action space uses the customised action encoding from the environment's preprocess file
         self.action_space = action_space
-        
+
         self.model = Sequential()
         neural_net.build_network(self)
 
@@ -19,7 +19,7 @@ class neural_net():
         self.model.add(Conv2D(16, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
         self.model.add(Conv2D(32, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
         # self.model.add(Conv2D(64, kernel_size=(3, 3), strides = (1, 1), padding='valid', activation = 'relu', data_format='channels_first'))
-        
+
         # convert image from 2D to 1D
         self.model.add(Flatten())
 
@@ -36,5 +36,3 @@ class neural_net():
         self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
         # self.model.summary()
-
-    
