@@ -186,7 +186,7 @@ for episode in range(int(args.episodes)):
             
             # when an agent's game score reaches 21
             if done:
-                print('\n Completed Episode ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, '\n')
+                print('\n Completed Episode ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
 
                 # train algorithm using experience replay
                 learner.memory_replay()
