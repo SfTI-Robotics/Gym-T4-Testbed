@@ -151,7 +151,6 @@ class summary:
         # generate summary graphs
         if episode_count % FREQUENCY == 0:
             fig1 = plt.figure(figsize=(5, 10)) # ploting normally takes ~0.5 seconds
-            fig1.text(1, 1, e_greedy_formula)
             i = 1
             for element in self.summary_types:
                 if element == 'sumiz_step':
@@ -189,11 +188,8 @@ class summary:
                     ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary, label = e_greedy_formula)
                     ax4.plot(range(len(self.epsilon_summary)), np.repeat(self.epsilon_goal, len(self.epsilon_summary)), 'r:')
                     ax4.set_title('Epsilon Greedy')
-                    ax4.set_xlabel('Episode')
-                    
+                    ax4.set_xlabel('Episode \n ' + e_greedy_formula)
                     ax4.set_ylabel('Epsilon')
-                    # ax4.legend(loc = 'lower right')
-                    # ax4.text(1, 1, e_greedy_formula, rotation = 90)
                     i += 1
 
                 if element == 'sumiz_average_reward':
@@ -205,7 +201,6 @@ class summary:
                     ax5.set_ylabel('Reward per step')
                     i += 1
             
-            # fig1.figtext(-1, -1, e_greedy_formula)
             plt.tight_layout()
             fig1.savefig(home + self.save_path + self.general_filename +  ".png")
             plt.close(fig1)
