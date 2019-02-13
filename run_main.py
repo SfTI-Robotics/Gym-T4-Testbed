@@ -15,6 +15,8 @@ from summary import summary
 import time
 import datetime
 
+# ============================================
+
 # For more on how argparse works see documentation
 # create argument options 
 parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -61,11 +63,6 @@ else :
     print("Algorithm not found")
     
 # ============================================
-# global variables
-SAVE_MODEL = True
-LOAD_MODEL = True
-MODEL_FILENAME = args.environment + '_' + args.algorithm + '_'
-# ============================================
 
 # create gym env
 env = gym.make(args.environment)
@@ -82,12 +79,11 @@ action_space=processor.new_action_space(action_space)
 # initialise the algorithm class which also contains the network 
 learner = brain.Learning(state_space, action_space)
 
-# if LOAD_MODEL == True:
-#     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
+# ============================================
 
 # Graphing results
 now = datetime.datetime.now()
-
+MODEL_FILENAME = args.environment + '_' + args.algorithm + '_'
 # our graphing function
 #summary sets the ranges and targets and saves the graph
 graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'],
@@ -113,10 +109,18 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # reward lower bound for graph 
             REWARD_MAX_M = processor.reward_max
     )
-print("\n ==== initialisation complete, start training ==== \n")
 
 # ==================================================
-#
+
+# storing neural network weights and parameters 
+SAVE_MODEL = True
+LOAD_MODEL = True
+# if LOAD_MODEL == True:
+#     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
+
+# ============================================
+print("\n ==== initialisation complete, start training ==== \n")
+
 for episode in range(int(args.episodes)):
 
     observation = env.reset()
@@ -165,10 +169,9 @@ for episode in range(int(args.episodes)):
         game_step += 1
         step+=1        
 
-#########################################################################################################
         if (not reward == 0) or (done) :
             print(  'game_number =',   game_number , 'game_step = ', game_step)
-            print(' epsilon =', learner.epsilon)
+            
             # backpropagate the reward received so that the actions leading up to this result is accounted for
             reward_array=processor.discounted_rewards(reward_array,learner.gamma)
                 
@@ -183,12 +186,13 @@ for episode in range(int(args.episodes)):
             
             # when an agent's game score reaches 21
             if done:
-                print('\n Completed Episode ' + str(episode), 'steps = ', step, '\n')
+                print('\n Completed Episode ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, '\n')
+
                 # train algorithm using experience replay
                 learner.memory_replay()
-
+                
                 break
-
+        
         observation = next_observation
 
     # store model weights and parameters when episode rewards are above a certain amount 
