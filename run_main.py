@@ -14,6 +14,8 @@ from argparse import RawTextHelpFormatter
 from summary import summary
 import time
 import datetime
+# recording environment render as video mp4
+from gym.wrappers import Monitor
 
 # ============================================
 
@@ -191,6 +193,9 @@ for episode in range(int(args.episodes)):
                 # train algorithm using experience replay
                 learner.memory_replay()
                 
+                # record video of environment render
+                env = gym.wrappers.Monitor(env,directory='Videos/pong/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
+         
                 break
         
         observation = next_observation
