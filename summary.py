@@ -4,9 +4,6 @@ import matplotlib.gridspec
 import os
 import time
 
-
-from PIL import Image
-
 from os.path import expanduser
 home = expanduser("~")
 
@@ -142,7 +139,8 @@ class summary:
         # an array that records total reward collected in each episode
         reward_count = 0,
         # epsilon greedy value
-        epsilon_value = 0
+        epsilon_value = 0, 
+        e_greedy_formula = 'insert formula'
     ):
         self.update(step_count, time_count, reward_count, epsilon_value)
 
@@ -187,10 +185,10 @@ class summary:
                 if element == 'sumiz_epsilon':
                     ax4 = fig1.add_subplot(self.num_main_axes, 1, i)
                     plt.axis([EPISODE_MIN,self.EPISODE_MAX, 0, 1])
-                    ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary)
+                    ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary, label = e_greedy_formula)
                     ax4.plot(range(len(self.epsilon_summary)), np.repeat(self.epsilon_goal, len(self.epsilon_summary)), 'r:')
                     ax4.set_title('Epsilon Greedy')
-                    ax4.set_xlabel('Episode')
+                    ax4.set_xlabel('Episode \n ' + e_greedy_formula)
                     ax4.set_ylabel('Epsilon')
                     i += 1
 
@@ -202,11 +200,11 @@ class summary:
                     ax5.set_xlabel('Episode')
                     ax5.set_ylabel('Reward per step')
                     i += 1
-
+            
             plt.tight_layout()
-
             fig1.savefig(home + self.save_path + self.general_filename +  ".png")
             plt.close(fig1)
+
         if not self.num_focus_axes or self.start_focus == self.end_focus:
             return
 

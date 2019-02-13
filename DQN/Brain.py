@@ -1,9 +1,9 @@
 import numpy as np
 import random
 from collections import deque
-# import the network class from file 
+# import the network class from file
 from DQN.Network import neural_net
-import time 
+import time
 
 # ========================
 
@@ -12,9 +12,9 @@ MAX_MEMORY_LENGTH = 6000
 # alpha
 LEARNING_RATE = 0.1
 # gamma
-REWARD_DECAY = 0.8	
+REWARD_DECAY = 0.8
 #used for memory replay see comment below
-START_TRAINING = 5000  
+START_TRAINING = 5000
 # how many memory's we learn from at a time
 batch_size=32
 
@@ -22,7 +22,7 @@ class Learning():
 
 
     def __init__(self,observations, actions):
-        self.state_space = observations 
+        self.state_space = observations
         self.action_space = actions
         #initialise network here and not in the main file
         #length of action space should be whatever new_action_space outputs see preprocess for more
@@ -34,7 +34,7 @@ class Learning():
         #transitions is where we store memory of max memory length
         self.transitions = deque(maxlen = MAX_MEMORY_LENGTH)
 
-    
+
     def choose_action(self, state, episode):
         if random.random() > self.epsilon:
             #this expolres by choosing a randomised action
@@ -59,11 +59,9 @@ class Learning():
         # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
         if len(self.transitions) < START_TRAINING:
             return
-
-        # experience replay
         # randomly select 32 memories from 5000
         batch = random.sample(self.transitions, batch_size)
-        
+
         for state, action, reward, next_state, done in batch:
             target = reward
             if not done:
@@ -75,10 +73,9 @@ class Learning():
             # resize array by increasing dimension
             state = np.expand_dims(state, axis=0)
             target_f = self.network.model.predict(state)
-            
+
             target_f[0][action] = target
             # print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose = 0)
 
         print("finish replay")
-
