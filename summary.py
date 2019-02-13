@@ -4,9 +4,6 @@ import matplotlib.gridspec
 import os
 import time
 
-
-from PIL import Image
-
 from os.path import expanduser
 home = expanduser("~")
 
@@ -142,7 +139,8 @@ class summary:
         # an array that records total reward collected in each episode
         reward_count = 0,
         # epsilon greedy value
-        epsilon_value = 0
+        epsilon_value = 0, 
+        e_greedy_formula = 'insert formula'
     ):
         self.update(step_count, time_count, reward_count, epsilon_value)
 
@@ -153,6 +151,7 @@ class summary:
         # generate summary graphs
         if episode_count % FREQUENCY == 0:
             fig1 = plt.figure(figsize=(5, 10)) # ploting normally takes ~0.5 seconds
+            fig1.text(1, 1, e_greedy_formula)
             i = 1
             for element in self.summary_types:
                 if element == 'sumiz_step':
@@ -187,11 +186,14 @@ class summary:
                 if element == 'sumiz_epsilon':
                     ax4 = fig1.add_subplot(self.num_main_axes, 1, i)
                     plt.axis([EPISODE_MIN,self.EPISODE_MAX, 0, 1])
-                    ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary)
+                    ax4.plot(range(len(self.epsilon_summary)),self.epsilon_summary, label = e_greedy_formula)
                     ax4.plot(range(len(self.epsilon_summary)), np.repeat(self.epsilon_goal, len(self.epsilon_summary)), 'r:')
                     ax4.set_title('Epsilon Greedy')
                     ax4.set_xlabel('Episode')
+                    
                     ax4.set_ylabel('Epsilon')
+                    # ax4.legend(loc = 'lower right')
+                    # ax4.text(1, 1, e_greedy_formula, rotation = 90)
                     i += 1
 
                 if element == 'sumiz_average_reward':
@@ -202,11 +204,12 @@ class summary:
                     ax5.set_xlabel('Episode')
                     ax5.set_ylabel('Reward per step')
                     i += 1
-
+            
+            # fig1.figtext(-1, -1, e_greedy_formula)
             plt.tight_layout()
-
             fig1.savefig(home + self.save_path + self.general_filename +  ".png")
             plt.close(fig1)
+
         if not self.num_focus_axes or self.start_focus == self.end_focus:
             return
 

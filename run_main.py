@@ -202,6 +202,6 @@ for episode in range(int(args.episodes)):
     #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
 
     # summarize plots the graph
-    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon)
+    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon, learner.e_greedy_formula)
 # killing environment to prevent memory leaks
 env.close()
