@@ -111,7 +111,8 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # reward lower bound for graph 
             REWARD_MAX_M = processor.reward_max
     )
-
+# =================================================
+DISCOUNTED_REWARDS_FACTOR=0.99
 # ==================================================
 
 # storing neural network weights and parameters 
@@ -175,7 +176,7 @@ for episode in range(int(args.episodes)):
             print(  'game_number =',   game_number , 'game_step = ', game_step)
             
             # backpropagate the reward received so that the actions leading up to this result is accounted for
-            reward_array=processor.discounted_rewards(reward_array,learner.gamma)
+            reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
                 
             #append each <s, a, r, s', d> to leraner.transitons for each game round
             for i in range(game_step):
