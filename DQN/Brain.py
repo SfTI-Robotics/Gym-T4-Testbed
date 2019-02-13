@@ -16,7 +16,7 @@ REWARD_DECAY = 0.8
 #used for memory replay see comment below
 START_TRAINING = 5000
 # how many memory's we learn from at a time
-batch_size=32
+batch_size=500
 
 class Learning():
 

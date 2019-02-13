@@ -29,7 +29,7 @@ parser.add_argument("-eps","--episodes", help="select number of episodes to grap
 args = parser.parse_args()
 
 # Preprocessing folder
-# this takes care of the environment specifics and image proccessing
+# this takes care of the environment specif7.8626167934090ics and image proccessing
 if args.environment == 'Pong-v0':
     import Preprocess.Pong_Preprocess as preprocess
     print('Pong works')
