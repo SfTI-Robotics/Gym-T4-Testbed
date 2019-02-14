@@ -13,8 +13,6 @@ MAX_MEMORY_LENGTH = 6000
 LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.8
-#used for memory replay see comment below
-START_TRAINING = 5000
 # how many memory's we learn from at a time
 batch_size=500
 
@@ -58,7 +56,7 @@ class Learning():
     def memory_replay(self):
         # experience replay learning from our memories once there are 5000 memories
         # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
-        if len(self.transitions) < START_TRAINING:
+        if len(self.transitions) < MAX_MEMORY_LENGTH:
             return
         # randomly select 32 memories from 5000
         batch = random.sample(self.transitions, batch_size)

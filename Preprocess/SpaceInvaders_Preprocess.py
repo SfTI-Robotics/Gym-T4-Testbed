@@ -8,10 +8,10 @@ import numpy as np
 class Processing:
     def __init__(self):
         self.deque = deque([np.zeros((110,84), dtype=np.int) for i in range(4)], maxlen=4)
-        self.step_max = 3000
-        self.time_max = 100
-        self.reward_min = -10         
-        self.reward_max= 1000 
+        self.step_max = 2000
+        self.time_max = 30
+        self.reward_min = 0       
+        self.reward_max= 1000
 
     def Preprocessing(self, state, is_new_episode):
         # grayscale
