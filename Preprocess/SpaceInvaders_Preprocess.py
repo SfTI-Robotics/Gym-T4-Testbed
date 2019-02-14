@@ -73,12 +73,7 @@ class Processing:
     # https://ai.stackexchange.com/questions/2449/what-are-different-actions-in-action-space-of-environment-of-pong-v0-game-from
 
     def new_action_space(self,actions):
-        # out of 6 actions, only use 3
-        # 0 and 1 is taking no move
-        # 2 and 4 move up 
-        # 3 and 5 move down
-        # we want it to only be able to select 0,2,3
-        return 3 
+        return actions
 
     def mapping_actions_to_keys(self,action_taken):
         # maps the 3 unique actions to OpenAI's gym action space (6 actions)
@@ -94,4 +89,4 @@ class Processing:
         elif action_taken == 2:
             action = 3
             
-        return action
+        return action_taken

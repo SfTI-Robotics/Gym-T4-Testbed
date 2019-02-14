@@ -195,7 +195,7 @@ for episode in range(int(args.episodes)):
                 learner.memory_replay()
                 
                 # record video of environment render
-                env = gym.wrappers.Monitor(env,directory='Videos/pong/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
+                # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
          
                 break
         
