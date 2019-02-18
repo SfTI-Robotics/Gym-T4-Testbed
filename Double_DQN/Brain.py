@@ -4,10 +4,14 @@ import keras
 import keras.models
 from collections import deque
 from Double_DQN.Network import neural_net
+import time
 
-
+#========================
+# length of transitions deque
 MAX_MEMORY_LENGTH = 5000
+
 START_TRAINING = 500
+
 batch_size=32
 
 class Learning():
@@ -40,7 +44,7 @@ class Learning():
 
         # increase epsilon
         #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 4000))
+        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
 
         return action
 
@@ -59,7 +63,7 @@ class Learning():
                 # resize array by increasing dimension
                 next_state = np.expand_dims(next_state, axis= 0)
                 # bootstrapping the predicted reward as Q-value
-                target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+                target = reward + self.gamma * np.max(self.target_network.model.predict(next_state))
 
             # resize array by increasing dimension
             state = np.expand_dims(state, axis=0)

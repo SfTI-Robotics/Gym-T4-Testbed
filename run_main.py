@@ -74,6 +74,14 @@ processor = preprocess.Processing()
 state_space = processor.get_state_space()
 # action space given by the environment
 action_space = env.action_space.n 
+
+#**********************************************************************#
+#if you want to look if there's any useless keys print the stuff below
+
+#what_actions_do = env.unwrapped.get_action_meanings()
+#print(what_actions_do)
+#***********************************************************************#\
+
 # here we change the action space if it contains 'useless' keys or actions that do the same thing
 # if no useless keys it just returns the envs defined action space
 # This function is created in the preprocess file  

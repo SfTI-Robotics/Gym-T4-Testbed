@@ -7,6 +7,7 @@ class neural_net():
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space
         self.action_space = action_space
+
         self.model = Sequential()
         # initialise network object
         neural_net.build_network(self)
@@ -22,7 +23,7 @@ class neural_net():
 
         # hidden layer takes a pre-processed frame as input, and has 200 units
         #  fibre channel layer 1
-        self.model.add(Dense(units=40,input_dim=self.obs_space, activation='relu', kernel_initializer='he_uniform'))
+        self.model.add(Dense(units=200,input_dim=self.obs_space, activation='relu', kernel_initializer='he_uniform'))
 
         # output layer
         self.model.add(Dense(units=self.action_space, activation='relu', kernel_initializer='RandomNormal'))
