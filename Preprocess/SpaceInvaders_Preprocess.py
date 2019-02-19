@@ -47,7 +47,14 @@ class Processing:
         return np.shape(self.deque) 
 
     def discounted_rewards(self, rewards, gamma):
+ 
+
         return rewards
+
+    # according to the resource below, Pong-v0 actions come in pairs, 
+    # therefore, we choose to only pass in one of each pair.
+    # this results in only threee actions
+    # https://ai.stackexchange.com/questions/2449/what-are-different-actions-in-action-space-of-environment-of-pong-v0-game-from
 
     def new_action_space(self,actions):
         return actions
