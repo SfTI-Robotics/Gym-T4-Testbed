@@ -41,6 +41,9 @@ elif args.environment == 'SpaceInvaders-v0':
 elif args.environment == 'MsPacman-v0':
     import Preprocess.MsPacman_Preprocess as preprocess
     print('MsPacman works')
+elif args.environment == 'CartPole-v1':
+    import Preprocess.Cartpole as preprocess
+    print('Cartpole works')
 else :
     print("Environment not found")
 
@@ -59,7 +62,7 @@ elif args.algorithm == 'DuellingDQN':
     import Dueling_DQN.Brain as brain
     print('Dueling works')
 elif args.algorithm == 'DDDQN':
-    import DDDQN_PER.Brain as brai
+    import DDDQN_PER.Brain as brain
     print('PER works')
 else :
     print("Algorithm not found")
@@ -74,6 +77,12 @@ processor = preprocess.Processing()
 state_space = processor.get_state_space()
 # action space given by the environment
 action_space = env.action_space.n 
+if args.environment == 'CartPole-v1':
+    state_space = env.observation_space.shape[0]
+
+#print(state_space)
+
+#print(action_space)
 
 #**********************************************************************#
 #if you want to look if there's any useless keys print the stuff below
@@ -200,13 +209,14 @@ for episode in range(int(args.episodes)):
                 print('\n Completed Episode ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
 
                 # train algorithm using experience replay
-                learner.memory_replay()
+                #learner.memory_replay()
                 
                 # record video of environment render
                 # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
          
                 break
         
+        learner.memory_replay()
         observation = next_observation
 
     # store model weights and parameters when episode rewards are above a certain amount 

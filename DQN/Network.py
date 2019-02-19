@@ -23,6 +23,9 @@ class neural_net():
         # convert image from 2D to 1D
         self.model.add(Flatten())
 
+        #layer for testing out code on cartpole
+        #self.model.add(Dense(24, input_shape=(self.obs_space,), activation="relu"))
+
         # hidden layer takes a pre-processed frame as input, and has 200 units
         #  fibre channel layer 1
         self.model.add(Dense(units=500, activation='relu', kernel_initializer='glorot_uniform'))

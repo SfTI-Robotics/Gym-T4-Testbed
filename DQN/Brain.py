@@ -50,6 +50,7 @@ class Learning():
         #  formula = 1 - a ** (-b * (episode - c))
         self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
         self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-4000))'
+
         return action
 
 

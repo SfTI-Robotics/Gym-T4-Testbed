@@ -12,7 +12,7 @@ MAX_MEMORY_LENGTH = 5000
 
 START_TRAINING = 500
 
-batch_size=32
+batch_size=64
 
 class Learning():
 
