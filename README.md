@@ -13,6 +13,7 @@
 - scikit-image
 - OpenCV
 - matplotlib
+- imageio
 
 
 ----------------
