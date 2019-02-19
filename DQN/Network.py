@@ -31,7 +31,7 @@ class neural_net():
         self.model.add(Dense(units=500, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
-        print("output layer dimensions = ", self.action_space)
+        # print("output layer dimensions = ", self.action_space)
         self.model.add(Dense(units=self.action_space, activation='softmax', kernel_initializer='RandomNormal'))
 
         # compile the model using traditional Machine Learning losses and optimizers

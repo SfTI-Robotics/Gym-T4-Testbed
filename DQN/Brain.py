@@ -14,7 +14,7 @@ LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.8
 # how many memory's we learn from at a time
-batch_size=500
+batch_size = 32
 
 class Learning():
 
@@ -49,7 +49,7 @@ class Learning():
         # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
         self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
-        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-4000))'
+        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-2500))'
 
         return action
 

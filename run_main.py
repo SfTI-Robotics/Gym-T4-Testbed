@@ -221,17 +221,19 @@ for episode in range(int(args.episodes)):
 
                 break
 
-        # train algorithm using experience replay
-        learner.memory_replay()
+        
         observation = next_observation
 
-        # make gif
-        if episode != 0 and episode % 5 == 0:
-            images = np.array(episode_frames)
-            fname = './gifs/episode'+str(episode)+'.gif'
-            with imageio.get_writer(fname, mode='I') as writer:
-                for frame in images:
-                    writer.append_data(frame)
+    # make gif
+    if episode != 0 and episode % 5 == 0:
+        images = np.array(episode_frames)
+        fname = './gifs/episode'+str(episode)+'.gif'
+        with imageio.get_writer(fname, mode='I') as writer:
+            for frame in images:
+                writer.append_data(frame)
+
+    # train algorithm using experience replay
+    learner.memory_replay()
 
 
 
