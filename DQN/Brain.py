@@ -8,7 +8,7 @@ import time
 # ========================
 
 # length of transitions deque
-MAX_MEMORY_LENGTH = 6000
+MAX_MEMORY_LENGTH = 60
 # alpha
 LEARNING_RATE = 0.1
 # gamma
@@ -63,20 +63,46 @@ class Learning():
         # randomly select 32 memories from 5000
         batch = random.sample(self.transitions, batch_size)
 
+        # for state, action, reward, next_state, done in batch:
+        #     target = reward
+        #     if not done:
+        #         # resize array by increasing dimension
+        #         next_state = np.expand_dims(next_state, axis= 0)
+        #         # bootstrapping the predicted reward as Q-value
+        #         target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+
+        #     # resize array by increasing dimension
+        #     state = np.expand_dims(state, axis=0)
+        #     target_f = self.network.model.predict(state)
+
+        #     target_f[0][action] = target
+        #     # print('target_f =', target_f)
+        #     self.network.model.fit(state, target_f, verbose = 0)
+       
+    #     =============================================
+        state_array = np.zeros((batch_size, *self.state_space)) 
+        next_state_array = np.zeros((batch_size, *self.state_space))
+        out = np.zeros((batch_size,3))
+        batch = random.sample(self.transitions, batch_size)
+        i = 0
         for state, action, reward, next_state, done in batch:
+            state_array[i:i+1] = state
+            next_state_array[i:i+1] = next_state
             target = reward
-            if not done:
-                # resize array by increasing dimension
-                next_state = np.expand_dims(next_state, axis= 0)
-                # bootstrapping the predicted reward as Q-value
-                target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
-            # resize array by increasing dimension
+            if done == False:
+                next_state = np.expand_dims(next_state, axis=0)
+                target = reward + self.gamma * np.amax(self.network.model.predict(next_state)[0] )
+            
             state = np.expand_dims(state, axis=0)
-            target_f = self.network.model.predict(state)
+            out[i] = self.network.model.predict(state)
+            out[i][action] = target
+            i += 1
 
-            target_f[0][action] = target
-            # print('target_f =', target_f)
-            self.network.model.fit(state, target_f, verbose = 0)
+        self.network.model.fit(state_array,out,batch_size = batch_size, epochs=1,verbose=1)
+       
+    #     =============================================
+
+
 
         print("finish replay")

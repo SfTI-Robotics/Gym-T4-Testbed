@@ -7,6 +7,8 @@ import numpy as np
 class neural_net():
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space
+        print('obs_space = ', obs_space)
+
         # action space uses the customised action encoding from the environment's preprocess file
         self.action_space = action_space
 
@@ -44,22 +46,14 @@ class neural_net():
     def build_network22(self):
         shape_image=self.obs_space
         init = keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
-        #self.model.add(keras.layers.Lambda(lambda x: x / 255.0,input_shape = shape_image))
-        # ============
-        # self.model.add(Conv2D(32,(8,8), strides=4,use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
-        
         # self.model.add(Conv2D(32,(8,8), strides=(2,2), use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
-        
         self.model.add(Conv2D(16, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
         self.model.add(Conv2D(32, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
-        
-        # ===========
         self.model.add(MaxPooling2D(pool_size=2))
-        # self.model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
         self.model.add(Conv2D(64,(3,3),use_bias= True, bias_initializer = 'zeros', kernel_initializer = init, activation = 'relu'))
         self.model.add(Flatten())
         self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
         self.model.add(Dense(24, activation = 'relu',kernel_initializer='he_uniform' ))
         self.model.add(Dense(self.action_space, activation='linear', kernel_initializer = 'he_uniform'))
         self.model.compile(optimizer=keras.optimizers.RMSprop(lr = 0.00025, rho = 0.95), loss = 'mse')
-        self.model.summary()
+        # self.model.summary()
