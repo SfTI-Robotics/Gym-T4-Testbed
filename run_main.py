@@ -201,10 +201,12 @@ for episode in range(int(args.episodes)):
         if (not reward == 0) or (done) :
             print(  'game_number =',   game_number , 'game_step = ', game_step)
 
-            # backpropagate the reward received so that the actions leading up to this result is accounted for
-            reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
+            if reward < 0 :
+                # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
+                # philosophy of encouragement
+                reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
-            #append each <s, a, r, s', d> to leraner.transitons for each game round
+            #append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
 

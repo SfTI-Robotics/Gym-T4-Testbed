@@ -55,7 +55,7 @@ class neural_net():
         
         # ===========
         self.model.add(MaxPooling2D(pool_size=2))
-        self.model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
+        # self.model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
         self.model.add(Conv2D(64,(3,3),use_bias= True, bias_initializer = 'zeros', kernel_initializer = init, activation = 'relu'))
         self.model.add(Flatten())
         self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
