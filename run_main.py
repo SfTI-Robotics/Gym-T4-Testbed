@@ -88,8 +88,8 @@ if args.environment == 'CartPole-v1':
 #**********************************************************************#
 #if you want to look if there's any useless keys print the stuff below
 
-#what_actions_do = env.unwrapped.get_action_meanings()
-#print(what_actions_do)
+what_actions_do = env.unwrapped.get_action_meanings()
+print(what_actions_do)
 #***********************************************************************#\
 
 # here we change the action space if it contains 'useless' keys or actions that do the same thing

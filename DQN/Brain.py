@@ -82,7 +82,8 @@ class Learning():
     #     =============================================
         state_array = np.zeros((batch_size, *self.state_space)) 
         next_state_array = np.zeros((batch_size, *self.state_space))
-        out = np.zeros((batch_size,3))
+        out = np.zeros((batch_size,len(self.state_space)))
+        print(len(self.state_space))
         batch = random.sample(self.transitions, batch_size)
         i = 0
         for state, action, reward, next_state, done in batch:
