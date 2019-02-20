@@ -4,12 +4,11 @@ this is the universal run script for all environments
 """
 # import dependencies
 import argparse
+from argparse import RawTextHelpFormatter
 import sys
 import numpy as np
 import time
 import gym
-# for formatting the new lines
-from argparse import RawTextHelpFormatter
 # for graphing
 from summary import summary
 import time
@@ -130,13 +129,15 @@ graph = summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
             # reward lower bound for graph
             REWARD_MAX_M = processor.reward_max
     )
+
 # =================================================
+
 DISCOUNTED_REWARDS_FACTOR=0.99
 # ==================================================
 
 # storing neural network weights and parameters
-SAVE_MODEL = True
-LOAD_MODEL = True
+# SAVE_MODEL = True
+# LOAD_MODEL = True
 # if LOAD_MODEL == True:
 #     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
 
