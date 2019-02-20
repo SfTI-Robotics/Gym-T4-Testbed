@@ -14,7 +14,7 @@ LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.8
 # how many memory's we learn from at a time
-batch_size = 32
+batch_size = 5000
 
 class Learning():
 
@@ -62,7 +62,7 @@ class Learning():
             return
         # randomly select 32 memories from 5000
         batch = random.sample(self.transitions, batch_size)
-
+# ===============================
         # for state, action, reward, next_state, done in batch:
         #     target = reward
         #     if not done:
@@ -78,13 +78,14 @@ class Learning():
         #     target_f[0][action] = target
         #     # print('target_f =', target_f)
         #     self.network.model.fit(state, target_f, verbose = 0)
-       
-    #     =============================================
+
+
+
+# =================================
         state_array = np.zeros((batch_size, *self.state_space)) 
         next_state_array = np.zeros((batch_size, *self.state_space))
         out = np.zeros((batch_size,len(self.state_space)))
-        print(len(self.state_space))
-        batch = random.sample(self.transitions, batch_size)
+        # batch = random.sample(self.transitions, batch_size)
         i = 0
         for state, action, reward, next_state, done in batch:
             state_array[i:i+1] = state
@@ -99,6 +100,7 @@ class Learning():
             out[i] = self.network.model.predict(state)
             out[i][action] = target
             i += 1
+# =============================
 
         self.network.model.fit(state_array,out,batch_size = batch_size, epochs=1,verbose=1)
        
