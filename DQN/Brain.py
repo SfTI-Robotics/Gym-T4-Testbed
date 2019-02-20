@@ -55,6 +55,7 @@ class Learning():
 
 
     def memory_replay(self):
+        #this is highly inefficient
         # experience replay learning from our memories once there are 5000 memories
         # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
         if len(self.transitions) < MAX_MEMORY_LENGTH:
