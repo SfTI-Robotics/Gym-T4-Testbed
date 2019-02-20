@@ -35,7 +35,7 @@ class neural_net():
         # print("output layer dimensions = ", self.action_space)
         self.model.add(Dense(units=self.action_space, activation='softmax', kernel_initializer='RandomNormal'))
 
-        # compile the model using traditional Machine Learning losses and optimizers
+        # compile theself.model using traditional Machine Learning losses and optimizers
         # self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
@@ -44,14 +44,22 @@ class neural_net():
     def build_network22(self):
         shape_image=self.obs_space
         init = keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
-        model.add(keras.layers.Lambda(lambda x: x / 255.0,input_shape = shape_image))
-        model.add(Conv2D(32,(8,8), strides=4,use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
-        model.add(MaxPooling2D(pool_size=2))
-        model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
-        model.add(Conv2D(64,(3,3),use_bias= True, bias_initializer = 'zeros', kernel_initializer = init, activation = 'relu'))
-        model.add(Flatten())
-        model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
-        model.add(Dense(24, activation = 'relu',kernel_initializer='he_uniform' ))
-        model.add(Dense(self.action_space, activation='linear', kernel_initializer = 'he_uniform'))
-        model.compile(optimizer=keras.optimizers.RMSprop(lr = 0.00025, rho = 0.95), loss = 'mse')
+        self.model.add(keras.layers.Lambda(lambda x: x / 255.0,input_shape = shape_image))
+        # ============
+        # self.model.add(Conv2D(32,(8,8), strides=4,use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
         
+        # self.model.add(Conv2D(32,(8,8), strides=(2,2), use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
+        
+        self.model.add(Conv2D(16, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
+        self.model.add(Conv2D(32, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))
+        
+        # ===========
+        self.model.add(MaxPooling2D(pool_size=2))
+        self.model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
+        self.model.add(Conv2D(64,(3,3),use_bias= True, bias_initializer = 'zeros', kernel_initializer = init, activation = 'relu'))
+        self.model.add(Flatten())
+        self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
+        self.model.add(Dense(24, activation = 'relu',kernel_initializer='he_uniform' ))
+        self.model.add(Dense(self.action_space, activation='linear', kernel_initializer = 'he_uniform'))
+        self.model.compile(optimizer=keras.optimizers.RMSprop(lr = 0.00025, rho = 0.95), loss = 'mse')
+        self.model.summary()
