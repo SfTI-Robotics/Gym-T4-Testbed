@@ -140,7 +140,7 @@ class summary:
         reward_count = 0,
         # epsilon greedy value
         epsilon_value = 0, 
-        e_greedy_formula = 'insert formula'
+        e_greedy_formula = 'e-greedy formula = '
     ):
         self.update(step_count, time_count, reward_count, epsilon_value)
 

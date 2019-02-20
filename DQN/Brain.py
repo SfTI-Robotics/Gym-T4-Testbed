@@ -8,13 +8,13 @@ import time
 # ========================
 
 # length of transitions deque
-MAX_MEMORY_LENGTH = 60
+MAX_MEMORY_LENGTH = 6000
 # alpha
 LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.8
 # how many memory's we learn from at a time
-batch_size = 5000
+batch_size = 100
 
 class Learning():
 
