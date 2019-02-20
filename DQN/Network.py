@@ -1,6 +1,6 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Conv2D
+from keras.layers import Dense, Flatten, Conv2D, Lambda, MaxPooling2D
 import numpy as np
 
 
@@ -11,7 +11,8 @@ class neural_net():
         self.action_space = action_space
 
         self.model = Sequential()
-        neural_net.build_network(self)
+        # neural_net.build_network(self)
+        neural_net.build_network22(self)
 
     def build_network(self):
         # 2 layers of convolutional networks
@@ -39,3 +40,18 @@ class neural_net():
         self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
         # self.model.summary()
+
+    def build_network22(self):
+        shape_image=self.obs_space
+        init = keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
+        model.add(keras.layers.Lambda(lambda x: x / 255.0,input_shape = shape_image))
+        model.add(Conv2D(32,(8,8), strides=4,use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
+        model.add(MaxPooling2D(pool_size=2))
+        model.add(Conv2D(64,(4,4), strides = 2, use_bias = True, bias_initializer = 'zeros',kernel_initializer = init, activation='relu'))
+        model.add(Conv2D(64,(3,3),use_bias= True, bias_initializer = 'zeros', kernel_initializer = init, activation = 'relu'))
+        model.add(Flatten())
+        model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
+        model.add(Dense(24, activation = 'relu',kernel_initializer='he_uniform' ))
+        model.add(Dense(self.action_space, activation='linear', kernel_initializer = 'he_uniform'))
+        model.compile(optimizer=keras.optimizers.RMSprop(lr = 0.00025, rho = 0.95), loss = 'mse')
+        
