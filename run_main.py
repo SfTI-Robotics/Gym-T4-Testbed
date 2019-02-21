@@ -42,9 +42,9 @@ elif args.environment == 'SpaceInvaders-v0':
 elif args.environment == 'MsPacman-v0':
     import Preprocess.MsPacman_Preprocess as preprocess
     print('MsPacman works')
-elif args.environment == 'CartPole-v1':
-    import Preprocess.Cartpole as preprocess
-    print('Cartpole works')
+elif args.environment == 'Breakout-v0':
+    import Preprocess.Breakout_Preprocess as preprocess
+    print('Breakout works')
 else :
     print("Environment not found")
 
@@ -78,8 +78,6 @@ processor = preprocess.Processing()
 state_space = processor.get_state_space()
 # action space given by the environment
 action_space = env.action_space.n
-if args.environment == 'CartPole-v1':
-    state_space = env.observation_space.shape[0]
 
 #print(state_space)
 
@@ -198,12 +196,13 @@ for episode in range(int(args.episodes)):
         step+=1
 
         if (not reward == 0) or (done) :
-            print(  'game_number =',   game_number , 'game_step = ', game_step)
+            if args.environment == 'Pong-v0':
+                print(  'game_number =',   game_number , 'game_step = ', game_step)
 
-            if reward > 0 : 
-                # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
-                # philosophy of encouragement
-                reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
+                if reward > 0 : 
+                    # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
+                    # philosophy of encouragement
+                    reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
             #append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
@@ -237,7 +236,7 @@ for episode in range(int(args.episodes)):
     # train algorithm using experience replay
     learner.memory_replay()
 
-
+    
 
     # store model weights and parameters when episode rewards are above a certain amount
     # and after every number of episodes

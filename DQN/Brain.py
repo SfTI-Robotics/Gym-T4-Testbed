@@ -29,7 +29,7 @@ class Learning():
         self.epsilon = 0
         self.e_greedy_formula = 'e-greedy formula = '
         self.gamma = REWARD_DECAY
-        self.alpha = 0.86
+        # self.alpha = 0.86
         #transitions is where we store memory of max memory length
         self.transitions = deque(maxlen = MAX_MEMORY_LENGTH)
 
