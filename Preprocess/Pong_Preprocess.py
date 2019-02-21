@@ -3,6 +3,7 @@ from skimage.color import rgb2gray # Help us to gray our frames
 import numpy as np
 #uncomment if you want to see what you've process and if it getting the right input
 # import cv2
+import matplotlib.pyplot as plt
 import time
 
 
@@ -25,7 +26,7 @@ class Processing:
         # this is to see if your processedframed looks alright
         # the part below show the original frame        
         # cv2.imshow("image", frame)
-        # cv2.waitKey(0)
+        # cv2.waitKey(100)
         # cv2.destroyAllWindows()
 
         # grayscale
@@ -43,8 +44,10 @@ class Processing:
         
         
         # uncomment to see single processed frame
-    #     cv2.imshow("image", frame)
-    #     cv2.waitKey(0)
+        # plt.imshow(np.array(frame))
+        # plt.show()
+        # cv2.imshow("image", np.array(frame))
+        # cv2.waitKey(10)
     #     cv2.destroyAllWindows()
         
         # state is a deque of 2 frames
@@ -65,7 +68,7 @@ class Processing:
             # in other steps one slot is already filled and the second one needs to be filled
             self.deque.append(frame)
             
-        # reshape the deque so that network recognises that its 4 frames stacked toghether
+        # reshape the deque so that network recognises that its two frames stacked toghether
         stacked_state = np.stack(self.deque, axis = 0)
         return stacked_state
 

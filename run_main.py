@@ -174,7 +174,6 @@ for episode in range(int(args.episodes)):
 
 
     while True:
-        # if running docker please comment out
         env.render()
         #action chooses from  simplified action space without useless keys
         action = learner.choose_action(observation, episode)
@@ -201,7 +200,7 @@ for episode in range(int(args.episodes)):
         if (not reward == 0) or (done) :
             print(  'game_number =',   game_number , 'game_step = ', game_step)
 
-            if reward < 0 :
+            if reward > 0 : 
                 # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
                 # philosophy of encouragement
                 reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
