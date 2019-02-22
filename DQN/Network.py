@@ -7,7 +7,6 @@ import numpy as np
 class neural_net():
     def __init__(self, obs_space, action_space):
         self.obs_space = obs_space
-        print('obs_space = ', obs_space)
 
         # action space uses the customised action encoding from the environment's preprocess file
         self.action_space = action_space

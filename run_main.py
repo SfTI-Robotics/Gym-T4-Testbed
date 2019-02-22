@@ -86,8 +86,8 @@ action_space = env.action_space.n
 #**********************************************************************#
 #if you want to look if there's any useless keys print the stuff below
 
-what_actions_do = env.unwrapped.get_action_meanings()
-print(what_actions_do)
+# what_actions_do = env.unwrapped.get_action_meanings()
+# print(what_actions_do)
 #***********************************************************************#\
 
 # here we change the action space if it contains 'useless' keys or actions that do the same thing
@@ -168,9 +168,6 @@ for episode in range(int(args.episodes)):
     next_states=[]
     dones=[]
 
-
-
-
     while True:
         env.render()
         #action chooses from  simplified action space without useless keys
@@ -199,7 +196,7 @@ for episode in range(int(args.episodes)):
             if args.environment == 'Pong-v0':
                 print(  'game_number =',   game_number , 'game_step = ', game_step)
 
-                if reward > 0 : 
+                if reward > 0 :
                     # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
                     # philosophy of encouragement
                     reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
@@ -215,14 +212,14 @@ for episode in range(int(args.episodes)):
 
             # when an agent's game score reaches 21
             if done:
-                print('\n Completed Episode ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
+                print('\n Completed Episode = ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
 
                 # record video of environment render
                 # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
 
                 break
 
-        
+
         observation = next_observation
 
     # make gif
@@ -236,7 +233,7 @@ for episode in range(int(args.episodes)):
     # train algorithm using experience replay
     learner.memory_replay()
 
-    
+
 
     # store model weights and parameters when episode rewards are above a certain amount
     # and after every number of episodes

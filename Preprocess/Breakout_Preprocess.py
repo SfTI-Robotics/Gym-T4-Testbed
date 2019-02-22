@@ -15,24 +15,20 @@ class Processing:
     def Preprocessing(self, state, is_new_episode):
         # plt.imshow(np.array(state))
         # plt.show()
-        # grayscale
+
         frame = rgb2gray(state)
         frame=frame[35:195]              
         frame = frame / 255.0 
         frame= transform.resize(frame,[110,84])
         
-
-        plt.imshow(np.array(frame))
-        plt.show()
+        # plt.imshow(np.array(frame))
+        # plt.show()
         
         frame = self.frames_to_state(frame, is_new_episode)
         return frame
 
-
     def frames_to_state(self, frame, is_new_episode):
 
-        # print(frame.shape[:])
-        # frame = self.Preprocessing(self, state)
         if is_new_episode:
             # all frames in new deque are of same state
             self.deque.append(frame)
