@@ -1,5 +1,5 @@
 #!/bin/bash
-file="list_of_tests.txt"
+file="testbed.txt"
 # Read the textfile which holds the arguments and then parse those arguments 
 # into the run file for an algorithm
 
