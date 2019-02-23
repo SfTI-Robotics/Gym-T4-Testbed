@@ -48,8 +48,8 @@ class Learning():
         # equation designed for training on 10 000 episodes
         # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
-        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-2500))'
+        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 4000))
+        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-4000))'
 
         return action
 
