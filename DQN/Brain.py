@@ -35,6 +35,9 @@ class Learning():
 
 
     def choose_action(self, state, episode):
+        # self.epsilon =  self.network.model.predict(np.expand_dims(state, axis=0))
+        # print('e = ', self.epsilon)
+
         if random.random() > self.epsilon:
             #this expolres by choosing a randomised action
             action = random.randrange(self.action_space)
@@ -51,33 +54,42 @@ class Learning():
         self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 4000))
         self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-4000))'
 
+        # if random.random() < self.epsilon:
+        #     action = 2 # UP_ACTION
+        # else:
+        #     action = 3 #DOWN_ACTION
+
         return action
 
 
+
     def memory_replay(self):
-        #this is highly inefficient
-        # experience replay learning from our memories once there are 5000 memories
-        # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
-        if len(self.transitions) < MAX_MEMORY_LENGTH:
-            return
-        # randomly select 32 memories from 5000
-        batch = random.sample(self.transitions, batch_size)
+
 # ===============================
-        for state, action, reward, next_state, done in batch:
-            target = reward
-            # if not done:
-            #     # resize array by increasing dimension
-            #     next_state = np.expand_dims(next_state, axis= 0)
-            #     # bootstrapping the predicted reward as Q-value    
-            #     target = reward + self.gamma * #np.max(self.network.model.predict(next_state))
 
-            # resize array by increasing dimension
-            state = np.expand_dims(state, axis=0)
-            target_f = self.network.model.predict(state)
+#         #this is highly inefficient
+#         # experience replay learning from our memories once there are 5000 memories
+#         # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
+#         if len(self.transitions) < MAX_MEMORY_LENGTH:
+#             return
+#         # randomly select 32 memories from 5000
+#         batch = random.sample(self.transitions, batch_size)
+# # ===============================
+#         for state, action, reward, next_state, done in batch:
+#             target = reward
+#             # if not done:
+#             #     # resize array by increasing dimension
+#             #     next_state = np.expand_dims(next_state, axis= 0)
+#             #     # bootstrapping the predicted reward as Q-value    
+#             #     target = reward + self.gamma * #np.max(self.network.model.predict(next_state))
 
-            target_f[0][action] = target
-            # print('target_f =', target_f)
-            self.network.model.fit(state, target_f, verbose = 0)
+#             # resize array by increasing dimension
+#             state = np.expand_dims(state, axis=0)
+#             target_f = self.network.model.predict(state)
+
+#             target_f[0][action] = target
+#             # print('target_f =', target_f)
+#             self.network.model.fit(state, target_f, verbose = 0)
 
 
 

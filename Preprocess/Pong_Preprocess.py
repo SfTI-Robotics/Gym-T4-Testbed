@@ -97,7 +97,8 @@ class Processing:
                 running_add = 0
             running_add = running_add * gamma + rewards[i]
             discounted_r[i] = running_add
-
+        discounted_r -= np.mean(discounted_r) #normalizing the result
+        discounted_r /= np.std(discounted_r) 
         return discounted_r
 
     # according to the resource below, Pong-v0 actions come in pairs, 
@@ -111,7 +112,7 @@ class Processing:
         # 2 and 4 move up 
         # 3 and 5 move down
         # we want it to only be able to select 0,2,3
-        return 3 
+        return 3
 
     def mapping_actions_to_keys(self,action_taken):
         # maps the 3 unique actions to OpenAI's gym action space (6 actions)

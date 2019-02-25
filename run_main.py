@@ -201,9 +201,12 @@ for episode in range(int(args.episodes)):
                     # philosophy of encouragement
                     reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
-            #append each <s, a, r, s', d> to learner.transitons for each game round
-            for i in range(game_step):
-                learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
+            # #append each <s, a, r, s', d> to learner.transitons for each game round
+            # for i in range(game_step):
+                # learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
+
+            learner.network.model.fit(states, actions, sample_weight= reward_array)
+
 
             # empty arrays after each round is complete
             states, actions, reward_array, next_states, dones  = [], [], [], [], []
@@ -222,16 +225,17 @@ for episode in range(int(args.episodes)):
 
         observation = next_observation
 
-    # make gif
-    if episode != 0 and episode % 5 == 0:
-        images = np.array(episode_frames)
-        fname = './gifs/episode'+str(episode)+'.gif'
-        with imageio.get_writer(fname, mode='I') as writer:
-            for frame in images:
-                writer.append_data(frame)
+    # # make gif
+    # if episode != 0 and episode % 5 == 0:
+    #     images = np.array(episode_frames)
+    #     fname = './gifs/episode'+str(episode)+'.gif'
+    #     with imageio.get_writer(fname, mode='I') as writer:
+    #         for frame in images:
+    #             writer.append_data(frame)
 
     # train algorithm using experience replay
-    learner.memory_replay()
+    # learner.memory_replay()
+
 
 
 

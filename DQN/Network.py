@@ -54,5 +54,5 @@ class neural_net():
         self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
         self.model.add(Dense(24, activation = 'relu',kernel_initializer='he_uniform' ))
         self.model.add(Dense(self.action_space, activation='linear', kernel_initializer = 'he_uniform'))
-        self.model.compile(optimizer=keras.optimizers.RMSprop(lr = 0.00025, rho = 0.95), loss = 'mse')
+        self.model.compile(optimizer=keras.optimizers.Adam(lr = 0.00025), loss = 'mse')
         # self.model.summary()
