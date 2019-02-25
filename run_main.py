@@ -163,6 +163,7 @@ for episode in range(int(args.episodes)):
     # arrays for other variable are needed for appending to transitions in our learner to work
     # arrays emptied after every round in an episode
     reward_array=[]
+    reward_episode =[]
     states=[]
     actions=[]
     next_states=[]
@@ -204,19 +205,19 @@ for episode in range(int(args.episodes)):
             # #append each <s, a, r, s', d> to learner.transitons for each game round
             # for i in range(game_step):
                 # learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
-
-            learner.network.model.fit(states, actions, sample_weight= reward_array)
-
-
-            # empty arrays after each round is complete
-            states, actions, reward_array, next_states, dones  = [], [], [], [], []
+            reward_episode.append(reward_array)
+            reward_array=[]
             game_number += 1
             game_step=0
 
             # when an agent's game score reaches 21
             if done:
                 print('\n Completed Episode = ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
+                learner.network.model.fit(states, actions, sample_weight= reward_episode)
 
+
+                # empty arrays after each round is complete
+                states, actions, reward_episode, next_states, dones  = [], [], [], [], []
                 # record video of environment render
                 # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
 

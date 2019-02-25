@@ -44,8 +44,8 @@ class Processing:
         
         
         # uncomment to see single processed frame
-        plt.imshow(np.array(frame))
-        plt.show()
+        # plt.imshow(np.array(frame))
+        # plt.show()
         # cv2.imshow("image", np.array(frame))
         # cv2.waitKey(10)
     #     cv2.destroyAllWindows()
