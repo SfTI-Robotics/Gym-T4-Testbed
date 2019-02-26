@@ -8,13 +8,13 @@ import time
 # ========================
 
 # length of transitions deque
-MAX_MEMORY_LENGTH = 6000
+MAX_MEMORY_LENGTH = 10000
 # alpha
 LEARNING_RATE = 0.1
 # gamma
-REWARD_DECAY = 0.8
+REWARD_DECAY = 0.99
 # how many memory's we learn from at a time
-batch_size = 100
+batch_size = 60
 
 class Learning():
 
@@ -51,8 +51,8 @@ class Learning():
         # equation designed for training on 10 000 episodes
         # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 4000))
-        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-4000))'
+        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
+        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
 
         # if random.random() < self.epsilon:
         #     action = 2 # UP_ACTION
@@ -66,22 +66,17 @@ class Learning():
     def memory_replay(self):
 
 # ===============================
+        for state, action, reward, next_state, done in batch:
+            target = reward
+            if not done:
+                # resize array by increasing dimension
+                #next_state = np.expand_dims(next_state, axis= 0)
+                # bootstrapping the predicted reward as Q-value    
+                target = reward + self.gamma * np.max(self.network.model.predict(next_state))
 
-#         #this is highly inefficient
-#         # experience replay learning from our memories once there are 5000 memories
-#         # condition for how many transitions need to stored before meory replay is used(1 step=1 transtion)
-#         if len(self.transitions) < MAX_MEMORY_LENGTH:
-#             return
-#         # randomly select 32 memories from 5000
-#         batch = random.sample(self.transitions, batch_size)
-# # ===============================
-#         for state, action, reward, next_state, done in batch:
-#             target = reward
-#             # if not done:
-#             #     # resize array by increasing dimension
-#             #     next_state = np.expand_dims(next_state, axis= 0)
-#             #     # bootstrapping the predicted reward as Q-value    
-#             #     target = reward + self.gamma * #np.max(self.network.model.predict(next_state))
+            # resize array by increasing dimension
+            #state = np.expand_dims(state, axis=0)
+            target_f = self.network.model.predict(state)
 
 #             # resize array by increasing dimension
 #             state = np.expand_dims(state, axis=0)

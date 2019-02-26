@@ -1,4 +1,5 @@
-Pong-v0 DQN 10
+CartPole-v1 DQN 500
+#	Pong-v0 DQN 10
 #	SpaceInvaders-v0 DQN 10
 #	Breakout-v0 DQN 10
 Keep as last Line, no blank lines above or below it

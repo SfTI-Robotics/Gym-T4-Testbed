@@ -5,25 +5,23 @@ import numpy as np
 
 class Processing:
     def __init__(self):
-        self.deque = deque([np.zeros((110,84), dtype=np.int) for i in range(4)], maxlen=4)
         self.step_max = 400
         self.time_max = 20
         self.reward_min = 0      
-        self.reward_max = 400
+        self.reward_max = 500
 
     def Preprocessing(self, state, is_new_episode):
+        
         return state
 
 
     def frames_to_state(self, frame, is_new_episode):
-
-        frame = self.Preprocessing(self, frame)
-
+        
         return frame
 
 
     def get_state_space(self):
-        return np.shape(self.deque) 
+        return (" No shape") 
 
     def discounted_rewards(self, rewards, gamma):
         return rewards

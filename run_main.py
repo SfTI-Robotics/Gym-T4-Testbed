@@ -45,6 +45,9 @@ elif args.environment == 'MsPacman-v0':
 elif args.environment == 'Breakout-v0':
     import Preprocess.Breakout_Preprocess as preprocess
     print('Breakout works')
+elif args.environment == 'CartPole-v1':
+    import Preprocess.Cartpole_Preprocess as preprocess
+    print('Cartpole works')
 else :
     print("Environment not found")
 
@@ -76,12 +79,15 @@ env = gym.make(args.environment)
 processor = preprocess.Processing()
 # state space is determined by the deque storing the frames from the env
 state_space = processor.get_state_space()
+if args.environment == 'Cartpole-v1':
+    state_space = env.observation_space.shape[0]
+    print("Goes into if loop")
 # action space given by the environment
 action_space = env.action_space.n
 
-#print(state_space)
+print(state_space)
 
-#print(action_space)
+print(action_space)
 
 #**********************************************************************#
 #if you want to look if there's any useless keys print the stuff below
@@ -195,7 +201,7 @@ for episode in range(int(args.episodes)):
 
         if (not reward == 0) or (done) :
             if args.environment == 'Pong-v0':
-                print(  'game_number =',   game_number , 'game_step = ', game_step)
+                # print(  'game_number =',   game_number , 'game_step = ', game_step)
 
                 if reward > 0 :
                     # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
@@ -213,7 +219,7 @@ for episode in range(int(args.episodes)):
             # when an agent's game score reaches 21
             if done:
                 print('\n Completed Episode = ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
-                learner.network.model.fit(states, actions, sample_weight= reward_episode)
+                # learner.network.model.fit(states, actions, sample_weight= reward_episode)
 
 
                 # empty arrays after each round is complete
@@ -225,19 +231,15 @@ for episode in range(int(args.episodes)):
 
 
         observation = next_observation
-
-    # # make gif
-    # if episode != 0 and episode % 5 == 0:
-    #     images = np.array(episode_frames)
-    #     fname = './gifs/episode'+str(episode)+'.gif'
-    #     with imageio.get_writer(fname, mode='I') as writer:
-    #         for frame in images:
-    #             writer.append_data(frame)
-
-    # train algorithm using experience replay
-    # learner.memory_replay()
-
-
+        # train algorithm using experience replay
+        learner.memory_replay()
+    # make gif
+    if episode != 0 and episode % 5 == 0:
+        images = np.array(episode_frames)
+        fname = './gifs/episode'+str(episode)+'.gif'
+        with imageio.get_writer(fname, mode='I') as writer:
+            for frame in images:
+                writer.append_data(frame)
 
 
     # store model weights and parameters when episode rewards are above a certain amount
