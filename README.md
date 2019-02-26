@@ -25,7 +25,8 @@
 |- Roulette-v0      |Q Learning|
 |   |  |
 |{ Atari }      ||
-|- Pong-v0        | DQN, policy gradient| 10 000
+|- Pong-v0        | Double DQN, policy gradient| 10 000
+|- Breakout-v0       | Double DQN| 500 000 pure exploitation, train for 1000 000 episodes | 
 |- SpaceInvaders-v0       |DQN|
 |- MsPacman-v0||
 |- Enduro-v0||
