@@ -79,7 +79,7 @@ env = gym.make(args.environment)
 processor = preprocess.Processing()
 # state space is determined by the deque storing the frames from the env
 state_space = processor.get_state_space()
-if args.environment == 'Cartpole-v1':
+if args.environment == 'CartPole-v1':
     state_space = env.observation_space.shape[0]
     print("Goes into if loop")
 # action space given by the environment
@@ -209,8 +209,9 @@ for episode in range(int(args.episodes)):
                     reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
             # #append each <s, a, r, s', d> to learner.transitons for each game round
-            # for i in range(game_step):
-                # learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
+            for i in range(game_step):
+                learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
+                
             reward_episode.append(reward_array)
             reward_array=[]
             game_number += 1
@@ -234,12 +235,12 @@ for episode in range(int(args.episodes)):
         # train algorithm using experience replay
         learner.memory_replay()
     # make gif
-    if episode != 0 and episode % 5 == 0:
-        images = np.array(episode_frames)
-        fname = './gifs/episode'+str(episode)+'.gif'
-        with imageio.get_writer(fname, mode='I') as writer:
-            for frame in images:
-                writer.append_data(frame)
+    # if episode != 0 and episode % 5 == 0:
+    #     images = np.array(episode_frames)
+    #     fname = './gifs/episode'+str(episode)+'.gif'
+    #     with imageio.get_writer(fname, mode='I') as writer:
+    #         for frame in images:
+    #             writer.append_data(frame)
 
 
     # store model weights and parameters when episode rewards are above a certain amount

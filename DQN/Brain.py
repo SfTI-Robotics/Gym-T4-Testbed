@@ -8,13 +8,13 @@ import time
 # ========================
 
 # length of transitions deque
-MAX_MEMORY_LENGTH = 10000
+MAX_MEMORY_LENGTH = 50
 # alpha
 LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.99
 # how many memory's we learn from at a time
-batch_size = 60
+batch_size = 10
 
 class Learning():
 
@@ -64,29 +64,38 @@ class Learning():
 
 
     def memory_replay(self):
+        print('trans num', len(self.transitions))
 
+        if len(self.transitions) < MAX_MEMORY_LENGTH:
+            return
+        # randomly select 32 memories from 5000
+        print("line 1")
+        batch = random.sample(self.transitions, batch_size)
+        print("line 2")
 # ===============================
         for state, action, reward, next_state, done in batch:
+            print("line 3")
             target = reward
             if not done:
                 # resize array by increasing dimension
-                #next_state = np.expand_dims(next_state, axis= 0)
-                # bootstrapping the predicted reward as Q-value    
+                next_state = np.expand_dims(next_state, axis= 0)
+                # bootstrapping the predicted reward as Q-value   
+                print("line 4") 
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+                print("line 5")
 
             # resize array by increasing dimension
-            #state = np.expand_dims(state, axis=0)
+            state = np.expand_dims(state, axis=0)
             target_f = self.network.model.predict(state)
+            print("line 6")
 
-#             # resize array by increasing dimension
-#             state = np.expand_dims(state, axis=0)
-#             target_f = self.network.model.predict(state)
+            target_f[0][action] = target
+            print("line 7")
+            # print('target_f =', target_f)
+            self.network.model.fit(state, target_f, verbose = 0)
+            print("line 8")
 
-#             target_f[0][action] = target
-#             # print('target_f =', target_f)
-#             self.network.model.fit(state, target_f, verbose = 0)
-
-
+        print("FINISHED REPLAYYYYYYYYYYYYYY")
 
 # =================================
         # state_array = np.zeros((batch_size, *self.state_space)) 
@@ -118,4 +127,4 @@ class Learning():
 
 
 
-        print("finish replay")
+        
