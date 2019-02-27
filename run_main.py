@@ -17,7 +17,7 @@ import datetime
 from gym.wrappers import Monitor
 # allows gifs to be saved of the training episode for use in the Control Center.
 import imageio
-
+from gif_matplotlib import save_frames_as_gif
 # ============================================
 
 # For more on how argparse works see documentation
@@ -190,6 +190,7 @@ for episode in range(int(args.episodes)):
         next_observation, reward, done, _ = env.step(action_mapped)
         
         episode_frames.append(next_observation)
+        
 
         if args.environment == 'CartPole-v1':
             # punish if terminal state reached
@@ -241,13 +242,20 @@ for episode in range(int(args.episodes)):
             learner.memory_replay(episode)
         
     # make gif
-    if episode != 0 and episode % 5 == 0:
-        images = np.array(episode_frames)
-        fname = './gifs/episode'+str(episode)+'.gif'
-        with imageio.get_writer(fname, mode='I') as writer:
-            for frame in images:
-                writer.append_data(frame)
+    # if episode != 0 and episode % 5 == 0:
+    #     images = np.array(episode_frames)
+    #     print('gif = ', len(episode_frames))
+    #     print('im = ', len(images))
+
+    #     fname = './gifs/episode'+str(episode)+'.gif'
+    #     with imageio.get_writer(fname, mode='I') as writer:
+    #         for frame in images:
+    #             writer.append_data(frame)
+
     
+    # if episode != 0 and episode % 5 == 0:
+    #     fname = './gifs/episode'+str(episode)+'.gif'
+    #     save_frames_as_gif(episode_frames, fname)
 
     # store model weights and parameters when episode rewards are above a certain amount
     # and after every number of episodes

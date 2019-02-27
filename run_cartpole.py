@@ -1,4 +1,4 @@
-"""
+Auto stash before merge of "master" and "origin/master""""
 this is the universal run script for all environments
 
 """
