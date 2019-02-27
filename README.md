@@ -53,10 +53,13 @@
 ----------------
 
 
-| Envrionment   | Algorithm | Required Training Episodes |
-| --------------------- | ------------------- |------------------- |
+| Envrionment   | Algorithm | Required Training Episodes |Experience Reply |
+| --------------------- | ------------------- |------------------- |------------------- |------------------- |------------------- |------------------- |
 | { Toy text } |   NB. *many environments do not render*|
 |- Roulette-v0      |Q Learning|
+|   |  |
+| { Classic Control } |   NB. *most popular environments*|
+|- CartPole-v1        | DQN| 500| every step |
 |   |  |
 |{ Atari }      ||
 |- Pong-v0        | Double DQN, policy gradient| 10 000
@@ -71,8 +74,10 @@
 |||
 |{ Box 2D }
 |||
-|VizDoom
-|||
 |{ MuJoCo }
 |||
 |{ Robotics }
+|||
+|{ Non-OpenAI gym }
+|VizDoom
+|||

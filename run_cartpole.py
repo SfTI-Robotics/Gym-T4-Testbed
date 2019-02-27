@@ -241,12 +241,12 @@ for episode in range(int(args.episodes)):
             learner.memory_replay(episode)
         
     # make gif
-    if episode != 0 and episode % 5 == 0:
-        images = np.array(episode_frames)
-        fname = './gifs/episode'+str(episode)+'.gif'
-        with imageio.get_writer(fname, mode='I') as writer:
-            for frame in images:
-                writer.append_data(frame)
+    # if episode != 0 and episode % 5 == 0:
+    #     images = np.array(episode_frames)
+    #     fname = './gifs/episode'+str(episode)+'.gif'
+    #     with imageio.get_writer(fname, mode='I') as writer:
+    #         for frame in images:
+    #             writer.append_data(frame)
     
 
     # store model weights and parameters when episode rewards are above a certain amount
