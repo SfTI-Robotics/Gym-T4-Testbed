@@ -187,6 +187,11 @@ for episode in range(int(args.episodes)):
         next_observation, reward, done, _ = env.step(action_mapped)
         episode_frames.append(next_observation)
 
+        if args.environment == 'CartPole-v0':
+            # punish if terminal state reached
+            if done:
+                reward = -reward
+
         # appending <s, a, r, s', d> into arrays for storage
         episode_rewards += reward
         reward_array.append(reward)
@@ -208,10 +213,12 @@ for episode in range(int(args.episodes)):
                     # philosophy of encouragement
                     reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
+            
+
             # #append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
-                
+
             reward_episode.append(reward_array)
             reward_array=[]
             game_number += 1
@@ -233,7 +240,7 @@ for episode in range(int(args.episodes)):
 
         observation = next_observation
         # train algorithm using experience replay
-        learner.memory_replay()
+        
     # make gif
     # if episode != 0 and episode % 5 == 0:
     #     images = np.array(episode_frames)
@@ -241,7 +248,7 @@ for episode in range(int(args.episodes)):
     #     with imageio.get_writer(fname, mode='I') as writer:
     #         for frame in images:
     #             writer.append_data(frame)
-
+    learner.memory_replay()
 
     # store model weights and parameters when episode rewards are above a certain amount
     # and after every number of episodes

@@ -44,7 +44,7 @@ class neural_net():
 
     def build_network22(self):
         #shape_image=self.obs_space
-        # init = keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
+        #init = keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)
         # self.model.add(Conv2D(32,(8,8), strides=(2,2), use_bias =True,bias_initializer='zeros',kernel_initializer = init,activation = 'relu'))
         # self.model.add(Conv2D(16, kernel_size=(8, 8), strides = (2, 2), padding='valid', activation = 'relu', input_shape=self.obs_space, data_format='channels_first'))
         # self.model.add(Conv2D(32, kernel_size=(4, 4), strides = (2, 2), padding='valid', activation = 'relu', data_format='channels_first'))

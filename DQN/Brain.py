@@ -8,13 +8,13 @@ import time
 # ========================
 
 # length of transitions deque
-MAX_MEMORY_LENGTH = 50
+MAX_MEMORY_LENGTH = 1000
 # alpha
 LEARNING_RATE = 0.1
 # gamma
 REWARD_DECAY = 0.99
 # how many memory's we learn from at a time
-batch_size = 10
+batch_size = 64
 
 class Learning():
 
@@ -66,9 +66,9 @@ class Learning():
     def memory_replay(self):
         print('trans num', len(self.transitions))
 
-        if len(self.transitions) < MAX_MEMORY_LENGTH:
+        if len(self.transitions) < batch_size:
             return
-        # randomly select 32 memories from 5000
+       
         print("line 1")
         batch = random.sample(self.transitions, batch_size)
         print("line 2")
@@ -76,20 +76,29 @@ class Learning():
         for state, action, reward, next_state, done in batch:
             print("line 3")
             target = reward
+            # print("state sampled", state)
+            # print("action sampled", action)
+            print("reward sampled", reward)
+            # print("next state sampled", next_state)
             if not done:
                 # resize array by increasing dimension
                 next_state = np.expand_dims(next_state, axis= 0)
                 # bootstrapping the predicted reward as Q-value   
                 print("line 4") 
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+                print("target =", target)
                 print("line 5")
 
             # resize array by increasing dimension
             state = np.expand_dims(state, axis=0)
             target_f = self.network.model.predict(state)
+            print("target_f=", target_f)
             print("line 6")
 
             target_f[0][action] = target
+            print("target_f[0][action]=", target_f[0][action])
+            print("target_f convered=", target_f)
+            
             print("line 7")
             # print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose = 0)
