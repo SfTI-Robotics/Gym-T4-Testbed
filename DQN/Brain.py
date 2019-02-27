@@ -50,12 +50,12 @@ class Learning():
         # equation designed for training on 10 000 episodes
         # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
-        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
+        # self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
+        # self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
 
         return action
 
-    def memory_replay(self):
+    def memory_replay(self, episode):
 
         if len(self.transitions) < MAX_MEMORY_LENGTH :
             return
@@ -147,5 +147,9 @@ class Learning():
         self.network.model.fit(states, target, batch_size=batch_size, epochs=1, verbose=0)
             
         # =================================
+
+        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
+        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
+
         print("FINISHED REPLAY")
         

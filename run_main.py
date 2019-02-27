@@ -234,7 +234,7 @@ for episode in range(int(args.episodes)):
         observation = next_observation
         
     # train algorithm using experience replay
-    learner.memory_replay()
+    learner.memory_replay(episode)
         
     # make gif
     # if episode != 0 and episode % 5 == 0:
