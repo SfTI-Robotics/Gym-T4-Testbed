@@ -39,7 +39,7 @@ class Learning():
         # print('e = ', self.epsilon)
 
         if random.random() > self.epsilon:
-            #this expolres by choosing a randomised action
+            #this explores by choosing a randomised action
             action = random.randrange(self.action_space)
             # print('EXPLORE')
         else:
@@ -54,14 +54,7 @@ class Learning():
         self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
         self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
 
-        # if random.random() < self.epsilon:
-        #     action = 2 # UP_ACTION
-        # else:
-        #     action = 3 #DOWN_ACTION
-
         return action
-
-
 
     def memory_replay(self):
         print('trans num', len(self.transitions))
@@ -69,44 +62,44 @@ class Learning():
         if len(self.transitions) < batch_size:
             return
        
-        print("line 1")
+        # print("line 1")
         batch = random.sample(self.transitions, batch_size)
-        print("line 2")
-# ===============================
+        # print("line 2")
+        # ===============================
         for state, action, reward, next_state, done in batch:
-            print("line 3")
+            # print("line 3")
             target = reward
             # print("state sampled", state)
             # print("action sampled", action)
-            print("reward sampled", reward)
+            # print("reward sampled", reward)
             # print("next state sampled", next_state)
             if not done:
                 # resize array by increasing dimension
                 next_state = np.expand_dims(next_state, axis= 0)
                 # bootstrapping the predicted reward as Q-value   
-                print("line 4") 
+                # print("line 4") 
                 target = reward + self.gamma * np.max(self.network.model.predict(next_state))
-                print("target =", target)
-                print("line 5")
+                # print("target =", target)
+                # print("line 5")
 
             # resize array by increasing dimension
             state = np.expand_dims(state, axis=0)
             target_f = self.network.model.predict(state)
-            print("target_f=", target_f)
-            print("line 6")
+            # print("target_f=", target_f)
+            # print("line 6")
 
             target_f[0][action] = target
-            print("target_f[0][action]=", target_f[0][action])
-            print("target_f convered=", target_f)
+            # print("target_f[0][action]=", target_f[0][action])
+            # print("target_f convered=", target_f)
             
-            print("line 7")
+            # print("line 7")
             # print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose = 0)
-            print("line 8")
+            # print("line 8")
 
-        print("FINISHED REPLAYYYYYYYYYYYYYY")
+        print("FINISHED REPLAY")
 
-# =================================
+        # =================================
         # state_array = np.zeros((batch_size, *self.state_space)) 
 
         # next_state_array = np.zeros((batch_size, *self.state_space))
@@ -128,11 +121,9 @@ class Learning():
         #     out[i] = self.network.model.predict(state)
         #     out[i][action] = target
         #     i += 1
-# =============================
-
         # self.network.model.fit(state_array,out,batch_size = batch_size, epochs=1,verbose=1)
        
-    #     =============================================
+        # ===========================================
 
 
 

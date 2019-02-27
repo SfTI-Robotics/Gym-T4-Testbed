@@ -81,13 +81,13 @@ processor = preprocess.Processing()
 state_space = processor.get_state_space()
 if args.environment == 'CartPole-v1':
     state_space = env.observation_space.shape[0]
-    print("Goes into if loop")
+    # print("Goes into if loop")
 # action space given by the environment
 action_space = env.action_space.n
 
-print(state_space)
+# print(state_space)
 
-print(action_space)
+# print(action_space)
 
 #**********************************************************************#
 #if you want to look if there's any useless keys print the stuff below
@@ -176,7 +176,7 @@ for episode in range(int(args.episodes)):
     dones=[]
 
     while True:
-        env.render()
+        # env.render()
         #action chooses from  simplified action space without useless keys
         action = learner.choose_action(observation, episode)
         # actions map the simp,ified action space to the environment action space
@@ -187,7 +187,7 @@ for episode in range(int(args.episodes)):
         next_observation, reward, done, _ = env.step(action_mapped)
         episode_frames.append(next_observation)
 
-        if args.environment == 'CartPole-v0':
+        if args.environment == 'CartPole-v1':
             # punish if terminal state reached
             if done:
                 reward = -reward
@@ -205,19 +205,20 @@ for episode in range(int(args.episodes)):
         step+=1
 
         if (not reward == 0) or (done) :
-            if args.environment == 'Pong-v0':
-                # print(  'game_number =',   game_number , 'game_step = ', game_step)
+            # if args.environment == 'Pong-v0':
+            #     # print(  'game_number =',   game_number , 'game_step = ', game_step)
 
-                if reward > 0 :
-                    # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
-                    # philosophy of encouragement
-                    reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
+            #     if reward > 0 :
+            #         # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
+            #         # philosophy of encouragement
+            #         reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
 
             
 
             # #append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
+                # print('reward = ', reward_array[i])
 
             reward_episode.append(reward_array)
             reward_array=[]
@@ -226,9 +227,9 @@ for episode in range(int(args.episodes)):
 
             # when an agent's game score reaches 21
             if done:
-                print('\n Completed Episode = ' + str(episode), 'steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
+                print('\n Completed Episode = ' + str(episode), ', steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
                 # learner.network.model.fit(states, actions, sample_weight= reward_episode)
-
+                # print('reward = ', reward_episode)
 
                 # empty arrays after each round is complete
                 states, actions, reward_episode, next_states, dones  = [], [], [], [], []
