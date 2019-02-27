@@ -151,5 +151,5 @@ class Learning():
         self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
         self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
 
-        print("FINISHED REPLAY")
+        # print("FINISHED REPLAY")
         

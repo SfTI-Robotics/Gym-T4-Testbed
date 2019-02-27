@@ -15,6 +15,40 @@
 - matplotlib
 - imageio
 
+----------------
+### Files Overview
+
+``` bash
+
+# Bash scripts
+    run.sh
+    
+    runme.sh 
+    testbed.txt
+
+# Execution scripts 
+    run_main.py
+
+# Environment State Preprocessing
+    /Preprocess     # folder
+        Cartpole_Preprocess.py
+        Pong_Preprocess.py
+        _Preprocess
+        _Preprocess
+        _Preprocess
+
+# RL Algorithms
+    /DQN
+        brain.py
+        network.py
+
+# Saving training data
+    
+
+
+```
+
+
 
 ----------------
 

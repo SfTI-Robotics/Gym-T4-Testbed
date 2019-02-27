@@ -188,13 +188,14 @@ for episode in range(int(args.episodes)):
 
         # takes a step
         next_observation, reward, done, _ = env.step(action_mapped)
+        
         episode_frames.append(next_observation)
 
         if args.environment == 'CartPole-v1':
             # punish if terminal state reached
             if done:
                 reward = -reward
-
+        # print('reward = ', reward)
         # appending <s, a, r, s', d> into arrays for storage
                 
         states.append(observation)
@@ -215,12 +216,14 @@ for episode in range(int(args.episodes)):
             avg_reward = np.mean(reward_episode)
             # append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
-                # print(i)
+                # print(i) 
                 # print(states[i])
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
                 # print('reward = ', reward_array[i])
+                # print(len(learner.transitions))
 
-            print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step, ' avg reward = ', "%.4f" % avg_reward)
+            print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step)
+            # print( ' avg reward = ', "%.4f" % avg_reward)
             # print('\n')
 
             # empty arrays after each round is complete
@@ -233,8 +236,9 @@ for episode in range(int(args.episodes)):
 
         observation = next_observation
         
-    # train algorithm using experience replay
-    learner.memory_replay(episode)
+        if args.environment == 'CartPole-v1':
+            # train algorithm using experience replay
+            learner.memory_replay(episode)
         
     # make gif
     # if episode != 0 and episode % 5 == 0:
