@@ -148,6 +148,7 @@ DISCOUNTED_REWARDS_FACTOR=0.99
 # ============================================
 print("\n ==== initialisation complete, start training ==== \n")
 
+reward_episode =[]
 for episode in range(int(args.episodes)):
     # storing frames as gifs, array emptied each new episode
     episode_frames = []
@@ -169,7 +170,8 @@ for episode in range(int(args.episodes)):
     # arrays for other variable are needed for appending to transitions in our learner to work
     # arrays emptied after every round in an episode
     reward_array=[]
-    reward_episode =[]
+    if episode % 20 == 0:
+        reward_episode =[]
     states=[]
     actions=[]
     next_states=[]
@@ -218,7 +220,7 @@ for episode in range(int(args.episodes)):
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
                 # print('reward = ', reward_array[i])
 
-            print('Completed Episode = ' + str(episode), ', steps = ', step, ' epsilon =', learner.epsilon, ' avg reward = ', avg_reward)
+            print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step, ' avg reward = ', "%.4f" % avg_reward)
             # print('\n')
 
             # empty arrays after each round is complete
