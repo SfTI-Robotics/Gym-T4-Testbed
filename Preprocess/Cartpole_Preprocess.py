@@ -6,7 +6,7 @@ import numpy as np
 class Processing:
     def __init__(self):
         self.step_max = 400
-        self.time_max = 20
+        self.time_max = 5
         self.reward_min = 0      
         self.reward_max = 500
 

@@ -158,7 +158,7 @@ for episode in range(int(args.episodes)):
     observation = processor.Preprocessing(observation, True)
 
     start_time = time.time()
-    episode_rewards = 0 #total rewards for graphing
+    sum_rewar_array = 0 #total rewards for graphing
 
 
     game_number = 0 # increases every time a someone scores a point
@@ -176,7 +176,8 @@ for episode in range(int(args.episodes)):
     dones=[]
 
     while True:
-        # env.render()
+        if (episode > 150) and (args.environment == 'CartPole-v1'):
+            env.render()
         #action chooses from  simplified action space without useless keys
         action = learner.choose_action(observation, episode)
         # actions map the simp,ified action space to the environment action space
@@ -193,54 +194,45 @@ for episode in range(int(args.episodes)):
                 reward = -reward
 
         # appending <s, a, r, s', d> into arrays for storage
-        episode_rewards += reward
-        reward_array.append(reward)
+                
         states.append(observation)
         actions.append(action) # only append the '1 out of 3' action
-        dones.append(done)
+
+        reward_array.append(reward)
+        sum_rewar_array += reward
+        reward_episode.append(sum_rewar_array)
+
         next_observation = processor.Preprocessing(next_observation, False)
         next_states.append(next_observation)
+        dones.append(done)
 
         game_step += 1
         step+=1
 
-        if (not reward == 0) or (done) :
-            # if args.environment == 'Pong-v0':
-            #     # print(  'game_number =',   game_number , 'game_step = ', game_step)
-
-            #     if reward > 0 :
-            #         # backpropagate the POSITIVE reward received so that the actions leading up to this result is accounted for
-            #         # philosophy of encouragement
-            #         reward_array=processor.discounted_rewards(reward_array,DISCOUNTED_REWARDS_FACTOR)
-
-            
-
-            # #append each <s, a, r, s', d> to learner.transitons for each game round
+        if done:
+            avg_reward = np.mean(reward_episode)
+            # append each <s, a, r, s', d> to learner.transitons for each game round
             for i in range(game_step):
+                # print(i)
+                # print(states[i])
                 learner.transitions.append((states[i], actions[i], reward_array[i],next_states[i],dones[i]))
                 # print('reward = ', reward_array[i])
 
-            reward_episode.append(reward_array)
-            reward_array=[]
-            game_number += 1
-            game_step=0
+            print('Completed Episode = ' + str(episode), ', steps = ', step, ' epsilon =', learner.epsilon, ' avg reward = ', avg_reward)
+            # print('\n')
 
-            # when an agent's game score reaches 21
-            if done:
-                print('\n Completed Episode = ' + str(episode), ', steps = ', step, ' epsilon =', learner.epsilon, ' score = ', episode_rewards, '\n')
-                # learner.network.model.fit(states, actions, sample_weight= reward_episode)
-                # print('reward = ', reward_episode)
+            # empty arrays after each round is complete
+            states, actions, reward_episode, next_states, dones  = [], [], [], [], []
+            # record video of environment render
+            # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
 
-                # empty arrays after each round is complete
-                states, actions, reward_episode, next_states, dones  = [], [], [], [], []
-                # record video of environment render
-                # env = gym.wrappers.Monitor(env,directory='Videos/' + MODEL_FILENAME + '/',video_callable=lambda episode_id: True, force=True,write_upon_reset=False)
-
-                break
+            break
 
 
         observation = next_observation
-        # train algorithm using experience replay
+        
+    # train algorithm using experience replay
+    learner.memory_replay()
         
     # make gif
     # if episode != 0 and episode % 5 == 0:
@@ -249,7 +241,7 @@ for episode in range(int(args.episodes)):
     #     with imageio.get_writer(fname, mode='I') as writer:
     #         for frame in images:
     #             writer.append_data(frame)
-    learner.memory_replay()
+    
 
     # store model weights and parameters when episode rewards are above a certain amount
     # and after every number of episodes
@@ -258,6 +250,6 @@ for episode in range(int(args.episodes)):
     #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
 
     # summarize plots the graph
-    graph.summarize(episode, step, time.time() - start_time, episode_rewards, learner.epsilon, learner.e_greedy_formula)
+    graph.summarize(episode, step, time.time() - start_time, sum_rewar_array, learner.epsilon, learner.e_greedy_formula)
 # killing environment to prevent memory leaks
 env.close()

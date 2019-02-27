@@ -18,7 +18,6 @@ batch_size = 64
 
 class Learning():
 
-
     def __init__(self,observations, actions):
         self.state_space = observations
         self.action_space = actions
@@ -57,47 +56,46 @@ class Learning():
         return action
 
     def memory_replay(self):
-        print('trans num', len(self.transitions))
 
-        if len(self.transitions) < batch_size:
+        if len(self.transitions) < MAX_MEMORY_LENGTH :
             return
        
         # print("line 1")
         batch = random.sample(self.transitions, batch_size)
         # print("line 2")
+
+        
         # ===============================
-        for state, action, reward, next_state, done in batch:
-            # print("line 3")
-            target = reward
-            # print("state sampled", state)
-            # print("action sampled", action)
-            # print("reward sampled", reward)
-            # print("next state sampled", next_state)
-            if not done:
-                # resize array by increasing dimension
-                next_state = np.expand_dims(next_state, axis= 0)
-                # bootstrapping the predicted reward as Q-value   
-                # print("line 4") 
-                target = reward + self.gamma * np.max(self.network.model.predict(next_state))
-                # print("target =", target)
-                # print("line 5")
+        # for state, action, reward, next_state, done in batch:
+        #     # print("line 3")
+        #     target = reward
+        #     # print("state sampled", state)
+        #     # print("action sampled", action)
+        #     # print("reward sampled", reward)
+        #     # print("next state sampled", next_state)
+        #     if not done:
+        #         # resize array by increasing dimension
+        #         next_state = np.expand_dims(next_state, axis= 0)
+        #         # bootstrapping the predicted reward as Q-value   
+        #         # print("line 4") 
+        #         target = reward + self.gamma * np.max(self.network.model.predict(next_state))
+        #         # print("target =", target)
+        #         # print("line 5")
 
-            # resize array by increasing dimension
-            state = np.expand_dims(state, axis=0)
-            target_f = self.network.model.predict(state)
-            # print("target_f=", target_f)
-            # print("line 6")
+        #     # resize array by increasing dimension
+        #     state = np.expand_dims(state, axis=0)
+        #     target_f = self.network.model.predict(state)
+        #     # print("target_f=", target_f)
+        #     # print("line 6")
 
-            target_f[0][action] = target
-            # print("target_f[0][action]=", target_f[0][action])
-            # print("target_f convered=", target_f)
+        #     target_f[0][action] = target
+        #     # print("target_f[0][action]=", target_f[0][action])
+        #     # print("target_f convered=", target_f)
             
-            # print("line 7")
-            # print('target_f =', target_f)
-            self.network.model.fit(state, target_f, verbose = 0)
-            # print("line 8")
-
-        print("FINISHED REPLAY")
+        #     # print("line 7")
+        #     # print('target_f =', target_f)
+        #     self.network.model.fit(state, target_f, verbose = 0)
+        #     # print("line 8")
 
         # =================================
         # state_array = np.zeros((batch_size, *self.state_space)) 
@@ -125,6 +123,29 @@ class Learning():
        
         # ===========================================
 
+        states = np.zeros((batch_size, self.state_space))
+        next_states = np.zeros((batch_size, self.state_space))
+        action, reward, done = [], [], []
 
+        for i in range(batch_size):
+            states[i] = batch[i][0]
+            action.append(batch[i][1])
+            reward.append(batch[i][2])
+            next_states[i] = batch[i][3]
+            done.append(batch[i][4])
 
+        target = self.network.model.predict(states)
+
+        target_next = self.network.model.predict(next_states)
+        for i in range(batch_size):
+            if done[i]:
+                target[i][action[i]] = reward[i]
+            else:
+                # bellman equation
+                target[i][action[i]] = reward[i] + self.gamma * np.amax(target_next[i])
+
+        self.network.model.fit(states, target, batch_size=batch_size, epochs=1, verbose=0)
+            
+        # =================================
+        print("FINISHED REPLAY")
         
