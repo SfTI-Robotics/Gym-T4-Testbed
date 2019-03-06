@@ -1,4 +1,4 @@
-Auto stash before merge of "master" and "origin/master""""
+""""
 this is the universal run script for all environments
 
 """
@@ -10,7 +10,7 @@ import numpy as np
 import time
 import gym
 # for graphing
-from summary import summary
+from temp_Graphs.summary import summary
 import time
 import datetime
 # recording environment render as video mp4
@@ -49,7 +49,8 @@ elif args.environment == 'CartPole-v1':
     import Preprocess.Cartpole_Preprocess as preprocess
     print('Cartpole works')
 else :
-    print("Environment not found")
+    sys.exit("Environment not found")
+
 
 # algorithm folder
 # the newtork is imported into brain file in the header so no need to import the network here aswell
@@ -69,7 +70,7 @@ elif args.algorithm == 'DDDQN':
     import DDDQN_PER.Brain as brain
     print('PER works')
 else :
-    print("Algorithm not found")
+    sys.exit("Algorithm not found")
 
 # ============================================
 
