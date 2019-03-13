@@ -59,11 +59,11 @@
 |- Roulette-v0      |Q Learning|
 |   |  |
 | { Classic Control } |   NB. *most popular environments*|
-|- CartPole-v1        | DQN| 500| every step |
+|- CartPole-v1        | DQN| 500| every step after 45 episodes|
 |   |  |
 |{ Atari }      ||
 |- Pong-v0        | Double DQN, policy gradient| 10 000
-|- Breakout-v0       | Double DQN| 500 000 pure exploitation, train for 1000 000 episodes | 
+|- Breakout-v0       | Double DQN| 5000 pure exploration, train for 100 000 000 episodes | every step after 5000 episodes
 |- SpaceInvaders-v0       |DQN|
 |- MsPacman-v0||
 |- Enduro-v0||
