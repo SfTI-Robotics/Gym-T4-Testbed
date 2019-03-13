@@ -17,7 +17,7 @@ import datetime
 from gym.wrappers import Monitor
 # allows gifs to be saved of the training episode for use in the Control Center.
 import imageio
-from gif_matplotlib import save_frames_as_gif
+# from gif_matplotlib import save_frames_as_gif
 # ============================================
 
 # For more on how argparse works see documentation
