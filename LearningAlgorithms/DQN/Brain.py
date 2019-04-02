@@ -1,0 +1,77 @@
+import random
+import numpy as np
+from collections import deque
+
+import LearningAlgorithms.AbstractLearningAlgorithm.AbstractBrain as AbstractBrain
+
+# ========================
+
+# length of transitions deque
+MAX_MEMORY_LENGTH = 1000
+# alpha
+LEARNING_RATE = 0.1
+# gamma
+REWARD_DECAY = 0.99
+# how many memory's we learn from at a time
+batch_size = 64
+
+
+class Learning(AbstractBrain.AbstractLearning):
+
+    def __init__(self, observations, actions):
+        super().__init__(observations, actions)
+
+        # initialising epsilon changes immediately
+        self.epsilon = 0
+        self.e_greedy_formula = 'e-greedy formula = '
+        self.gamma = REWARD_DECAY
+        # self.alpha = 0.86
+        # transitions is where we store memory of max memory length
+        self.transitions = deque(maxlen=MAX_MEMORY_LENGTH)
+
+    def choose_action(self, state, episode):
+        if random.random() > self.epsilon:
+            # this explores by choosing a randomised action
+            action = random.randrange(self.action_space)
+        else:
+            # this exploits by choosing your max of your calculated q values
+            action = np.argmax(self.network.model.predict(np.expand_dims(state, axis=0)))
+
+        # increase epsilon
+        # equation designed for training on 10 000 episodes
+        # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
+        #  formula = 1 - a ** (-b * (episode - c))
+        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
+        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
+
+        return action
+
+    def memory_replay(self, episode):
+
+        if len(self.transitions) < MAX_MEMORY_LENGTH:
+            return
+
+        batch = random.sample(self.transitions, batch_size)
+
+        states = np.zeros((batch_size, self.state_space))
+        next_states = np.zeros((batch_size, self.state_space))
+        action, reward, done = [], [], []
+
+        for i in range(batch_size):
+            states[i] = batch[i][0]
+            action.append(batch[i][1])
+            reward.append(batch[i][2])
+            next_states[i] = batch[i][3]
+            done.append(batch[i][4])
+
+        target = self.network.model.predict(states)
+
+        target_next = self.network.model.predict(next_states)
+        for i in range(batch_size):
+            if done[i]:
+                target[i][action[i]] = reward[i]
+            else:
+                # bellman equation
+                target[i][action[i]] = reward[i] + self.gamma * np.amax(target_next[i])
+
+        self.network.model.fit(states, target, batch_size=batch_size, epochs=1, verbose=0)
