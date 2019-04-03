@@ -105,8 +105,10 @@ if __name__ == "__main__":
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
                     # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
                     save_path="/Gym-T4-Testbed/temp_Graphs/",
+                    # episode lower bound for graph
+                    episode_min=int(args.load_model_nr),
                     # episode upper bound for graph
-                    episode_max=int(args.episodes),
+                    episode_max=int(args.episodes) + int(args.load_model_nr),
                     # step upper bound for graph
                     step_max_m=processor.step_max,
                     # time upper bound for graph
@@ -116,5 +118,5 @@ if __name__ == "__main__":
                     # reward lower bound for graph
                     reward_max_m=processor.reward_max)
 
-    train(env, learner, graph, processor, args.episodes, is_cartpole, save_model=args.save_model,
-          model_filename="/Gym-T4-Testbed/temp_Models/" + MODEL_FILENAME, model_nr=args.load_model_nr)
+    train(env, learner, graph, processor, int(args.episodes), is_cartpole, save_model=args.save_model,
+          model_filename=MODEL_FILENAME, model_nr=int(args.load_model_nr), gif=True)

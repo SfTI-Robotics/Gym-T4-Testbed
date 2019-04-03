@@ -4,29 +4,30 @@ from os.path import expanduser
 import gym
 import numpy as np
 import imageio
+import tensorflow
 
 from LearningAlgorithms.AbstractLearningAlgorithm.AbstractBrain import AbstractLearning
 from Preprocessors.Abstract_Preprocess import AbstractProcessor
-from resources.gif_matplotlib import save_frames_as_gif
 from temp_Graphs.summary import Summary
 
 home = expanduser("~")
 
 SAVE_MODEL_FREQUENCY = 100
+SAVE_PATH = home + "/Gym-T4-Testbed/temp_Models/"
 
 
 def train(env: any, learner: AbstractLearning, graph: Summary, processor: AbstractProcessor, episodes: int,
-          is_cartpole: bool, save_model=False, model_filename='', model_nr=0):
+          is_cartpole: bool, save_model=False, model_filename='', model_nr=0, gif=False):
     # storing neural network weights and parameters
-    # if model_nr is not None:
-    #    load_model(learner, model_filename, model_nr)
+    if model_nr != 0:
+        load_model_from_file(learner, model_filename, model_nr)
 
     print("\n ==== initialisation complete, start training ==== \n")
 
     reward_episode = []
 
-    # for episode in range(int(model_nr) + 1, int(model_nr) + int(episodes) + 1):
-    for episode in range(int(episodes)):
+    # for episode in range(int(episodes)):
+    for episode in range(model_nr, model_nr + episodes):
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
 
@@ -107,20 +108,22 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
                 learner.memory_replay(episode)
 
         # make gif from episode frames
-        # make_gif(episode, episode_frames)
-
-        # store model weights and parameters when episode rewards are above a certain amount
-        # and after every number of episodes
-        # if save_model and episode % SAVE_MODEL_FREQUENCY == 0:
-        #     save_model(learner, model_filename, episode)
+        # no image data available for cartpole, no gif-ing possible
+        if gif and not is_cartpole:
+            make_gif(episode, model_filename, episode_frames)
 
         # summarize plots the graph
         graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
                         learner.e_greedy_formula)
 
+        # store model weights and parameters when episode rewards are above a certain amount
+        # and after every number of episodes
+        if save_model and episode % SAVE_MODEL_FREQUENCY == 0:
+            save_model_to_file(learner, graph, model_filename, episode)
+
     # always save last model, even outside of normal save-steps
-    # if save_model:
-    #     save_model(learner, model_filename, episode)
+    if save_model:
+        save_model_to_file(learner, graph, model_filename, episode)
 
     # killing environment to prevent memory leaks
     env.close()
@@ -129,18 +132,29 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
 # TODO: make this work (respect previous episode numbers, epsilon?)
 def load_model_from_file(learner, model_filename, model_nr):
     # TODO: check if file actually exists, if not just emit warning and proceed without loading anything
-    learner.network.model.load_weights(home + model_filename + str(model_nr) + '_model.h5')
+    learner.network.model.load_weights(home + "/Gym-T4-Testbed/temp_Models/" + model_filename + str(model_nr)
+                                       + '_model.h5')
     # update learner's epsilon to match episode number of loaded model
     learner.update_epsilon(int(model_nr))
-    print("Loaded model " + home + model_filename + str(model_nr)
+    print("Loaded model " + home + "/Gym-T4-Testbed/temp_Models/" + model_filename + str(model_nr)
           + '_model.h5 from disk and updated epsilon to ' + str(learner.epsilon))
 
 
 # TODO: make this work (respect previous episode numbers, epsilon?)
-def save_model_to_file(learner, model_filename, episode):
-    learner.network.model.save_weights(home + model_filename + str(episode) + '_model.h5',
+def save_model_to_file(learner, graph, model_filename, episode):
+    # save summary of previous steps
+    summary_writer = tensorflow.summary.FileWriter(SAVE_PATH + '/' + model_filename + str(episode))
+    # summary = tensorflow.Summary()
+    # summary.value.add(tag='Episode', simple_value=int(episode))
+    summary = tensorflow.Summary.Value(tag="Taggidiy", simple_value=episode)
+    summary = tensorflow.Summary(value=[summary])
+    summary_writer.add_summary(summary, episode)
+    summary_writer.flush()
+
+    # save model weights
+    learner.network.model.save_weights(SAVE_PATH + '/' + model_filename + str(episode) + '/' + 'model.h5',
                                        overwrite=True)
-    print("Saved model to disk as " + home + model_filename + str(episode) + '_model.h5')
+    print("Saved model to disk as " + SAVE_PATH + '/' + model_filename + str(episode) + '/' + 'model.h5')
 
 
 # TODO: fix function, make function call in train optional
@@ -149,18 +163,14 @@ def make_video(env, model_filename):
                                 video_callable=lambda episode_id: True, force=True, write_upon_reset=False)
 
 
-# TODO: fix function, make function call in train optional
-def make_gif(episode, episode_frames):
+def make_gif(episode, model_filename, episode_frames):
+    # no image data available for cartpole
     if episode != 0 and episode % 5 == 0:
         images = np.array(episode_frames)
         print('gif = ', len(episode_frames))
         print('im = ', len(images))
 
-        fname = './gifs/episode' + str(episode) + '.gif'
+        fname = './gifs/' + model_filename + 'episode' + str(episode) + '.gif'
         with imageio.get_writer(fname, mode='I') as writer:
             for frame in images:
                 writer.append_data(frame)
-
-    if episode != 0 and episode % 5 == 0:
-        fname = './gifs/episode' + str(episode) + '.gif'
-        save_frames_as_gif(episode_frames, fname)

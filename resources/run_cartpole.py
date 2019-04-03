@@ -111,20 +111,20 @@ graph = Summary(summary_types = ['sumiz_step', 'sumiz_time', 'sumiz_reward', 'su
                 # maximum exploitation value
                 epsilon_goal = 0.99,
                 # desired name for file
-                NAME = MODEL_FILENAME + str(now),
+                name=MODEL_FILENAME + str(now),
                 # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
                 # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
-                SAVE_PATH = "/Gym-T4-Testbed/temp_Graphs/",
+                save_path="/Gym-T4-Testbed/temp_Graphs/",
                 # episode upper bound for graph
-                EPISODE_MAX = int(args.episodes),
+                episode_max= int(args.episodes),
                 # step upper bound for graph
-                STEP_MAX_M = processor.step_max,
+                step_max_m= processor.step_max,
                 # time upper bound for graph
-                TIME_MAX_M = processor.time_max,
+                time_max_m= processor.time_max,
                 # reward upper bound for graph
-                REWARD_MIN_M = processor.reward_min,
+                reward_min_m= processor.reward_min,
                 # reward lower bound for graph
-                REWARD_MAX_M = processor.reward_max
+                reward_max_m= processor.reward_max
                 )
 
 # =================================================
