@@ -43,12 +43,12 @@ class Processor(AbstractProcessor):
             # append new frame to deque
             # in other steps one slot is already filled and the second one needs to be filled
             self.deque.append(frame)
-        # reshape the deque so that network recognises that its two frames stacked toghether
+        # reshape the deque so that network recognises that its two frames stacked together
         stacked_state = np.stack(self.deque, axis=0)
         return stacked_state
 
     def get_state_space(self):
-        # this is used to return the processed shape  to the network initialiser
+        # this is used to return the processed shape  to the network initializer
         # print('image size: ', np.shape(self.deque))
         return np.shape(self.deque)
 

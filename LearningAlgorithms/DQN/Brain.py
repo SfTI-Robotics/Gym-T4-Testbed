@@ -18,16 +18,23 @@ batch_size = 64
 
 class Learning(AbstractBrain.AbstractLearning):
 
-    def __init__(self, observations, actions):
-        super().__init__(observations, actions)
+    def __init__(self, observations, actions, is_cartpole):
+        super().__init__(observations, actions, is_cartpole)
 
         # initialising epsilon changes immediately
         self.epsilon = 0
-        self.e_greedy_formula = 'e-greedy formula = '
+        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
         self.gamma = REWARD_DECAY
         # self.alpha = 0.86
         # transitions is where we store memory of max memory length
         self.transitions = deque(maxlen=MAX_MEMORY_LENGTH)
+
+    def update_epsilon(self, episode):
+        # increase epsilon
+        # equation designed for training on 10 000 episodes
+        # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
+        #  formula = 1 - a ** (-b * (episode - c))
+        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
 
     def choose_action(self, state, episode):
         if random.random() > self.epsilon:
@@ -37,22 +44,15 @@ class Learning(AbstractBrain.AbstractLearning):
             # this exploits by choosing your max of your calculated q values
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis=0)))
 
-        # increase epsilon
-        # equation designed for training on 10 000 episodes
-        # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
-        #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 5.45 ** (-0.009 * (episode - 100))
-        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
+        self.update_epsilon(episode)
 
         return action
 
     def memory_replay(self, episode):
-
         if len(self.transitions) < MAX_MEMORY_LENGTH:
             return
 
         batch = random.sample(self.transitions, batch_size)
-
         states = np.zeros((batch_size, self.state_space))
         next_states = np.zeros((batch_size, self.state_space))
         action, reward, done = [], [], []
@@ -65,7 +65,6 @@ class Learning(AbstractBrain.AbstractLearning):
             done.append(batch[i][4])
 
         target = self.network.model.predict(states)
-
         target_next = self.network.model.predict(next_states)
         for i in range(batch_size):
             if done[i]:

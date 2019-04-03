@@ -3,14 +3,12 @@ from abc import ABC, abstractmethod
 
 class AbstractProcessor(ABC):
 
-    # values needed for every processor
-    step_max = 0
-    time_max = 0
-    reward_min = 0
-    reward_max = 0
-
     def __init__(self):
-        pass
+        # values needed for every processor
+        self.step_max = 500
+        self.time_max = 120
+        self.reward_min = -100
+        self.reward_max = 100
 
     @abstractmethod
     def preprocessing(self, state, is_new_episode):

@@ -1,33 +1,31 @@
 import time
+from os.path import expanduser
+
+import gym
+import numpy as np
+import imageio
 
 from LearningAlgorithms.AbstractLearningAlgorithm.AbstractBrain import AbstractLearning
 from Preprocessors.Abstract_Preprocess import AbstractProcessor
+from resources.gif_matplotlib import save_frames_as_gif
 from temp_Graphs.summary import Summary
+
+home = expanduser("~")
+
+SAVE_MODEL_FREQUENCY = 100
 
 
 def train(env: any, learner: AbstractLearning, graph: Summary, processor: AbstractProcessor, episodes: int,
-          is_cartpole: bool):
-
-    # =================================================
-
-    # TODO: why is this never used?
-    # DISCOUNTED_REWARDS_FACTOR = 0.99
-
-    # ==================================================
-
-    # TODO: see if this works,
-    #  make it an optional parameter
+          is_cartpole: bool, save_model=False, model_filename='', model_nr=0):
     # storing neural network weights and parameters
-    # SAVE_MODEL = True
-    # LOAD_MODEL = True
-    # if LOAD_MODEL == True:
-    #     neuralNet.model.save_weights(neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5'))
-
-    # ============================================
+    # if model_nr is not None:
+    #    load_model(learner, model_filename, model_nr)
 
     print("\n ==== initialisation complete, start training ==== \n")
 
     reward_episode = []
+
+    # for episode in range(int(model_nr) + 1, int(model_nr) + int(episodes) + 1):
     for episode in range(int(episodes)):
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
@@ -40,8 +38,6 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
         start_time = time.time()
         sum_rewards_array = 0  # total rewards for graphing
 
-        # TODO: Why is this never used?
-        # game_number = 0  # increases every time a someone scores a point
         game_step = 0  # for discounted rewards, steps for each round
         step = 0  # count total steps for each episode for the graph
 
@@ -57,9 +53,9 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
         dones = []
 
         while True:
-            # TODO: exception for cartpole
-            # if (episode > 150) and (args.environment == 'CartPole-v1'):
-            #    env.render()
+            # remove comment to watch learning process in cartpole environment
+            # if (episode > 150) and is_cartpole:
+            #     env.render()
 
             # action chooses from  simplified action space without useless keys
             action = learner.choose_action(observation, episode)
@@ -71,7 +67,6 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
 
             episode_frames.append(next_observation)
 
-            # TODO: exception for cartpole
             if is_cartpole:
                 # punish if terminal state reached
                 if done:
@@ -93,54 +88,79 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             step += 1
 
             if done:
-                # TODO: Why is this never used?
-                # avg_reward = np.mean(reward_episode)
-                # append each <s, a, r, s', d> to learner.transitons for each game round
+                # append each <s, a, r, s', d> to learner.transitions for each game round
                 for i in range(game_step):
                     learner.transitions.append((states[i], actions[i], reward_array[i], next_states[i], dones[i]))
-
-                print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step)
+                print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
+                      ", total reward = ", sum_rewards_array)
 
                 # empty arrays after each round is complete
                 states, actions, reward_episode, next_states, dones = [], [], [], [], []
-                # TODO: see if this works,
-                #  then make it optional using parameters (in separate file/function?)
                 # record video of environment render
-                # env = gym.wrappers.Monitor(env, directory='Videos/' + MODEL_FILENAME + '/', video_callable=lambda
-                #    episode_id: True, force=True,write_upon_reset=False)
+                # env = make_video(env, model_filename)
                 break
 
             observation = next_observation
-            # TODO: exception for cartpole
+
             if is_cartpole:
                 # train algorithm using experience replay
                 learner.memory_replay(episode)
 
-        # TODO: see if this works,
-        #  then make it optional using parameters (in a separate file/function?)
-        # make gif
-        # if episode != 0 and episode % 5 == 0:
-        #     images = np.array(episode_frames)
-        #     print('gif = ', len(episode_frames))
-        #     print('im = ', len(images))
-
-        #     fname = './gifs/episode'+str(episode)+'.gif'
-        #     with imageio.get_writer(fname, mode='I') as writer:
-        #         for frame in images:
-        #             writer.append_data(frame)
-
-        # if episode != 0 and episode % 5 == 0:
-        #     fname = './gifs/episode'+str(episode)+'.gif'
-        #     save_frames_as_gif(episode_frames, fname)
+        # make gif from episode frames
+        # make_gif(episode, episode_frames)
 
         # store model weights and parameters when episode rewards are above a certain amount
         # and after every number of episodes
-
-        # if (SAVE_MODEL == True and episode % 5 == 0):
-        #     neuralNet.model.save_weights('./temp_Models/' + MODEL_FILENAME+ 'model.h5', overwrite = True)
+        # if save_model and episode % SAVE_MODEL_FREQUENCY == 0:
+        #     save_model(learner, model_filename, episode)
 
         # summarize plots the graph
         graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
                         learner.e_greedy_formula)
+
+    # always save last model, even outside of normal save-steps
+    # if save_model:
+    #     save_model(learner, model_filename, episode)
+
     # killing environment to prevent memory leaks
     env.close()
+
+
+# TODO: make this work (respect previous episode numbers, epsilon?)
+def load_model_from_file(learner, model_filename, model_nr):
+    # TODO: check if file actually exists, if not just emit warning and proceed without loading anything
+    learner.network.model.load_weights(home + model_filename + str(model_nr) + '_model.h5')
+    # update learner's epsilon to match episode number of loaded model
+    learner.update_epsilon(int(model_nr))
+    print("Loaded model " + home + model_filename + str(model_nr)
+          + '_model.h5 from disk and updated epsilon to ' + str(learner.epsilon))
+
+
+# TODO: make this work (respect previous episode numbers, epsilon?)
+def save_model_to_file(learner, model_filename, episode):
+    learner.network.model.save_weights(home + model_filename + str(episode) + '_model.h5',
+                                       overwrite=True)
+    print("Saved model to disk as " + home + model_filename + str(episode) + '_model.h5')
+
+
+# TODO: fix function, make function call in train optional
+def make_video(env, model_filename):
+    return gym.wrappers.Monitor(env, directory='Videos/' + model_filename + '/',
+                                video_callable=lambda episode_id: True, force=True, write_upon_reset=False)
+
+
+# TODO: fix function, make function call in train optional
+def make_gif(episode, episode_frames):
+    if episode != 0 and episode % 5 == 0:
+        images = np.array(episode_frames)
+        print('gif = ', len(episode_frames))
+        print('im = ', len(images))
+
+        fname = './gifs/episode' + str(episode) + '.gif'
+        with imageio.get_writer(fname, mode='I') as writer:
+            for frame in images:
+                writer.append_data(frame)
+
+    if episode != 0 and episode % 5 == 0:
+        fname = './gifs/episode' + str(episode) + '.gif'
+        save_frames_as_gif(episode_frames, fname)

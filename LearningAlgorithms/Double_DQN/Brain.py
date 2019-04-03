@@ -17,21 +17,26 @@ batch_size = 64
 
 class Learning(AbstractBrain):
 
-    def __init__(self, observations, actions):
-        super.__init__(observations, actions)
+    def __init__(self, observations, actions, is_cartpole):
+        super.__init__(observations, actions, is_cartpole)
 
         # create a new network object for the target network
-        self.target_network = NeuralNet(self.state_space, self.action_space)
+        self.target_network = NeuralNet(self.state_space, self.action_space, is_cartpole)
 
         # copy over weights from behaviour to target
         self.update_target_model()
 
         self.epsilon = 0
         self.gamma = 0.95
-        self.e_greedy_formula = 'e-greedy formula = '
+        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-2500))'
 
         # transitions is where we store memory of max memory length
         self.transitions = deque(maxlen=MAX_MEMORY_LENGTH)
+
+    def update_epsilon(self, episode):
+        # increase epsilon
+        #  formula = 1 - a ** (-b * (episode - c))
+        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
@@ -40,10 +45,7 @@ class Learning(AbstractBrain):
         else:
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis=0)))
 
-        # increase epsilon
-        #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon = 1 - 1.2 ** (-0.003 * (episode - 2500))
-        self.e_greedy_formula = 'e = 1-1.2^(-0.003*(episode-2500))'
+        self.update_epsilon(episode)
 
         return action
 
@@ -80,7 +82,7 @@ class Learning(AbstractBrain):
         # action, reward, done = [], [], []
 
         # # extract variables from transition
-        # # extract seperate s,a,r.s'
+        # # extract separate s,a,r.s'
         # for i in range(batch_size):
         #     states[i] = np.array(batch[i][0])
         #     action.append(batch[i][1])

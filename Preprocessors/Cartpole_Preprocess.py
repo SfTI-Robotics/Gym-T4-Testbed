@@ -4,7 +4,8 @@ from Preprocessors.Abstract_Preprocess import AbstractProcessor
 class Processor(AbstractProcessor):
     def __init__(self):
         super().__init__()
-        self.step_max = 400
+        # was 400 before, but environment runs for up to 500 steps (and a reward of 498)
+        self.step_max = 500
         self.time_max = 5
         self.reward_min = 0      
         self.reward_max = 500

@@ -4,23 +4,23 @@ from keras.models import Sequential
 
 
 class NeuralNet:
-    def __init__(self, obs_space, action_space):
+
+    def __init__(self, obs_space, action_space, is_cartpole):
         self.obs_space = obs_space
         # action space uses the customised action encoding from the environment's preprocess file
         self.action_space = action_space
 
         self.model = Sequential()
-        # this network works for everything except cartpole
-        self.build_network()
-        # TODO: remove exceptions for cartpole, if possible
-        # this network works for cartpole
-        # neural_net.build_network22(self)
-
-    # TODO: reduce to one build_network function that works for all algorithms
+        if is_cartpole:
+            # this network works only for cartpole
+            self.build_network22()
+        else:
+            # this network works for everything except cartpole
+            self.build_network()
 
     def build_network(self):
         # 2 layers of convolutional networks
-        # padding is added so that information is not loss when the kernal size is smaller
+        # padding is added so that information is not loss when the kernel size is smaller
         self.model.add(Conv2D(16, kernel_size=(8, 8), strides=(2, 2), padding='valid', activation='relu',
                               input_shape=self.obs_space, data_format='channels_first'))
         self.model.add(Conv2D(32, kernel_size=(4, 4), strides=(2, 2), padding='valid', activation='relu',
@@ -55,7 +55,7 @@ class NeuralNet:
 
     def build_network_double_dqn(self):
         # 3 layers of convolutional networks
-        # padding is added so that information is not loss when the kernal size is smaller
+        # padding is added so that information is not loss when the kernel size is smaller
         self.model.add(
             Conv2D(32, kernel_size=(3, 3), padding='valid', activation='relu', input_shape=self.obs_space,
                    data_format='channels_first'))

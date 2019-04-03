@@ -11,13 +11,17 @@ class AbstractLearning(ABC):
     transitions = None
     e_greedy_formula = ""
 
-    def __init__(self, observations, actions):
+    def __init__(self, observations, actions, is_cartpole):
         self.state_space = observations
         self.action_space = actions
 
         # initialise network here and not in the main file
         # length of action space should be whatever new_action_space outputs see preprocess for more
-        self.network = NeuralNet(self.state_space, self.action_space)
+        self.network = NeuralNet(self.state_space, self.action_space, is_cartpole)
+
+    @abstractmethod
+    def update_epsilon(self, episode):
+        pass
 
     @abstractmethod
     def choose_action(self, state, episode):
