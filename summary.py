@@ -150,6 +150,7 @@ class Summary:
             ax1 = fig1.add_subplot(self.num_main_axes, 1, i)
             plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, STEP_MIN_M, self.STEP_MAX_M])
             ax1.plot(range(len(self.step_summary)), self.step_summary)
+            # only plot additional line if goal was specified
             if self.step_goal is not None:
                 ax1.plot(range(len(self.step_summary)), np.repeat(self.step_goal, len(self.step_summary)), 'r:')
             ax1.set_title('Number of steps taken in each episode')
@@ -168,6 +169,7 @@ class Summary:
             ax3 = fig1.add_subplot(self.num_main_axes, 1, i)
             plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, self.REWARD_MIN_M, self.REWARD_MAX_M])
             ax3.plot(range(len(self.reward_summary)), self.reward_summary)
+            # only plot additional line if goal was specified
             if self.reward_goal is not None:
                 ax3.plot(range(len(self.reward_summary)), np.repeat(self.reward_goal, len(self.reward_summary)),
                          'r:')
@@ -179,6 +181,7 @@ class Summary:
             ax4 = fig1.add_subplot(self.num_main_axes, 1, i)
             plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, 1])
             ax4.plot(range(len(self.epsilon_summary)), self.epsilon_summary, label=e_greedy_formula)
+            # only plot additional line if goal was specified
             if self.epsilon_goal is not None:
                 ax4.plot(range(len(self.epsilon_summary)), np.repeat(self.epsilon_goal, len(self.epsilon_summary)),
                          'r:')
@@ -189,6 +192,7 @@ class Summary:
         if 'sumiz_average_reward' in self.summary_types:
             ax5 = fig1.add_subplot(self.num_main_axes, 1, i)
             ax5.plot(range(len(self.average_reward_summary)), self.average_reward_summary)
+            # only plot additional line if goal was specified
             if self.average_reward_goal is not None:
                 ax5.plot(range(len(self.average_reward_summary)),
                          np.repeat(self.average_reward_goal, len(self.average_reward_summary)), 'r:')
@@ -208,6 +212,7 @@ class Summary:
             plt.axis([self.start_focus, self.end_focus, STEP_MIN_F, STEP_MAX_F])
             ax1.plot(range(self.start_focus, min(episode_count, self.end_focus)),
                      self.step_summary[self.start_focus:min(episode_count, self.end_focus)])
+            # only plot additional line if goal was specified
             if self.step_goal is not None:
                 ax1.plot(range(self.start_focus, min(episode_count, self.end_focus)),
                          np.repeat(self.step_goal, min(episode_count, self.end_focus) - self.start_focus), 'r:')
@@ -228,6 +233,7 @@ class Summary:
             ax3 = fig2.add_subplot(self.num_focus_axes, 1, i)
             ax3.plot(range(self.start_focus, min(episode_count, self.end_focus)),
                      self.epsilon_summary[self.start_focus:min(episode_count, self.end_focus)])
+            # only plot additional line if goal was specified
             if self.epsilon_goal is not None:
                 ax3.plot(range(self.start_focus, min(episode_count, self.end_focus)),
                          np.repeat(self.epsilon_goal, min(episode_count, self.end_focus) - self.start_focus), 'r:')

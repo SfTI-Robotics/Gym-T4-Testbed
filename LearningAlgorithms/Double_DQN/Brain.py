@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from collections import deque
+
 import LearningAlgorithms.AbstractLearningAlgorithm.AbstractBrain as AbstractBrain
 
 # ========================
@@ -15,10 +16,10 @@ START_TRAINING = 500
 batch_size = 64
 
 
-class Learning(AbstractBrain):
+class Learning(AbstractBrain.AbstractLearning):
 
     def __init__(self, observations, actions, is_cartpole):
-        super.__init__(observations, actions, is_cartpole)
+        super().__init__(observations, actions, is_cartpole)
 
         # create a new network object for the target network
         self.target_network = NeuralNet(self.state_space, self.action_space, is_cartpole)
@@ -72,7 +73,7 @@ class Learning(AbstractBrain):
             # print('target_f =', target_f)
             self.network.model.fit(state, target_f, verbose=0)
 
-        print("finish replay")
+        # print("finish replay")
 
         # # experience replay
         # batch = random.sample(self.transitions, batch_size)

@@ -45,10 +45,9 @@ class Learning(AbstractBrain.AbstractLearning):
             action = np.argmax(self.network.model.predict(np.expand_dims(state, axis=0)))
 
         self.update_epsilon(episode)
-
         return action
 
-    def memory_replay(self, episode):
+    def memory_replay(self):
         if len(self.transitions) < MAX_MEMORY_LENGTH:
             return
 

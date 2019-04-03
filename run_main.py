@@ -10,12 +10,11 @@ import gym
 import datetime
 
 # for graphing
-from temp_Graphs.summary import Summary
+from summary import Summary
 from training import train
 
 
 # TODO: reduce length of functions wherever possible
-
 # TODO: add method comments
 
 if __name__ == "__main__":
@@ -28,11 +27,10 @@ if __name__ == "__main__":
     parser.add_argument("-env", "--environment",
                         help="select a environment: \n Pong-v0 \n SpaceInvaders-v0 \n MsPacman-v0")
     parser.add_argument("-eps", "--episodes", help="select number of episodes to graph")
-    parser.add_argument("-save", "--save_model", help='select whether model should be saved', action='store_true')
-    parser.add_argument("-load_nr", "--load_model_nr",
-                        help="number of the model that should be loaded, model-nr can be found in model-name: "
-                             "[environment]_[algorithm]_[model-nr]_model.h5",
-                        required=False, default="0")
+    parser.add_argument("-save", "--save_model", help='saves model and tensorboard summary regularly',
+                        action='store_true')
+    parser.add_argument("-load", "--load_model", help='loads model for given algorithm and environment',
+                        action='store_true')
 
     # retrieve user inputted args from cmd line
     args = parser.parse_args()
@@ -105,10 +103,8 @@ if __name__ == "__main__":
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
                     # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
                     save_path="/Gym-T4-Testbed/temp_Graphs/",
-                    # episode lower bound for graph
-                    episode_min=int(args.load_model_nr),
                     # episode upper bound for graph
-                    episode_max=int(args.episodes) + int(args.load_model_nr),
+                    episode_max=int(args.episodes),
                     # step upper bound for graph
                     step_max_m=processor.step_max,
                     # time upper bound for graph
@@ -118,5 +114,6 @@ if __name__ == "__main__":
                     # reward lower bound for graph
                     reward_max_m=processor.reward_max)
 
-    train(env, learner, graph, processor, int(args.episodes), is_cartpole, save_model=args.save_model,
-          model_filename=MODEL_FILENAME, model_nr=int(args.load_model_nr), gif=True)
+    # train learner and plot results
+    train(env, learner, graph, processor, int(args.episodes), MODEL_FILENAME[:-1], is_cartpole,
+          save_model=args.save_model, load_model=args.load_model, gif=False)

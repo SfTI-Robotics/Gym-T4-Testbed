@@ -9,7 +9,7 @@ import sys
 import numpy as np
 import gym
 # for graphing
-from temp_Graphs.summary import Summary
+from summary import Summary
 import time
 import datetime
 # recording environment render as video mp4

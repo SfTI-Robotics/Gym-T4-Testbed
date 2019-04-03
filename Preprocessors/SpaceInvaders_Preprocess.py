@@ -3,10 +3,10 @@ from skimage import transform  # Help us to preprocess the frames
 from skimage.color import rgb2gray  # Help us to gray our frames
 import numpy as np
 
-# http://maciejjaskowski.github.io/2016/03/09/space-invaders.html
 from Preprocessors.Abstract_Preprocess import AbstractProcessor
 
 
+# http://maciejjaskowski.github.io/2016/03/09/space-invaders.html
 class Processor(AbstractProcessor):
     def __init__(self):
         super().__init__()

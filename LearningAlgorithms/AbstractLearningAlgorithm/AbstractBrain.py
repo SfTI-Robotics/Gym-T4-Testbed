@@ -28,5 +28,5 @@ class AbstractLearning(ABC):
         pass
 
     @abstractmethod
-    def memory_replay(self, episode):
+    def memory_replay(self):
         pass

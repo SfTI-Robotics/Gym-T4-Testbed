@@ -57,7 +57,6 @@ class Processor(AbstractProcessor):
     # the reward is backpropagated so that the actions leading up to the result
     # are assigned a percentage of the reward.
     # 'running add' variable that resets to 0 whenever this happens
-
     def discounted_rewards(self, rewards, gamma):
         # initialise array and variable
         discounted_r = np.zeros_like(rewards, dtype=np.float32)
