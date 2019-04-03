@@ -16,6 +16,8 @@ from training import train
 
 # TODO: reduce length of functions wherever possible
 
+# TODO: add method comments
+
 if __name__ == "__main__":
 
     # For more on how argparse works see documentation
@@ -26,8 +28,15 @@ if __name__ == "__main__":
     parser.add_argument("-env", "--environment",
                         help="select a environment: \n Pong-v0 \n SpaceInvaders-v0 \n MsPacman-v0")
     parser.add_argument("-eps", "--episodes", help="select number of episodes to graph")
+    parser.add_argument("-save", "--save_model", help='select whether model should be saved', action='store_true')
+    parser.add_argument("-load_nr", "--load_model_nr",
+                        help="number of the model that should be loaded, model-nr can be found in model-name: "
+                             "[environment]_[algorithm]_[model-nr]_model.h5",
+                        required=False, default="0")
+
     # retrieve user inputted args from cmd line
     args = parser.parse_args()
+    is_cartpole = (args.environment == 'CartPole-v1')
 
     # Prepossessing folder
     # this takes care of the environment specifics and image processing
@@ -55,9 +64,10 @@ if __name__ == "__main__":
     processor = Preprocess.Processor()
     # state space is determined by the deque storing the frames from the env
     state_space = processor.get_state_space()
-    # TODO: exception for cartpole
-    if args.environment == 'CartPole-v1':
+
+    if is_cartpole:
         state_space = env.observation_space.shape[0]
+
     # action space given by the environment
     action_space = env.action_space.n
 
@@ -78,7 +88,7 @@ if __name__ == "__main__":
     else:
         sys.exit("Algorithm not found")
 
-    learner = Learning(state_space, action_space)
+    learner = Learning(state_space, action_space, is_cartpole)
 
     # ============================================
 
@@ -87,27 +97,24 @@ if __name__ == "__main__":
     MODEL_FILENAME = args.environment + '_' + args.algorithm + '_'
     # our graphing function
     # summary sets the ranges and targets and saves the graph
-    graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_epsilon'],
-                    # the optimal step count of the optimal policy
-                    step_goal=0,
-                    # the maximum reward for the optimal policy
-                    reward_goal=0,
+    graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_average_reward', 'sumiz_epsilon'],
                     # maximum exploitation value
                     epsilon_goal=0.99,
                     # desired name for file
-                    NAME=MODEL_FILENAME + str(now),
-                    # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
+                    name=MODEL_FILENAME + str(now),
+                    # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
                     # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
-                    SAVE_PATH="/Gym-T4-Testbed/temp_Graphs/",
+                    save_path="/Gym-T4-Testbed/temp_Graphs/",
                     # episode upper bound for graph
-                    EPISODE_MAX=int(args.episodes),
+                    episode_max=int(args.episodes),
                     # step upper bound for graph
-                    STEP_MAX_M=processor.step_max,
+                    step_max_m=processor.step_max,
                     # time upper bound for graph
-                    TIME_MAX_M=processor.time_max,
+                    time_max_m=processor.time_max,
                     # reward upper bound for graph
-                    REWARD_MIN_M=processor.reward_min,
+                    reward_min_m=processor.reward_min,
                     # reward lower bound for graph
-                    REWARD_MAX_M=processor.reward_max)
+                    reward_max_m=processor.reward_max)
 
-    train(env, learner, graph, processor, args.episodes, (args.environment == 'CartPole-v1'))
+    train(env, learner, graph, processor, args.episodes, is_cartpole, save_model=args.save_model,
+          model_filename="/Gym-T4-Testbed/temp_Models/" + MODEL_FILENAME, model_nr=args.load_model_nr)
