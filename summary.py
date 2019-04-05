@@ -27,6 +27,8 @@ REWARD_MAX_F = 1
 #  for every episode, plot the average reward received in the last +/- n episodes
 #  (same for time, steps)
 
+# TODO: scale of execution time should adapt to actual values, without having to guess a maximum
+
 
 class Summary:
     def __init__(
@@ -53,11 +55,9 @@ class Summary:
             episode_max=100,
             # step upper bound for graph
             step_max_m=500,
-            # time upper bound for graph
-            time_max_m=120,
-            # reward upper bound for graph
-            reward_min_m=-100,
             # reward lower bound for graph
+            reward_min_m=-100,
+            # reward upper bound for graph
             reward_max_m=100
     ):
         self.summary_types = summary_types
@@ -71,7 +71,6 @@ class Summary:
         self.EPISODE_MIN = episode_min
         self.EPISODE_MAX = episode_max
         self.STEP_MAX_M = step_max_m
-        self.TIME_MAX_M = time_max_m
         self.REWARD_MIN_M = reward_min_m
         self.REWARD_MAX_M = reward_max_m
 
@@ -148,7 +147,8 @@ class Summary:
         i = 1
         if 'sumiz_step' in self.summary_types:
             ax1 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, STEP_MIN_M, self.STEP_MAX_M])
+            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.step_summary)])
+            # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, STEP_MIN_M, self.STEP_MAX_M])
             ax1.plot(range(len(self.step_summary)), self.step_summary)
             # only plot additional line if goal was specified
             if self.step_goal is not None:
@@ -159,7 +159,7 @@ class Summary:
             i += 1
         if 'sumiz_time' in self.summary_types:
             ax2 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, TIME_MIN_M, self.TIME_MAX_M])
+            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.time_summary)])
             ax2.plot(range(len(self.time_summary)), self.time_summary)
             ax2.set_title('Execution time in each episode')
             ax2.set_xlabel('Episode')
@@ -167,7 +167,8 @@ class Summary:
             i += 1
         if 'sumiz_reward' in self.summary_types:
             ax3 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, self.REWARD_MIN_M, self.REWARD_MAX_M])
+            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX,
+                      np.min([0, np.min(self.reward_summary)]), np.max(self.reward_summary)])
             ax3.plot(range(len(self.reward_summary)), self.reward_summary)
             # only plot additional line if goal was specified
             if self.reward_goal is not None:

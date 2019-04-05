@@ -1,110 +1,109 @@
 import keras
-from keras.layers import Conv2D, Flatten, Dense
+from keras import Model, Input
+from keras.layers import Conv2D, Flatten, Dense, Lambda, K, merge
 from keras.models import Sequential
 
 
-class NeuralNet:
+# TODO: networks depend on algorithm -> restructure
 
-    def __init__(self, obs_space, action_space, is_cartpole):
-        self.obs_space = obs_space
-        # action space uses the customised action encoding from the environment's preprocess file
-        self.action_space = action_space
 
-        self.model = Sequential()
-        if is_cartpole:
-            # this network works only for cartpole
-            self.build_network22()
-        else:
-            # this network works for everything except cartpole
-            self.build_network()
+class NeuralNetworkBuilder:
 
-    def build_network(self):
+    @staticmethod
+    def build_dqn_network(obs_space, action_space):
+        model = Sequential()
         # 2 layers of convolutional networks
         # padding is added so that information is not loss when the kernel size is smaller
-        self.model.add(Conv2D(16, kernel_size=(8, 8), strides=(2, 2), padding='valid', activation='relu',
-                              input_shape=self.obs_space, data_format='channels_first'))
-        self.model.add(Conv2D(32, kernel_size=(4, 4), strides=(2, 2), padding='valid', activation='relu',
-                              data_format='channels_first'))
+        model.add(Conv2D(32, kernel_size=(8, 8), strides=(4, 4), padding='valid', activation='relu',
+                         input_shape=obs_space, data_format='channels_first'))
+        model.add(Conv2D(64, kernel_size=(4, 4), strides=(2, 2), activation='relu',))
+        model.add(Conv2D(64, kernel_size=(4, 4), activation='relu',))
 
         # convert image from 2D to 1D
-        self.model.add(Flatten())
+        model.add(Flatten())
 
         # layer for testing out code on cartpole
         # self.model.add(Dense(24, input_shape=(self.obs_space,), activation="relu"))
 
         # hidden layer takes a pre-processed frame as input, and has 200 units
         #  fibre channel layer 1
-        self.model.add(Dense(units=500, activation='relu', kernel_initializer='glorot_uniform'))
+        model.add(Dense(units=512, activation='relu', kernel_initializer='glorot_uniform'))
 
         # output layer
         # print("output layer dimensions = ", self.action_space)
-        self.model.add(Dense(units=self.action_space, activation='softmax', kernel_initializer='RandomNormal'))
+        model.add(Dense(units=action_space, activation='softmax', kernel_initializer='RandomNormal'))
 
         # compile the self.model using traditional Machine Learning losses and optimizers
         # self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-        self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
         # self.model.summary()
+        return model
 
-    def build_network22(self):
-        self.model.add(Dense(24, input_shape=(self.obs_space,), activation="relu"))
+    # TODO: try to use dqn network for cartpole
+    @staticmethod
+    def build_cartpole_network(obs_space, action_space):
+        model = Sequential()
+        model.add(Dense(24, input_shape=obs_space, activation="relu"))
         # self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
-        self.model.add(Dense(24, activation='relu'))
-        self.model.add(Dense(self.action_space, activation='linear'))
-        self.model.compile(optimizer=keras.optimizers.Adam(lr=0.00025), loss='mse')
+        model.add(Dense(24, activation='relu'))
+        model.add(Dense(action_space, activation='linear'))
+        model.compile(optimizer=keras.optimizers.Adam(lr=0.00025), loss='mse')
         # self.model.summary()
+        return model
 
-    def build_network_double_dqn(self):
-        # 3 layers of convolutional networks
-        # padding is added so that information is not loss when the kernel size is smaller
-        self.model.add(
-            Conv2D(32, kernel_size=(3, 3), padding='valid', activation='relu', input_shape=self.obs_space,
-                   data_format='channels_first'))
-        self.model.add(
-            Conv2D(64, kernel_size=(5, 5), padding='valid', activation='relu', data_format='channels_first'))
-        self.model.add(
-            Conv2D(64, kernel_size=(5, 5), padding='valid', activation='relu', data_format='channels_first'))
-        # convert image from 3D to 1D
-        self.model.add(Flatten())
+    @staticmethod
+    def build_dueling_cartpole_network(obs_space, action_space):
+        state_input = Input(shape=obs_space)
+        x = Dense(24, activation='relu')(state_input)
+        x = Dense(24, activation='relu')(x)
+        x = Flatten()(x)
 
-        # hidden layer takes a pre-processed frame as input, and has 200 units
-        #  fibre channel layer 1
-        self.model.add(
-            Dense(units=200, input_dim=self.obs_space, activation='relu', kernel_initializer='he_uniform'))
+        state_value = Dense(12, activation='relu')(x)
+        state_value = Dense(1, init='uniform')(state_value)
+        state_value = Lambda(lambda s: K.expand_dims(s[:, 0], axis=-1), output_shape=(action_space,))(state_value)
 
-        # output layer
-        self.model.add(Dense(units=self.action_space, activation='relu', kernel_initializer='RandomNormal'))
+        action_advantage = Dense(12, activation='relu')(x)
+        action_advantage = Dense(action_space)(action_advantage)
+        action_advantage = Lambda(lambda a: a[:, :] - K.mean(a[:, :], keepdims=True),
+                                  output_shape=(action_space,))(action_advantage)
 
-        # compile the model using traditional Machine Learning losses and optimizers
-        self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-        # self.model.summary()
+        state_action_value = keras.layers.add([state_value, action_advantage])
+        model = Model(input=state_input, output=state_action_value)
+        model.compile(loss='mse', optimizer='adam')
+        model.summary()
+        return model
 
-    def build_network_dueling_dqn(self):
-        self.model.add(
-            Conv2D(32, kernel_size=(3, 3), padding='valid', activation='relu', input_shape=self.obs_space,
-                   data_format='channels_first'))
-        self.model.add(
-            Conv2D(64, kernel_size=(5, 5), padding='valid', activation='relu', data_format='channels_first'))
-        self.model.add(
-            Conv2D(64, kernel_size=(5, 5), padding='valid', activation='relu', data_format='channels_first'))
-        self.model.add(Flatten())
-        self.model.add(
-            Dense(units=512, input_dim=self.obs_space, activation='relu', kernel_initializer='he_uniform'))
-        # self.model.add(Dense(units=self.action_space, activation='relu', kernel_initializer='RandomNormal'))
+    # TODO: make this work
+    @staticmethod
+    def build_dueling_dqn_network(obs_space, action_space):
 
-        advantage = Dense(units=self.action_space, activation='relu', kernel_initializer='RandomNormal')
-        value = Dense(units=1, activation='relu', kernel_initializer='RandomNormal')
+        # see https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/models.py
+        state_input = Input(shape=obs_space)
+        x = Conv2D(32, kernel_size=(8, 8), strides=(4, 4), activation='relu',
+                   data_format='channels_first')(state_input)
+        x = Conv2D(64, kernel_size=(4, 4), strides=(2, 2), activation='relu')(x)
+        x = Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+        x = Flatten()(x)
 
-        self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+        # state value tower - V
+        state_value = Dense(256, activation='relu')(x)
+        state_value = Dense(1, init='uniform')(state_value)
+        state_value = Lambda(lambda s: K.expand_dims(s[:, 0], axis=-1), output_shape=(action_space,))(state_value)
 
-        advantage = Dense(NUM_ACTIONS)(fc1)
+        # action advantage tower - A
+        action_advantage = Dense(256, activation='relu')(x)
+        action_advantage = Dense(action_space)(action_advantage)
+        action_advantage = Lambda(lambda a: a[:, :] - K.mean(a[:, :], keepdims=True),
+                                  output_shape=(action_space,))(action_advantage)
 
-        fc2 = Dense(512)(flatten)
-        value = Dense(1)(fc2)
-        policy = merge([advantage, value], mode=lambda x: x[0] - K.mean(x[0]) + x[1], output_shape=(NUM_ACTIONS,))
-        # policy = Dense(NUM_ACTIONS)(merge_layer)
+        # merge to state-action value function Q
+        state_action_value = keras.layers.add([state_value, action_advantage])
 
-        self.model = Model(input=[input_layer], output=[policy])
-        self.model.compile(loss='mse', optimizer=Adam(lr=0.000001))
+        model = Model(input=state_input, output=state_action_value)
+        # model.compile(rmsprop(lr=learning_rate), "mse")
+        # TODO: incorporate learning rate?
+        # adam = Adam(lr=learning_rate)
+        model.compile(loss='mse', optimizer='adam')
 
-        self.target_model = Model(input=[input_layer], output=[policy])
-        self.target_model.compile(loss='mse', optimizer=Adam(lr=0.000001))
+        model.summary()
+        return model

@@ -83,6 +83,9 @@ if __name__ == "__main__":
     elif args.algorithm == 'DoubleDQN':
         from LearningAlgorithms.Double_DQN.Brain import Learning
         print('Double works')
+    elif args.algorithm == 'DuelingDQN':
+        from LearningAlgorithms.Dueling_DQN.Brain import Learning
+        print('Dueling works')
     else:
         sys.exit("Algorithm not found")
 
@@ -107,8 +110,6 @@ if __name__ == "__main__":
                     episode_max=int(args.episodes),
                     # step upper bound for graph
                     step_max_m=processor.step_max,
-                    # time upper bound for graph
-                    time_max_m=processor.time_max,
                     # reward upper bound for graph
                     reward_min_m=processor.reward_min,
                     # reward lower bound for graph

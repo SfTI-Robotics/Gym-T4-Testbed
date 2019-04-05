@@ -34,7 +34,6 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
     if load_model:
         load_model_from_file(learner, SAVE_PATH + model_name)
 
-    reward_episode = []
     summary_writer = tensorflow.summary.FileWriter(SAVE_PATH + '/' + model_name + '_Summary')
     print("\n ==== initialisation complete, start training ==== \n")
 
@@ -43,27 +42,14 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
 
-        observation = env.reset()
-        episode_frames.append(observation)
+        state = env.reset()
+        episode_frames.append(state)
         # Processing initial image cropping, grayscale, and stacking 4 of them
-        observation = processor.preprocessing(observation, True)
+        state = processor.preprocessing(state, True)
 
         start_time = time.time()
         sum_rewards_array = 0  # total rewards for graphing
-
-        game_step = 0  # for discounted rewards, steps for each round
         step = 0  # count total steps for each episode for the graph
-
-        # these arrays are used to calculated and store discounted rewards
-        # arrays for other variable are needed for appending to transitions in our learner to work
-        # arrays emptied after every round in an episode
-        reward_array = []
-        if episode % 20 == 0:
-            reward_episode = []
-        states = []
-        actions = []
-        next_states = []
-        dones = []
 
         while True:
             # remove comment to watch learning process in cartpole environment
@@ -71,63 +57,53 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             #     env.render()
 
             # action chooses from  simplified action space without useless keys
-            action = learner.choose_action(observation, episode)
+            action = learner.choose_action(state, episode)
             # actions map the simplified action space to the environment action space
             # if action space has no useless keys then action = action_mapped
             action_mapped = processor.mapping_actions_to_keys(action)
             # takes a step
-            next_observation, reward, done, _ = env.step(action_mapped)
+            next_state, reward, done, _ = env.step(action_mapped)
 
-            episode_frames.append(next_observation)
+            episode_frames.append(next_state)
 
             if is_cartpole:
                 # punish if terminal state reached
                 if done:
                     reward = -reward
 
-            # appending <s, a, r, s', d> into arrays for storage
-            states.append(observation)
-            actions.append(action)  # only append the '1 out of 3' action
-
-            reward_array.append(reward)
             sum_rewards_array += reward
-            reward_episode.append(sum_rewards_array)
+            next_state = processor.preprocessing(next_state, False)
 
-            next_observation = processor.preprocessing(next_observation, False)
-            next_states.append(next_observation)
-            dones.append(done)
+            # TODO: remember action or action_mapped?
+            # append <s, a, r, s', d> to learner.transitions
+            learner.remember(state, action, reward, next_state, done)
 
-            game_step += 1
             step += 1
+            state = next_state
+            # TODO: make experience replay work for ALL environments
+            # if is_cartpole:
+            # train algorithm using experience replay
+            learner.memory_replay()
 
             if done:
-                # append each <s, a, r, s', d> to learner.transitions for each game round
-                for i in range(game_step):
-                    learner.transitions.append((states[i], actions[i], reward_array[i], next_states[i], dones[i]))
+                # takes care of updating target model for Double_DQN
+                learner.finish_episode_training()
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
 
                 # empty arrays after each round is complete
-                states, actions, reward_episode, next_states, dones = [], [], [], [], []
                 # record video of environment render
                 # env = make_video(env, model_filename)
                 break
 
-            observation = next_observation
-
-            learner.memory_replay()
-            # if is_cartpole:
-            #    # train algorithm using experience replay
-            #    learner.memory_replay(episode)
+        # summarize plots the graph
+        graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
+                        learner.e_greedy_formula)
 
         # make gif from episode frames
         # no image data available for cartpole
         if gif and not is_cartpole and episode != 0 and episode % SAVE_GIF_FREQUENCY == 0:
             make_gif(episode, model_name, episode_frames)
-
-        # summarize plots the graph
-        graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
-                        learner.e_greedy_formula)
 
         if save_model:
             # save episode data to tensorboard summary

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from LearningAlgorithms.AbstractLearningAlgorithm.Network import NeuralNet
+from LearningAlgorithms.AbstractLearningAlgorithm.Network import NeuralNetworkBuilder
 
 
 class AbstractLearning(ABC):
@@ -11,13 +11,13 @@ class AbstractLearning(ABC):
     transitions = None
     e_greedy_formula = ""
 
-    def __init__(self, observations, actions, is_cartpole):
+    def __init__(self, observations, actions):
         self.state_space = observations
         self.action_space = actions
 
-        # initialise network here and not in the main file
-        # length of action space should be whatever new_action_space outputs see preprocess for more
-        self.network = NeuralNet(self.state_space, self.action_space, is_cartpole)
+    @abstractmethod
+    def remember(self, state, action, reward, next_state, done):
+        pass
 
     @abstractmethod
     def update_epsilon(self, episode):
@@ -29,4 +29,7 @@ class AbstractLearning(ABC):
 
     @abstractmethod
     def memory_replay(self):
+        pass
+
+    def finish_episode_training(self):
         pass
