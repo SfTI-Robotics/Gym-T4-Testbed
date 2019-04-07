@@ -147,8 +147,8 @@ class Summary:
         i = 1
         if 'sumiz_step' in self.summary_types:
             ax1 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.step_summary)])
             # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, STEP_MIN_M, self.STEP_MAX_M])
+            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.step_summary)])
             ax1.plot(range(len(self.step_summary)), self.step_summary)
             # only plot additional line if goal was specified
             if self.step_goal is not None:
@@ -167,6 +167,7 @@ class Summary:
             i += 1
         if 'sumiz_reward' in self.summary_types:
             ax3 = fig1.add_subplot(self.num_main_axes, 1, i)
+            # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, self.REWARD_MIN_M, self.REWARD_MAX_M])
             plt.axis([self.EPISODE_MIN, self.EPISODE_MAX,
                       np.min([0, np.min(self.reward_summary)]), np.max(self.reward_summary)])
             ax3.plot(range(len(self.reward_summary)), self.reward_summary)

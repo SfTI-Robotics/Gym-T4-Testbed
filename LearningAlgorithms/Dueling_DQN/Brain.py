@@ -26,11 +26,6 @@ class Learning(AbstractBrain.AbstractLearning):
         if is_cartpole:
             self.state_space = (observations,)
             self.network = NeuralNetworkBuilder.build_dueling_cartpole_network(self.state_space, self.action_space)
-            # print('No cartpole network implemented yet')
-            # exit(42)
-            # self.state_space = (observations,)
-            # self.network = \
-            #    NeuralNetworkBuilder.build_cartpole_network(self.state_space, self.action_space)
         else:
             self.network = NeuralNetworkBuilder.build_dueling_dqn_network(self.state_space, self.action_space)
 

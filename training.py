@@ -77,13 +77,11 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             # TODO: remember action or action_mapped?
             # append <s, a, r, s', d> to learner.transitions
             learner.remember(state, action, reward, next_state, done)
+            # train algorithm using experience replay
+            learner.memory_replay()
 
             step += 1
             state = next_state
-            # TODO: make experience replay work for ALL environments
-            # if is_cartpole:
-            # train algorithm using experience replay
-            learner.memory_replay()
 
             if done:
                 # takes care of updating target model for Double_DQN

@@ -39,40 +39,6 @@ class NeuralNetworkBuilder:
         # self.model.summary()
         return model
 
-    # TODO: try to use dqn network for cartpole
-    @staticmethod
-    def build_cartpole_network(obs_space, action_space):
-        model = Sequential()
-        model.add(Dense(24, input_shape=obs_space, activation="relu"))
-        # self.model.add(Dense(512, activation='relu', kernel_initializer='he_uniform' ))
-        model.add(Dense(24, activation='relu'))
-        model.add(Dense(action_space, activation='linear'))
-        model.compile(optimizer=keras.optimizers.Adam(lr=0.00025), loss='mse')
-        # self.model.summary()
-        return model
-
-    @staticmethod
-    def build_dueling_cartpole_network(obs_space, action_space):
-        state_input = Input(shape=obs_space)
-        x = Dense(24, activation='relu')(state_input)
-        x = Dense(24, activation='relu')(x)
-        x = Flatten()(x)
-
-        state_value = Dense(12, activation='relu')(x)
-        state_value = Dense(1, init='uniform')(state_value)
-        state_value = Lambda(lambda s: K.expand_dims(s[:, 0], axis=-1), output_shape=(action_space,))(state_value)
-
-        action_advantage = Dense(12, activation='relu')(x)
-        action_advantage = Dense(action_space)(action_advantage)
-        action_advantage = Lambda(lambda a: a[:, :] - K.mean(a[:, :], keepdims=True),
-                                  output_shape=(action_space,))(action_advantage)
-
-        state_action_value = keras.layers.add([state_value, action_advantage])
-        model = Model(input=state_input, output=state_action_value)
-        model.compile(loss='mse', optimizer='adam')
-        model.summary()
-        return model
-
     # TODO: make this work
     @staticmethod
     def build_dueling_dqn_network(obs_space, action_space):
@@ -105,5 +71,38 @@ class NeuralNetworkBuilder:
         # adam = Adam(lr=learning_rate)
         model.compile(loss='mse', optimizer='adam')
 
-        model.summary()
+        # model.summary()
+        return model
+
+    # TODO: try to use dqn network for cartpole
+    @staticmethod
+    def build_cartpole_network(obs_space, action_space):
+        model = Sequential()
+        model.add(Dense(24, input_shape=obs_space, activation="relu"))
+        model.add(Dense(24, activation='relu'))
+        model.add(Dense(action_space, activation='linear'))
+        # TODO: extract learning rate
+        model.compile(optimizer=keras.optimizers.Adam(lr=0.001), loss='mse')
+        # self.model.summary()
+        return model
+
+    @staticmethod
+    def build_dueling_cartpole_network(obs_space, action_space):
+        state_input = Input(shape=obs_space)
+        x = Dense(24, activation='relu')(state_input)
+        x = Dense(24, activation='relu')(x)
+
+        state_value = Dense(12, activation='relu')(x)
+        state_value = Dense(1, init='uniform')(state_value)
+        state_value = Lambda(lambda s: K.expand_dims(s[:, 0], axis=-1), output_shape=(action_space,))(state_value)
+
+        action_advantage = Dense(12, activation='relu')(x)
+        action_advantage = Dense(action_space)(action_advantage)
+        action_advantage = Lambda(lambda a: a[:, :] - K.mean(a[:, :], keepdims=True),
+                                  output_shape=(action_space,))(action_advantage)
+
+        state_action_value = keras.layers.add([state_value, action_advantage])
+        model = Model(input=state_input, output=state_action_value)
+        model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=0.001))
+        # model.summary()
         return model
