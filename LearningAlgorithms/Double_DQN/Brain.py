@@ -14,6 +14,7 @@ class Learning(AbstractBrain.AbstractLearning):
     MAX_MEMORY_LENGTH = 2000
     START_TRAINING = 1000
     TARGET_MODEL_UPDATE_FREQUENCY = 500
+    START_EPSILON_DECAY = 100
     # how many memory's we learn from at a time
     batch_size = 64
 
@@ -33,6 +34,7 @@ class Learning(AbstractBrain.AbstractLearning):
         self.update_target_model()
 
         self.e_greedy_formula = 'e = min{e_min, e_prev * e_decay}'
+        # self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
         self.epsilon_min = 0.01
@@ -53,18 +55,22 @@ class Learning(AbstractBrain.AbstractLearning):
     def remember(self, state, action, reward, next_state, done):
         self.transitions.append((state, action, reward, next_state, done))
         # TODO: test this
-        # if self.is_cartpole and done:
-        #     self.update_target_model()
+        if self.is_cartpole and done:
+            self.update_target_model()
 
     def update_epsilon(self, episode):
+        # equation designed for training on 10 000 episodes
+        # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
+        #  formula = 1 - a ** (-b * (episode - c))
+        self.epsilon = 5.45 ** (-0.009 * (episode - self.START_EPSILON_DECAY))
+
         # decrease epsilon if learning process has started
-        if (self.epsilon > self.epsilon_min) & (self.time_step > self.START_TRAINING):
-            self.epsilon = self.epsilon * self.epsilon_decay
-            # self.epsilon -= (1 - self.epsilon_min) / 5000000  # boltzman softmax
+        # if (self.epsilon > self.epsilon_min) & (self.time_step > self.START_TRAINING):
+        #     self.epsilon = self.epsilon * self.epsilon_decay
 
     # the processed state is used in choosing action
     def choose_action(self, state, episode):
-        # TODO: check if this caused deterioration
+        # if random.random() <= self.epsilon:
         if random.random() <= self.epsilon:
             action = random.randrange(self.action_space)
         else:
@@ -104,7 +110,7 @@ class Learning(AbstractBrain.AbstractLearning):
 
         self.network.fit(states, target, batch_size=self.batch_size, epochs=1, verbose=0)
         # update target network
-        if self.time_step % self.TARGET_MODEL_UPDATE_FREQUENCY == 0:
+        if self.time_step % self.TARGET_MODEL_UPDATE_FREQUENCY == 0 and not self.is_cartpole:
             self.update_target_model()
 
     def update_target_model(self):
