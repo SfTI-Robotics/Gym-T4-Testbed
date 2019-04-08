@@ -30,6 +30,3 @@ class AbstractLearning(ABC):
     @abstractmethod
     def memory_replay(self):
         pass
-
-    def finish_episode_training(self):
-        pass

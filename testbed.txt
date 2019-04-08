@@ -4,9 +4,5 @@
 #   Breakout-v0 DQN 10
 #
 CartPole-v1 DQN 1000 -save
-Breakout-v0 DQN 1000 -save
-CartPole-v1 DoubleDQN 1000 -save
-Breakout-v0 DoubleDQN 1000 -save
-CartPole-v1 DuelingDQN 1000 -save
-Breakout-v0 DuelingDQN 1000 -save
+Breakout-v0 DoubleDQN 10000 -save
 Keep as last Line, no blank lines above or below it

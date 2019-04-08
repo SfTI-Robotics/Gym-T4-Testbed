@@ -1,6 +1,6 @@
 import keras
 from keras import Model, Input
-from keras.layers import Conv2D, Flatten, Dense, Lambda, K, merge
+from keras.layers import Conv2D, Flatten, Dense, Lambda, K
 from keras.models import Sequential
 
 
@@ -17,7 +17,7 @@ class NeuralNetworkBuilder:
         model.add(Conv2D(32, kernel_size=(8, 8), strides=(4, 4), padding='valid', activation='relu',
                          input_shape=obs_space, data_format='channels_first'))
         model.add(Conv2D(64, kernel_size=(4, 4), strides=(2, 2), activation='relu',))
-        model.add(Conv2D(64, kernel_size=(4, 4), activation='relu',))
+        model.add(Conv2D(32, kernel_size=(4, 4), activation='relu',))
 
         # convert image from 2D to 1D
         model.add(Flatten())
@@ -78,9 +78,9 @@ class NeuralNetworkBuilder:
     @staticmethod
     def build_cartpole_network(obs_space, action_space):
         model = Sequential()
-        model.add(Dense(24, input_shape=obs_space, activation="relu"))
-        model.add(Dense(24, activation='relu'))
-        model.add(Dense(action_space, activation='linear'))
+        model.add(Dense(24, input_shape=obs_space, activation="relu", kernel_initializer='he_uniform'))
+        model.add(Dense(24, activation='relu', kernel_initializer='he_uniform'))
+        model.add(Dense(action_space, activation='linear', kernel_initializer='he_uniform'))
         # TODO: extract learning rate
         model.compile(optimizer=keras.optimizers.Adam(lr=0.001), loss='mse')
         # self.model.summary()

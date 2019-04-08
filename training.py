@@ -84,8 +84,6 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             state = next_state
 
             if done:
-                # takes care of updating target model for Double_DQN
-                learner.finish_episode_training()
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
 
