@@ -16,6 +16,7 @@ from training import train
 
 # TODO: reduce length of functions wherever possible
 # TODO: add method comments
+# TODO: add replay mode (load previous model and let it act in environments without learning)
 
 if __name__ == "__main__":
 
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     # summary sets the ranges and targets and saves the graph
     graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_average_reward', 'sumiz_epsilon'],
                     # maximum exploitation value
-                    epsilon_goal=0.01,
+                    epsilon_goal=0.99,
                     # desired name for file
                     name=MODEL_FILENAME + str(now),
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"

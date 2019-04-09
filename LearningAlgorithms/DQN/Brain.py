@@ -11,8 +11,10 @@ from LearningAlgorithms.AbstractLearningAlgorithm.Network import NeuralNetworkBu
 class Learning(AbstractBrain.AbstractLearning):
     # TODO: make pretty! Different options for Atari and Basic Control?
     # length of transitions deque
-    MAX_MEMORY_LENGTH = 2000
-    START_TRAINING = 1000
+    MAX_MEMORY_LENGTH = 200000
+    START_TRAINING = 64
+    START_EPSILON_DECAY = 1
+    MIN_EPSILON = 0.1
     # alpha
     LEARNING_RATE = 0.001
     # gamma
@@ -25,16 +27,15 @@ class Learning(AbstractBrain.AbstractLearning):
         if is_cartpole:
             self.state_space = (observations, )
             self.network = \
-                NeuralNetworkBuilder.build_cartpole_network(self.state_space, self.action_space)
+                NeuralNetworkBuilder.build_cartpole_network(self.state_space, self.action_space, self.LEARNING_RATE)
         else:
-            self.network = NeuralNetworkBuilder.build_dqn_network(self.state_space, self.action_space)
+            self.network = NeuralNetworkBuilder.build_dqn_network(self.state_space, self.action_space,
+                                                                  self.LEARNING_RATE)
 
         # initialising epsilon changes immediately
+        self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-1))'
         self.epsilon = 1.0
-        self.epsilon_decay = 0.999
-        self.epsilon_min = 0.01
-        self.e_greedy_formula = 'e = min{e_min, e_prev * e_decay}'
-        self.time_step = 0
+
         # transitions is where we store memory of max memory length
         self.transitions = deque(maxlen=self.MAX_MEMORY_LENGTH)
 
@@ -42,10 +43,10 @@ class Learning(AbstractBrain.AbstractLearning):
         self.transitions.append((state, action, reward, next_state, done))
 
     def update_epsilon(self, episode):
-        # decrease epsilon if learning process has started
-        # if (self.epsilon > self.epsilon_min) & (self.time_step > self.START_TRAINING):
-        if (self.epsilon > self.epsilon_min) & (self.time_step > self.START_TRAINING):
-            self.epsilon = self.epsilon * self.epsilon_decay
+        # equation designed for training on 10 000 episodes
+        # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
+        #  formula = 1 - a ** (-b * (episode - c))
+        self.epsilon = max(self.MIN_EPSILON, 5.45 ** (-0.009 * (episode - self.START_EPSILON_DECAY)))
 
     def choose_action(self, state, episode):
         if random.random() <= self.epsilon:
@@ -59,7 +60,6 @@ class Learning(AbstractBrain.AbstractLearning):
         return action
 
     def memory_replay(self):
-        # if len(self.transitions) < self.START_TRAINING:
         if len(self.transitions) < self.START_TRAINING:
             return
 
@@ -85,4 +85,3 @@ class Learning(AbstractBrain.AbstractLearning):
                 target[i][action[i]] = reward[i] + self.gamma * np.amax(target_next[i])
 
         self.network.fit(states, target, batch_size=self.batch_size, epochs=1, verbose=0)
-
