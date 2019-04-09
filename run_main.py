@@ -10,8 +10,8 @@ import gym
 import datetime
 
 # for graphing
-from summary import Summary
-from training import train
+from utils.summary import Summary
+from training.training import train
 
 
 # TODO: reduce length of functions wherever possible
@@ -40,19 +40,19 @@ if __name__ == "__main__":
     # Prepossessing folder
     # this takes care of the environment specifics and image processing
     if args.environment == 'Pong-v0':
-        import Preprocessors.Pong_Preprocess as Preprocess
+        import utils.preprocessing.Pong_Preprocess as Preprocess
         print('Pong works')
     elif args.environment == 'SpaceInvaders-v0':
-        import Preprocessors.SpaceInvaders_Preprocess as Preprocess
+        import utils.preprocessing.SpaceInvaders_Preprocess as Preprocess
         print('SpaceInvaders works')
     elif args.environment == 'MsPacman-v0':
-        import Preprocessors.MsPacman_Preprocess as Preprocess
+        import utils.preprocessing.MsPacman_Preprocess as Preprocess
         print('MsPacman works')
     elif args.environment == 'Breakout-v0':
-        import Preprocessors.Breakout_Preprocess as Preprocess
+        import utils.preprocessing.Breakout_Preprocess as Preprocess
         print('Breakout works')
     elif args.environment == 'CartPole-v1':
-        import Preprocessors.Cartpole_Preprocess as Preprocess
+        import utils.preprocessing.Cartpole_Preprocess as Preprocess
         print('Cartpole works')
     else:
         sys.exit("Environment not found")
@@ -79,13 +79,13 @@ if __name__ == "__main__":
 
     # algorithm folder
     if args.algorithm == 'DQN':
-        from LearningAlgorithms.DQN.Brain import Learning
+        from agents.image_input.DQN_Brain import Learning
         print('DQN works')
     elif args.algorithm == 'DoubleDQN':
-        from LearningAlgorithms.Double_DQN.Brain import Learning
+        from agents.image_input.Double_DQN_Brain import Learning
         print('Double works')
     elif args.algorithm == 'DuelingDQN':
-        from LearningAlgorithms.Dueling_DQN.Brain import Learning
+        from agents.image_input.Dueling_Brain import Learning
         print('Dueling works')
     else:
         sys.exit("Algorithm not found")
@@ -105,8 +105,7 @@ if __name__ == "__main__":
                     # desired name for file
                     name=MODEL_FILENAME + str(now),
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
-                    # SAVE_PATH = "/github/Gym-T4-Testbed/Gym-T4-Testbed/temp_Graphs/",
-                    save_path="/Gym-T4-Testbed/temp_Graphs/",
+                    save_path="/Gym-T4-Testbed/output/graphs/",
                     # episode upper bound for graph
                     episode_max=int(args.episodes),
                     # step upper bound for graph
