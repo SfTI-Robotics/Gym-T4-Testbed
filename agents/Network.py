@@ -74,7 +74,6 @@ class NeuralNetworkBuilder:
         model.add(Dense(action_space, activation='linear', kernel_initializer='he_uniform'))
         # TODO: extract learning rate
         model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate), loss='mse')
-        # model.compile(optimizer='adam', loss='mse')
         # self.model.summary()
         return model
 

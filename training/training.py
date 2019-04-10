@@ -57,7 +57,7 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             #     env.render()
 
             # action chooses from  simplified action space without useless keys
-            action = learner.choose_action(state, episode)
+            action = learner.choose_action(state)
             # actions map the simplified action space to the environment action space
             # if action space has no useless keys then action = action_mapped
             action_mapped = processor.mapping_actions_to_keys(action)
@@ -76,7 +76,7 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
 
             # TODO: remember action or action_mapped?
             # append <s, a, r, s', d> to learner.transitions
-            learner.remember(state, action, reward, next_state, done)
+            learner.remember(state, action, reward, next_state, done, episode)
             # train algorithm using experience replay
             learner.memory_replay()
 

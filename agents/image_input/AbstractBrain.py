@@ -14,7 +14,7 @@ class AbstractLearning(ABC):
         self.action_space = actions
 
     @abstractmethod
-    def remember(self, state, action, reward, next_state, done):
+    def remember(self, state, action, reward, next_state, done, episode):
         pass
 
     @abstractmethod
@@ -22,7 +22,7 @@ class AbstractLearning(ABC):
         pass
 
     @abstractmethod
-    def choose_action(self, state, episode):
+    def choose_action(self, state):
         pass
 
     @abstractmethod
