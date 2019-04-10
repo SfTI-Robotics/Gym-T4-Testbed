@@ -2,6 +2,7 @@ import time
 from os.path import expanduser
 import tensorflow
 
+from agents import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 from utils.storing import save_model_to_file, save_episode_to_summary, make_gif, load_model_from_file
@@ -9,36 +10,33 @@ from utils.summary import Summary
 
 home = expanduser("~")
 
-SAVE_MODEL_FREQUENCY = 100
-SAVE_GIF_FREQUENCY = 10
-SAVE_PATH = home + "/Gym-T4-Testbed/output/models/"
 
-
-def train(env: any, learner: AbstractLearning, graph: Summary, processor: AbstractProcessor, episodes: int,
-          model_name: str, is_cartpole: bool, save_model=False, load_model=False, gif=False) -> None:
+def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, processor: AbstractProcessor,
+          config, model_name, is_cartpole) -> None:
     """
     Trains learner in env and plots results
     :param env: gym environment
     :param learner: untrained learner
+    :param memory: memory for storing experiences as tuples containing state, action, reward, next_state, done
     :param graph: summary for result plotting
     :param processor: pre-processor for given environment
-    :param episodes: number of training episodes
+    :param config: configurations for training
     :param model_name: name of model as [environment]_[algorithm]
     :param is_cartpole: should be true if environment used for training is "CartPole-v1"
-    :param save_model: true if model should be saved every SAVE_MODEL_FREQUENCY steps
-    :param load_model: true if previous model for given algorithm and environment should be loaded before training
-    :param gif: true if episodes should be saved as gifs
     """
 
     # loading neural network weights and parameters
-    if load_model:
-        load_model_from_file(learner, SAVE_PATH + model_name)
+    if config['load_model']:
+        load_model_from_file(learner, home + config['model_save_path'] + model_name)
 
-    summary_writer = tensorflow.summary.FileWriter(SAVE_PATH + '/' + model_name + '_Summary')
+    summary_writer = tensorflow.summary.FileWriter(home + config['model_save_path'] + '/' + model_name + '_Summary')
+
     print("\n ==== initialisation complete, start training ==== \n")
 
+# ============================================================================================================== #
+
     # for episode in range(int(episodes)):
-    for episode in range(episodes):
+    for episode in range(config['episodes']):
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
 
@@ -52,10 +50,6 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
         step = 0  # count total steps for each episode for the graph
 
         while True:
-            # remove comment to watch learning process in cartpole environment
-            # if (episode > 150) and is_cartpole:
-            #     env.render()
-
             # action chooses from  simplified action space without useless keys
             action = learner.choose_action(state)
             # actions map the simplified action space to the environment action space
@@ -76,9 +70,11 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
 
             # TODO: remember action or action_mapped?
             # append <s, a, r, s', d> to learner.transitions
-            learner.remember(state, action, reward, next_state, done, episode)
+            memory.store_transition(state, action, reward, next_state, done)
             # train algorithm using experience replay
-            learner.memory_replay()
+            if len(memory.stored_transitions) >= config['initial_exploration_steps']:
+                states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
+                learner.train_network(states, actions, rewards, next_states, dones, episode, step)
 
             step += 1
             state = next_state
@@ -86,11 +82,9 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
             if done:
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
-
-                # empty arrays after each round is complete
-                # record video of environment render
-                # env = make_video(env, model_filename)
                 break
+
+# ============================================================================================================== #
 
         # summarize plots the graph
         graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
@@ -98,18 +92,20 @@ def train(env: any, learner: AbstractLearning, graph: Summary, processor: Abstra
 
         # make gif from episode frames
         # no image data available for cartpole
-        if gif and not is_cartpole and episode != 0 and episode % SAVE_GIF_FREQUENCY == 0:
+        if config['save_gif'] and not is_cartpole and episode != 0 and episode % config['gif_save_frequency'] == 0:
             make_gif(episode, model_name, episode_frames)
 
-        if save_model:
+        if config['save_model']:
             # save episode data to tensorboard summary
             save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
                                     sum_rewards_array, learner.epsilon)
 
             # store model weights and parameters when episode rewards are above a certain amount
             # and after every number of episodes
-            if episode % SAVE_MODEL_FREQUENCY == 0:
-                save_model_to_file(learner, SAVE_PATH + model_name)
+            if episode % config['model_save_frequency'] == 0:
+                save_model_to_file(learner, home + config['model_save_path'] + model_name)
+
+# ============================================================================================================== #
 
     # killing environment to prevent memory leaks
     env.close()

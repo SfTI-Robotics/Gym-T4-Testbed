@@ -3,7 +3,7 @@ import numpy as np
 from collections import deque
 
 import agents.image_input.AbstractBrain as AbstractBrain
-from agents.Network import NeuralNetworkBuilder
+from agents.networks.Network import NeuralNetworkBuilder
 
 # =================================================================================================================== #
 

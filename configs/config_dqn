@@ -1,0 +1,28 @@
+{
+  "algorithm": "DQN",
+  "environment": "CartPole-v1",
+  "episodes": 100000,
+
+  "batch_size": 64,
+
+  "memory_size": 20000,
+  "initial_exploration_steps": 20000,
+
+  "target_update_frequency": 2000,
+  "network_train_frequency": 10,
+
+  "initial_epsilon_episodes": 1000,
+  "min_epsilon": 0.05,
+
+  "learning_rate": 0.001,
+  "gamma": 0.99,
+
+  "save_model": false,
+  "load_model": false,
+  "save_gif": false,
+
+  "model_save_frequency": 100,
+  "gif_save_frequency": 10,
+  "model_save_path": "/Gym-T4-Testbed/output/models/"
+
+}

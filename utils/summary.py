@@ -48,7 +48,7 @@ class Summary:
             # desired name for file
             name="default_image",
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
-            save_path=home,
+            save_path='',
             # episode lower bound for graph
             episode_min=0,
             # episode upper bound for graph

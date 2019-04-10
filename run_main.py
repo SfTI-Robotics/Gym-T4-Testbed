@@ -6,12 +6,20 @@ this is the universal run script for all environments
 import argparse
 from argparse import RawTextHelpFormatter
 import sys
+from os.path import expanduser
+
 import gym
 import datetime
 
 # for graphing
+from agents.Memory import Memory
 from utils.summary import Summary
 from training.training import train
+
+# for parameters
+import json
+
+home = expanduser("~")
 
 
 # TODO: reduce length of functions wherever possible
@@ -23,54 +31,54 @@ if __name__ == "__main__":
     # For more on how argparse works see documentation
     # create argument options
     parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
-    parser.add_argument("-alg", "--algorithm",
-                        help="select a algorithm: \n QLearning \n DQN \n DoubleDQN \n DuellingDQN \n DDDQN")
-    parser.add_argument("-env", "--environment",
-                        help="select a environment: \n Pong-v0 \n SpaceInvaders-v0 \n MsPacman-v0")
-    parser.add_argument("-eps", "--episodes", help="select number of episodes to graph")
-    parser.add_argument("-save", "--save_model", help='saves model and tensorboard summary regularly',
-                        action='store_true')
-    parser.add_argument("-load", "--load_model", help='loads model for given algorithm and environment',
-                        action='store_true')
+    parser.add_argument("-file", "--filename", help='name of file containing parameters in json-format',)
 
     # retrieve user inputted args from cmd line
     args = parser.parse_args()
-    is_cartpole = (args.environment == 'CartPole-v1')
+
+    # Read JSON data into the datastore variable
+    full_path = home + args.filename
+    if full_path:
+        with open(full_path, 'r') as f:
+            config = json.load(f)
+
+# ============================================================================================================== #
 
     # Prepossessing folder
     # this takes care of the environment specifics and image processing
-    if args.environment == 'Pong-v0':
+    if config['environment'] == 'Pong-v0':
         import utils.preprocessing.Pong_Preprocess as Preprocess
         print('Pong works')
-    elif args.environment == 'SpaceInvaders-v0':
+    elif config['environment'] == 'SpaceInvaders-v0':
         import utils.preprocessing.SpaceInvaders_Preprocess as Preprocess
         print('SpaceInvaders works')
-    elif args.environment == 'MsPacman-v0':
+    elif config['environment'] == 'MsPacman-v0':
         import utils.preprocessing.MsPacman_Preprocess as Preprocess
         print('MsPacman works')
-    elif args.environment == 'Breakout-v0':
+    elif config['environment'] == 'Breakout-v0':
         import utils.preprocessing.Breakout_Preprocess as Preprocess
         print('Breakout works')
-    elif args.environment == 'CartPole-v1':
+    elif config['environment'] == 'CartPole-v1':
         import utils.preprocessing.Cartpole_Preprocess as Preprocess
         print('Cartpole works')
     else:
         sys.exit("Environment not found")
+    is_cartpole = (config['environment'] == 'CartPole-v1')
 
     # create gym env
-    env = gym.make(args.environment)
+    env = gym.make(config['environment'])
     # initialise processing class specific to environment
     processor = Preprocess.Processor()
     # state space is determined by the deque storing the frames from the env
     state_space = processor.get_state_space()
 
     if is_cartpole:
-        state_space = env.observation_space.shape[0]
+        state_space = (env.observation_space.shape[0],)
 
     # action space given by the environment
     action_space = env.action_space.n
 
-    # ============================================
+    # ============================================================================================================== #
 
     # here we change the action space if it contains 'useless' keys or actions that do the same thing
     # if no useless keys it just returns the envs defined action space
@@ -78,25 +86,30 @@ if __name__ == "__main__":
     action_space = processor.new_action_space(action_space)
 
     # algorithm folder
-    if args.algorithm == 'DQN':
+    if config['algorithm'] == 'DQN':
         from agents.image_input.DQN_Brain import Learning
         print('DQN works')
-    elif args.algorithm == 'DoubleDQN':
+    elif config['algorithm'] == 'DoubleDQN':
         from agents.image_input.Double_DQN_Brain import Learning
         print('Double works')
-    elif args.algorithm == 'DuelingDQN':
+    elif config['algorithm'] == 'DuelingDQN':
         from agents.image_input.Dueling_Brain import Learning
         print('Dueling works')
     else:
         sys.exit("Algorithm not found")
 
-    learner = Learning(state_space, action_space, is_cartpole)
+    learner = Learning(state_space, action_space, config)
 
-    # ============================================
+    # ============================================================================================================== #
+
+    # create memory
+    memory = Memory(config['memory_size'], state_space)
+
+    # ============================================================================================================== #
 
     # Graphing results
     now = datetime.datetime.now()
-    MODEL_FILENAME = args.environment + '_' + args.algorithm + '_'
+    MODEL_FILENAME = config['environment'] + '_' + config['algorithm'] + '_'
     # our graphing function
     # summary sets the ranges and targets and saves the graph
     graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_average_reward', 'sumiz_epsilon'],
@@ -107,7 +120,7 @@ if __name__ == "__main__":
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
                     save_path="/Gym-T4-Testbed/output/graphs/",
                     # episode upper bound for graph
-                    episode_max=int(args.episodes),
+                    episode_max=config['episodes'],
                     # step upper bound for graph
                     step_max_m=processor.step_max,
                     # reward upper bound for graph
@@ -115,6 +128,7 @@ if __name__ == "__main__":
                     # reward lower bound for graph
                     reward_max_m=processor.reward_max)
 
+    # ============================================================================================================== #
+
     # train learner and plot results
-    train(env, learner, graph, processor, int(args.episodes), MODEL_FILENAME[:-1], is_cartpole,
-          save_model=args.save_model, load_model=args.load_model, gif=False)
+    train(env, learner, memory, graph, processor, config, MODEL_FILENAME[:-1], is_cartpole)

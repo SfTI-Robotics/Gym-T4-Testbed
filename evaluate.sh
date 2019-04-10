@@ -21,7 +21,7 @@ while IFS=$'\t' read -r line  ;
 			echo "Now Running ${words[0]} environment"
 			
 			# Running the python script
-			python3 run_main.py -env ${words[0]} -alg ${words[1]} -eps ${words[2]}
+			python3 run_main.py -file ${words[0]}
 
 			# close all programs to avoid memory leak
 			kill -9 $(jobs -p)
