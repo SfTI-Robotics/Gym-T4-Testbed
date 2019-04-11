@@ -6,6 +6,7 @@ class AbstractLearning(ABC):
     # variables needed in all Learning classes
     epsilon = 0
     e_greedy_formula = ""
+    network = None
 
     def __init__(self, observations, actions, config):
         self.state_space = observations

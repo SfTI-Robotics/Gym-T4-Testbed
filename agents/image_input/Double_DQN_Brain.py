@@ -53,8 +53,6 @@ class Learning(AbstractBrain.AbstractLearning):
             return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
 
     def train_network(self, states, actions, rewards, next_states, dones, episode, step):
-        # TODO: when should we train? after every action? after ever episode? after n steps?
-        # TODO: when should we start training? once we have one full batch? once the memory is full? after n steps?
         if step % self.config['network_train_frequency']:
             target = self.network.predict(states)
             next_predictions_network = self.network.predict(next_states)

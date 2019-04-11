@@ -20,7 +20,7 @@ class Learning(AbstractBrain.AbstractLearning):
             self.target_network = build_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
 
         # initialising epsilon changes immediately
-        self.e_greedy_formula = 'e = 1-5.45^(-0.005*(episode-1))'
+        self.e_greedy_formula = 'e = 5.45^(-0.0001*(episode-initial_epsilon_episodes))'
         self.epsilon = 1.0
 
         self.update_target_model()
@@ -29,7 +29,7 @@ class Learning(AbstractBrain.AbstractLearning):
         # equation designed for training on 10 000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
         self.epsilon = \
-            max(self.config['min_epsilon'], 5.45 ** (-0.005 * (episode - self.config['initial_epsilon_episodes'])))
+            max(self.config['min_epsilon'], 5.45 ** (-0.0001 * (episode - self.config['initial_epsilon_episodes'])))
 
     def choose_action(self, state):
         if random.random() <= self.epsilon:

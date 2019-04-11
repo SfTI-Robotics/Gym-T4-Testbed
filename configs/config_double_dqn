@@ -20,8 +20,10 @@
   "save_model": false,
   "load_model": false,
   "save_gif": false,
+  "save_tensorboard_summary": true,
+  "save_plot": true,
 
   "model_save_frequency": 100,
-  "gif_save_frequency": 10,
-  "model_save_path": "/Gym-T4-Testbed/output/models/"
+  "gif_save_frequency": 100,
+  "model_load_path": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
 }

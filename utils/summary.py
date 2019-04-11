@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 from os.path import expanduser
@@ -97,12 +99,9 @@ class Summary:
             self.num_main_axes += 1
             self.is_average_reward_axes = True
 
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # if len(os.listdir(home + self.save_path) ) != 0:
-        #     file_list = [ f for f in os.listdir(home + self.save_path) if f.endswith(".png") ]
-        #     for f in file_list:
-        #         os.remove(os.path.join(home + self.save_path, f))
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # create folder, if necessary
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
 
         self.num_focus_axes = 0
         if 'sumiz_step' in self.summary_types:
@@ -203,7 +202,7 @@ class Summary:
             ax5.set_ylabel('Reward per step')
             i += 1
         plt.tight_layout()
-        fig1.savefig(home + self.save_path + self.general_filename + ".png")
+        fig1.savefig(self.save_path + self.general_filename + ".png")
         plt.close(fig1)
 
     def plot_index_focused_summary_graphs(self, episode_count):
@@ -244,7 +243,7 @@ class Summary:
             ax3.set_ylabel('Epsilon')
             i += 1
         plt.tight_layout()
-        fig2.savefig(home + self.save_path + self.general_filename + "_focused_summary.png")
+        fig2.savefig(self.save_path + self.general_filename + "_focused_summary.png")
         plt.close(fig2)
 
     def update(self, step_count, time_count, reward_count, epsilon_value):

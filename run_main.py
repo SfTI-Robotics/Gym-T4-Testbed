@@ -19,12 +19,14 @@ from training.training import train
 # for parameters
 import json
 
-home = expanduser("~")
+PATH = expanduser("~")
+MODEL_FILENAME = ''
 
 
-# TODO: reduce length of functions wherever possible
 # TODO: add method comments
 # TODO: add replay mode (load previous model and let it act in environments without learning)
+# TODO: make epsilon decay configurable
+# TODO: add DDDQN with PER as comparison option
 
 if __name__ == "__main__":
 
@@ -37,9 +39,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Read JSON data into the datastore variable
-    full_path = home + args.filename
-    if full_path:
-        with open(full_path, 'r') as f:
+    config_file_path = PATH + args.filename
+    if config_file_path:
+        with open(config_file_path, 'r') as f:
             config = json.load(f)
 
 # ============================================================================================================== #
@@ -48,18 +50,23 @@ if __name__ == "__main__":
     # this takes care of the environment specifics and image processing
     if config['environment'] == 'Pong-v0':
         import utils.preprocessing.Pong_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "Pong"
         print('Pong works')
     elif config['environment'] == 'SpaceInvaders-v0':
         import utils.preprocessing.SpaceInvaders_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "SpaceInvaders"
         print('SpaceInvaders works')
     elif config['environment'] == 'MsPacman-v0':
         import utils.preprocessing.MsPacman_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "MsPacman"
         print('MsPacman works')
     elif config['environment'] == 'Breakout-v0':
         import utils.preprocessing.Breakout_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "Breakout"
         print('Breakout works')
     elif config['environment'] == 'CartPole-v1':
         import utils.preprocessing.Cartpole_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "CartPole"
         print('Cartpole works')
     else:
         sys.exit("Environment not found")
@@ -88,12 +95,15 @@ if __name__ == "__main__":
     # algorithm folder
     if config['algorithm'] == 'DQN':
         from agents.image_input.DQN_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/DQN/'
         print('DQN works')
     elif config['algorithm'] == 'DoubleDQN':
         from agents.image_input.Double_DQN_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/DoubleDQN/'
         print('Double works')
     elif config['algorithm'] == 'DuelingDQN':
         from agents.image_input.Dueling_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/DuelingDQN/'
         print('Dueling works')
     else:
         sys.exit("Algorithm not found")
@@ -109,7 +119,6 @@ if __name__ == "__main__":
 
     # Graphing results
     now = datetime.datetime.now()
-    MODEL_FILENAME = config['environment'] + '_' + config['algorithm'] + '_'
     # our graphing function
     # summary sets the ranges and targets and saves the graph
     graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_average_reward', 'sumiz_epsilon'],
@@ -118,7 +127,7 @@ if __name__ == "__main__":
                     # desired name for file
                     name=MODEL_FILENAME + str(now),
                     # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
-                    save_path="/Gym-T4-Testbed/output/graphs/",
+                    save_path=PATH + '/graphs/',
                     # episode upper bound for graph
                     episode_max=config['episodes'],
                     # step upper bound for graph
@@ -131,4 +140,4 @@ if __name__ == "__main__":
     # ============================================================================================================== #
 
     # train learner and plot results
-    train(env, learner, memory, graph, processor, config, MODEL_FILENAME[:-1], is_cartpole)
+    train(env, learner, memory, graph, processor, config, PATH)

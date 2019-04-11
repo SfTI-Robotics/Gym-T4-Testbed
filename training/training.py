@@ -5,14 +5,14 @@ import tensorflow
 from agents import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
-from utils.storing import save_model_to_file, save_episode_to_summary, make_gif, load_model_from_file
+from utils.storing import load_model_from_file, make_gif, save_episode_to_summary, save_model_to_file
 from utils.summary import Summary
 
 home = expanduser("~")
 
 
 def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, processor: AbstractProcessor,
-          config, model_name, is_cartpole) -> None:
+          config, save_path) -> None:
     """
     Trains learner in env and plots results
     :param env: gym environment
@@ -21,19 +21,20 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
     :param graph: summary for result plotting
     :param processor: pre-processor for given environment
     :param config: configurations for training
-    :param model_name: name of model as [environment]_[algorithm]
-    :param is_cartpole: should be true if environment used for training is "CartPole-v1"
+    :param save_path: path to folder: [home]/Gym-T4-Testbed/output/[algorithm]/
     """
 
     # loading neural network weights and parameters
     if config['load_model']:
-        load_model_from_file(learner, home + config['model_save_path'] + model_name)
+        load_model_from_file(learner, home + config['model_load_path'])
 
-    summary_writer = tensorflow.summary.FileWriter(home + config['model_save_path'] + '/' + model_name + '_Summary')
+    # if not os.path.exists(save_path + 'tensorboard_summary/'):
+    #    os.makedirs(save_path + 'tensorboard_summary/')
+    summary_writer = tensorflow.summary.FileWriter(save_path + 'tensorboard_summary/')
 
     print("\n ==== initialisation complete, start training ==== \n")
 
-# ============================================================================================================== #
+    # ============================================================================================================== #
 
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
@@ -60,7 +61,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
             episode_frames.append(next_state)
 
-            if is_cartpole:
+            if config['environment'] == 'CartPole-v1':
                 # punish if terminal state reached
                 if done:
                     reward = -reward
@@ -84,28 +85,31 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
                       ", total reward = ", sum_rewards_array)
                 break
 
-# ============================================================================================================== #
+    # ============================================================================================================== #
 
         # summarize plots the graph
-        graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
-                        learner.e_greedy_formula)
+        if config['save_plot']:
+            graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
+                            learner.e_greedy_formula)
 
         # make gif from episode frames
         # no image data available for cartpole
-        if config['save_gif'] and not is_cartpole and episode != 0 and episode % config['gif_save_frequency'] == 0:
-            make_gif(episode, model_name, episode_frames)
+        if config['save_gif'] and \
+                config['environment'] != 'CartPole-v1' \
+                and episode != 0 and episode % config['gif_save_frequency'] == 0:
+            make_gif(episode, save_path + '/gifs/', episode_frames)
 
-        if config['save_model']:
+        if config['save_tensorboard_summary']:
             # save episode data to tensorboard summary
             save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
                                     sum_rewards_array, learner.epsilon)
 
+        if config['save_model'] and episode != 0 and episode % config['model_save_frequency'] == 0:
             # store model weights and parameters when episode rewards are above a certain amount
             # and after every number of episodes
-            if episode % config['model_save_frequency'] == 0:
-                save_model_to_file(learner, home + config['model_save_path'] + model_name)
+            save_model_to_file(learner, save_path + '/models/', config['environment'], episode)
 
-# ============================================================================================================== #
+    # ============================================================================================================== #
 
     # killing environment to prevent memory leaks
     env.close()
