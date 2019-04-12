@@ -26,6 +26,6 @@
   "save_tensorboard_summary": true,
 
   "model_save_frequency": 1000,
-  "gif_save_frequency": 500,
+  "gif_save_frequency": 4,
   "model_load_path": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
 }

@@ -37,8 +37,8 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
     # ============================================================================================================== #
 
     # keeping track of best episode within the last store_frequency steps
-    max_reward = 0
-    max_episode_number = 0
+    max_reward = -1
+    max_episode_number = -1
     max_episode_frames = []
 
     # for episode in range(int(episodes)):
@@ -106,7 +106,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         # no image data available for cartpole
         if config['save_gif'] and \
                 config['environment'] != 'CartPole-v1' \
-                and episode == 0 or episode % config['gif_save_frequency'] == 0:
+                and (episode == 0 or episode % config['gif_save_frequency'] == 0):
             make_gif(max_episode_number, max_reward, save_path + '/gifs/', max_episode_frames)
             max_reward = -1
             max_episode_number = -1
