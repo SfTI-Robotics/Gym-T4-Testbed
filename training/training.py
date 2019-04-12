@@ -106,7 +106,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         # no image data available for cartpole
         if config['save_gif'] and \
                 config['environment'] != 'CartPole-v1' \
-                and (episode == 0 or episode % config['gif_save_frequency'] == 0):
+                and (episode == 0 or (episode+1) % config['gif_save_frequency'] == 0):
             make_gif(max_episode_number, max_reward, save_path + '/gifs/', max_episode_frames)
             max_reward = -1
             max_episode_number = -1
@@ -117,7 +117,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
                                     sum_rewards_array, learner.epsilon)
 
-        if config['save_model'] and episode != 0 and episode % config['model_save_frequency'] == 0:
+        if config['save_model'] and episode != 0 and (episode+1) % config['model_save_frequency'] == 0:
             # store model weights and parameters when episode rewards are above a certain amount
             # and after every number of episodes
             save_model_to_file(learner, save_path + '/models/', config['environment'], episode)

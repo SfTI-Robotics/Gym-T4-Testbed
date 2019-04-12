@@ -1,7 +1,7 @@
 {
   "algorithm": "DuelingDQN",
-  "environment": "CartPole-v1",
-  "episodes": 5,
+  "environment": "Breakout-v0",
+  "episodes": 1000000,
 
   "batch_size": 64,
 
@@ -26,7 +26,7 @@
   "save_tensorboard_summary": true,
 
   "model_save_frequency": 10000,
-  "gif_save_frequency": 4,
+  "gif_save_frequency": 500,
   "model_load_path": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
 
 }
