@@ -1,3 +1,7 @@
-/Gym-T4-Testbed/configs/config_dqn
-/Gym-T4-Testbed/configs/config_double_dqn
+/Gym-T4-Testbed/configs/CartPole/config_dqn
+/Gym-T4-Testbed/configs/CartPole/config_double_dqn
+/Gym-T4-Testbed/configs/CartPole/config_dueling_dqn
+/Gym-T4-Testbed/configs/Breakout/config_dqn
+/Gym-T4-Testbed/configs/Breakout/config_double_dqn
+/Gym-T4-Testbed/configs/Breakout/config_dueling_dqn
 #

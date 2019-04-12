@@ -36,6 +36,11 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
     # ============================================================================================================== #
 
+    # keeping track of best episode within the last store_frequency steps
+    max_reward = 0
+    max_episode_number = 0
+    max_episode_frames = []
+
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
         # storing frames as gifs, array emptied each new episode
@@ -83,6 +88,11 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             if done:
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
+                # update data for best episode
+                if sum_rewards_array > max_reward:
+                    max_reward = sum_rewards_array
+                    max_episode_number = episode
+                    max_episode_frames = episode_frames
                 break
 
     # ============================================================================================================== #
@@ -96,8 +106,11 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         # no image data available for cartpole
         if config['save_gif'] and \
                 config['environment'] != 'CartPole-v1' \
-                and episode != 0 and episode % config['gif_save_frequency'] == 0:
-            make_gif(episode, save_path + '/gifs/', episode_frames)
+                and episode == 0 or episode % config['gif_save_frequency'] == 0:
+            make_gif(max_episode_number, max_reward, save_path + '/gifs/', max_episode_frames)
+            max_reward = -1
+            max_episode_number = -1
+            max_episode_frames = []
 
         if config['save_tensorboard_summary']:
             # save episode data to tensorboard summary

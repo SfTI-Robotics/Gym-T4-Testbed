@@ -29,8 +29,8 @@ class Learning(AbstractBrain.AbstractLearning):
         self.update_target_model()
 
         # self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
-        self.e_greedy_formula = 'e = 1-5.45^(-0.007*(episode-100))'
-        self.epsilon = 1.0
+        self.e_greedy_formula = 'e -= (initial_e - min_e) / exploration-rate'
+        self.epsilon = self.config['epsilon']
 
         # transitions is where we store memory of max memory length
         self.transitions = deque(maxlen=self.config['memory_size'])
@@ -42,8 +42,10 @@ class Learning(AbstractBrain.AbstractLearning):
         # equation designed for training on 10 000 episodes
         # epsilon is below 0 until 'c' episodes is reached and is approx 1 for last 1000 episodes
         #  formula = 1 - a ** (-b * (episode - c))
-        self.epsilon \
-            = max(self.config['min_epsilon'], 5.45 ** (-0.007 * (episode - self.config['initial_epsilon_episodes'])))
+        # self.epsilon \
+        #     = max(self.config['min_epsilon'], 5.45 ** (-0.007 * (episode - self.config['initial_epsilon_episodes'])))
+        if self.epsilon > self.config['epsilon_min']:
+            self.epsilon -= (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
     # the processed state is used in choosing action
     def choose_action(self, state):

@@ -63,12 +63,13 @@ def save_model_to_file(learner: AbstractLearning, save_path: str, environment_na
                                        str(datetime.datetime.now()) + '.h5', overwrite=True)
 
 
-def make_gif(episode: int, save_path: str, episode_frames: []) -> None:
+def make_gif(episode: int, reward: int, save_path: str, episode_frames: []) -> None:
     """
     Creates gif using episode frames
-    :param episode: number of last episode in episode_frames
+    :param episode: number of episode to be stored
+    :param reward: reward received in episode
     :param save_path: path to folder
-    :param episode_frames: list of episode frames
+    :param episode_frames: array of episode frames
     """
     # create folder for model, if necessary
     if not os.path.exists(save_path):
@@ -78,7 +79,7 @@ def make_gif(episode: int, save_path: str, episode_frames: []) -> None:
     print('gif = ', len(episode_frames))
     print('im = ', len(images))
 
-    fname = save_path + 'episode' + str(episode) + '.gif'
+    fname = save_path + 'episode' + str(episode) + '_reward' + str(reward) + '.gif'
     with imageio.get_writer(fname, mode='I') as writer:
         for frame in images:
             writer.append_data(frame)

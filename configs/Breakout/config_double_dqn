@@ -1,0 +1,31 @@
+{
+  "algorithm": "DoubleDQN",
+  "environment": "Breakout-v0",
+  "episodes": 5,
+
+  "batch_size": 64,
+
+  "memory_size": 50000,
+  "initial_exploration_steps": 5000,
+
+  "target_update_frequency": 10000,
+  "network_train_frequency": 4,
+
+  "epsilon": 1.0,
+  "epsilon_min": 0.05,
+  "epsilon_explore": 5000000,
+
+  "learning_rate": 0.001,
+  "gamma": 0.99,
+
+  "save_model": true,
+  "load_model": false,
+
+  "save_gif": true,
+  "save_plot": true,
+  "save_tensorboard_summary": true,
+
+  "model_save_frequency": 10000,
+  "gif_save_frequency": 500,
+  "model_load_path": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
+}

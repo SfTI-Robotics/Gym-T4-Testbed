@@ -1,17 +1,19 @@
 {
-  "algorithm": "DuelingDQN",
+  "algorithm": "DQN",
   "environment": "CartPole-v1",
-  "episodes": 2000,
+  "episodes": 5,
 
   "batch_size": 64,
 
-  "memory_size": 3000,
-  "initial_exploration_steps": 3000,
+  "memory_size": 10000,
+  "initial_exploration_steps": 1000,
 
-  "network_train_frequency": 10,
+  "target_update_frequency": 10000,
+  "network_train_frequency": 4,
 
-  "initial_epsilon_episodes": 100,
-  "min_epsilon": 0.05,
+  "epsilon": 1.0,
+  "epsilon_min": 0.05,
+  "epsilon_explore": 2000,
 
   "learning_rate": 0.001,
   "gamma": 0.99,
@@ -19,11 +21,11 @@
   "save_model": true,
   "load_model": false,
 
-  "save_gif": false,
+  "save_gif": true,
   "save_plot": true,
   "save_tensorboard_summary": true,
 
-  "model_save_frequency": 2000,
+  "model_save_frequency": 1000,
   "gif_save_frequency": 500,
   "model_load_path": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
 
