@@ -2,5 +2,5 @@
 # /Gym-T4-Testbed/configs/target_model_update_test/250
 # /Gym-T4-Testbed/configs/target_model_update_test/500
 # /Gym-T4-Testbed/configs/target_model_update_test/1000
-Gym-T4-Testbed/configs/Breakout/config_double_dqngit s
+Gym-T4-Testbed/configs/Breakout/config_double_dqn
 #
