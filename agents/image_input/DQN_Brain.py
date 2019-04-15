@@ -21,18 +21,17 @@ class Learning(AbstractBrain.AbstractLearning):
 
         # initialising epsilon changes immediately
         # self.e_greedy_formula = 'e = 5.45^(-0.0001*(episode-initial_epsilon_episodes))'
-        self.e_greedy_formula = 'e -= (initial_e - min_e) / exploration-rate'
+        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
         self.epsilon = self.config['epsilon']
+        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
         self.update_target_model()
 
     def update_epsilon(self, episode):
-        # equation designed for training on 10 000 episodes
-        #  formula = 1 - a ** (-b * (episode - c))
         # self.epsilon = \
         #     max(self.config['min_epsilon'], 5.45 ** (-0.0001 * (episode - self.config['initial_epsilon_episodes'])))
         if self.epsilon > self.config['epsilon_min']:
-            self.epsilon -= (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
+            self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
     def choose_action(self, state):
         if random.random() <= self.epsilon:

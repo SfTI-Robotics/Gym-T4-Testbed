@@ -72,7 +72,6 @@ if __name__ == "__main__":
         print('Cartpole works')
     else:
         sys.exit("Environment not found")
-    is_cartpole = (config['environment'] == 'CartPole-v1')
 
     # create gym env
     env = gym.make(config['environment'])
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     # state space is determined by the deque storing the frames from the env
     state_space = processor.get_state_space()
 
-    if is_cartpole:
+    if config['environment'] == 'CartPole-v1':
         state_space = (env.observation_space.shape[0],)
 
     # action space given by the environment

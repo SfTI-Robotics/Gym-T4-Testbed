@@ -1,6 +1,5 @@
 import datetime
 
-import gym
 import imageio
 import tensorflow
 import os
@@ -59,8 +58,8 @@ def save_model_to_file(learner: AbstractLearning, save_path: str, environment_na
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     # save model weights
-    learner.network.model.save_weights(save_path + '/' + environment_name + '_model_episode' + str(episode) + '_' +
-                                       str(datetime.datetime.now()) + '.h5', overwrite=True)
+    learner.network.save_weights(save_path + '/' + environment_name + '_model_episode' + str(episode) + '_' +
+                                 str(datetime.datetime.now()) + '.h5', overwrite=True)
 
 
 def make_gif(episode: int, reward: int, save_path: str, episode_frames: []) -> None:

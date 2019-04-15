@@ -1,7 +1,5 @@
-/Gym-T4-Testbed/configs/CartPole/config_dqn
-/Gym-T4-Testbed/configs/CartPole/config_double_dqn
-/Gym-T4-Testbed/configs/CartPole/config_dueling_dqn
-/Gym-T4-Testbed/configs/Breakout/config_dqn
-/Gym-T4-Testbed/configs/Breakout/config_double_dqn
-/Gym-T4-Testbed/configs/Breakout/config_dueling_dqn
+/Gym-T4-Testbed/configs/target_model_update_test/100
+/Gym-T4-Testbed/configs/target_model_update_test/250
+/Gym-T4-Testbed/configs/target_model_update_test/500
+/Gym-T4-Testbed/configs/target_model_update_test/1000
 #

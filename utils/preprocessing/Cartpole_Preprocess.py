@@ -14,7 +14,6 @@ class Processor(AbstractProcessor):
         return state
 
     def frames_to_state(self, frame, is_new_episode):
-        
         return frame
 
     def get_state_space(self):

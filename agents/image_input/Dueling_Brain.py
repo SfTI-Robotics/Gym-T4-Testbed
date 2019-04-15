@@ -17,12 +17,13 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             self.network = build_dueling_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
 
-        self.e_greedy_formula = 'e -= (initial_e - min_e) / exploration-rate'
+        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
         self.epsilon = self.config['epsilon']
+        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
     def update_epsilon(self, episode):
         if self.epsilon > self.config['epsilon_min']:
-            self.epsilon -= (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
+            self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
     def choose_action(self, state):
         if random.random() <= self.epsilon:

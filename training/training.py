@@ -28,8 +28,6 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
     if config['load_model']:
         load_model_from_file(learner, home + config['model_load_path'])
 
-    # if not os.path.exists(save_path + 'tensorboard_summary/'):
-    #    os.makedirs(save_path + 'tensorboard_summary/')
     summary_writer = tensorflow.summary.FileWriter(save_path + 'tensorboard_summary/')
 
     print("\n ==== initialisation complete, start training ==== \n")
@@ -41,12 +39,15 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
     max_episode_number = -1
     max_episode_frames = []
 
+    training_step = 0
+
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
 
         state = env.reset()
+
         episode_frames.append(state)
         # Processing initial image cropping, grayscale, and stacking 4 of them
         state = processor.preprocessing(state, True)
@@ -80,10 +81,11 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             # train algorithm using experience replay
             if len(memory.stored_transitions) >= config['initial_exploration_steps']:
                 states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
-                learner.train_network(states, actions, rewards, next_states, dones, episode, step)
+                learner.train_network(states, actions, rewards, next_states, dones, episode, training_step)
 
             step += 1
             state = next_state
+            training_step += 1
 
             if done:
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
