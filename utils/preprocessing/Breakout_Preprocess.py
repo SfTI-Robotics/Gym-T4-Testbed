@@ -12,7 +12,7 @@ class Processor(AbstractProcessor):
 
     def __init__(self):
         super().__init__()
-        self.deque = deque([np.zeros((110, 84), dtype=np.int) for i in range(4)], maxlen=4)
+        self.deque = deque([np.zeros((84, 84), dtype=np.int) for i in range(4)], maxlen=4)
         self.step_max = 2000
         self.time_max = 30
         self.reward_min = 0
@@ -31,8 +31,8 @@ class Processor(AbstractProcessor):
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
         resized_screen = cv2.resize(img, (84, 110), interpolation=cv2.INTER_AREA)
         x_t = resized_screen[18:102, :]
-        x_t = np.reshape(x_t, [84, 84, 1])
-        return x_t.astype(np.uint8)
+        x_t = np.reshape(x_t, [84, 84])
+        return self.frames_to_state(x_t.astype(np.uint8), is_new_episode)
 
     def frames_to_state(self, frame, is_new_episode):
         if is_new_episode:

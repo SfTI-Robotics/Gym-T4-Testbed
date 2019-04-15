@@ -1,5 +1,5 @@
 {
-  "algorithm": "DoubleDQN",
+  "algorithm": "DQN",
   "environment": "CartPole-v1",
   "episodes": 750,
 
@@ -13,7 +13,7 @@
 
   "epsilon": 1.0,
   "epsilon_min": 0.01,
-  "epsilon_explore": 1000,
+  "epsilon_explore": 5000,
 
   "learning_rate": 0.001,
   "gamma": 0.99,
