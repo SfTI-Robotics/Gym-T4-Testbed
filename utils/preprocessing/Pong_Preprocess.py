@@ -1,7 +1,8 @@
 import sys
 from collections import deque
-from skimage.color import rgb2gray  # Help us to gray our frames
+import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 
@@ -10,7 +11,7 @@ class Processor(AbstractProcessor):
     def __init__(self):
         super().__init__()
         # deque is used to temporarily hold images while it being stacked
-        self.deque = deque([np.zeros((80, 80), dtype=np.int) for i in range(2)], maxlen=2)
+        self.deque = deque([np.zeros((84, 84), dtype=np.int) for i in range(2)], maxlen=2)
         # This stuff is need for the graph this needs to be set up for each environment
         # We decided to put it in preprocess as for each environment:
         #             the range of steps a game takes changes 
@@ -23,26 +24,30 @@ class Processor(AbstractProcessor):
         self.reward_max = 30
 
     def preprocessing(self, frame, is_new_episode):
-        # grayscale
-        frame = rgb2gray(frame)
-        # cropping frame
-        frame = frame[35:195]
-        # extract every second pixel in the image and resizes it to 80 x 80 
-        frame = frame[::2, ::2]
-        # state is a deque of 2 frames
-        state = self.frames_to_state(frame, is_new_episode)
-        return state
+        # see https://github.com/gsurma/atari/blob/master/gym_wrappers.py
+        img = np.reshape(frame, [210, 160, 3]).astype(np.float32)
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
+        resized_screen = cv2.resize(img, (84, 110), interpolation=cv2.INTER_AREA)
+        x_t = resized_screen[18:102, :]
+        x_t = np.reshape(x_t, [84, 84])
+        return self.frames_to_state(x_t.astype(np.uint8), is_new_episode)
 
     def frames_to_state(self, frame, is_new_episode):
         if is_new_episode:
             # all frames in new deque are of same state
             # new episode the deque is completely empty so both slots need to be filled
+            # TODO: How many frames are needed for Pong? 2 or 4?
+            self.deque.append(frame)
+            self.deque.append(frame)
             self.deque.append(frame)
             self.deque.append(frame)
         else:
             # append new frame to deque
             # in other steps one slot is already filled and the second one needs to be filled
             self.deque.append(frame)
+
+            plt.imshow(frame, cmap="gray")
+            plt.show()
         # reshape the deque so that network recognises that its two frames stacked together
         stacked_state = np.stack(self.deque, axis=0)
         return stacked_state

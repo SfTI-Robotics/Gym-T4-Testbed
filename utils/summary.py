@@ -31,6 +31,8 @@ REWARD_MAX_F = 1
 
 # TODO: scale of execution time should adapt to actual values, without having to guess a maximum
 
+# TODO: add plot of loss
+#   https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/networks.py
 
 class Summary:
     def __init__(
