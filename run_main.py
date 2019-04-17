@@ -12,7 +12,7 @@ import gym
 import datetime
 
 # for graphing
-from agents.Memory import Memory
+from agents.memory.Memory import Memory
 from utils.summary import Summary
 from training.training import train
 

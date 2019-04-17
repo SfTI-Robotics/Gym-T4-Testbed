@@ -2,7 +2,7 @@ import time
 from os.path import expanduser
 import tensorflow
 
-from agents import Memory
+from agents.memory import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 from utils.storing import load_model_from_file, make_gif, save_episode_to_summary, save_model_to_file

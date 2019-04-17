@@ -21,29 +21,39 @@
 ``` bash
 
 # Bash scripts
-    run.sh
-    
-    runme.sh 
-    testbed.txt
+    evaluate.sh
+        using testbed.txt
 
 # Execution scripts 
     run_main.py
+        using training.py
 
 # Environment State Preprocessing
-    /Preprocess     # folder
-        Cartpole_Preprocess.py
-        Pong_Preprocess.py
-        _Preprocess
-        _Preprocess
-        _Preprocess
+    /utils/preprocessing     # folder
+        Abstract_Preprocessor.py    # abstract preprocessor class, used in training.py
+        implementations for Cartpole, Breakout, MsPacman, Pong, SpaceInvaders
 
 # RL Algorithms
-    /DQN
-        brain.py
-        network.py
+    /agents
+        /image_input
+            AbstractBrain   # abstract agent class, used in training.py
+            implementations for DQN, DoubleDQN, DuelingDQN
+        
+        /memory
+            Memory.py   # storage for replay data
+            
+        /networks
+            dqn_networks.py # build functions for neural networks
+            dueling_dqn_networks.py # build functions for neural networks with split layer
+            
+# Training
+    /training
+        training.py # trains a RL agent in an environment
 
 # Saving training data
-    
+    /utils
+        summary.py  # plotting training data
+        storing.py  # saving model files and gifs during training process
 
 
 ```
@@ -51,33 +61,3 @@
 
 
 ----------------
-
-
-| Envrionment   | Algorithm | Required Training Episodes |Experience Reply |
-| --------------------- | ------------------- |------------------- |------------------- |------------------- |------------------- |------------------- |
-| { Toy text } |   NB. *many environments do not render*|
-|- Roulette-v0      |Q Learning|
-|   |  |
-| { Classic Control } |   NB. *most popular environments*|
-|- CartPole-v1        | DQN| 500| every step after 45 episodes|
-|   |  |
-|{ Atari }      ||
-|- Pong-v0        | Double DQN, policy gradient| 10 000
-|- Breakout-v0       | Double DQN| 5000 pure exploration, train for 100 000 000 episodes | every step after 5000 episodes
-|- SpaceInvaders-v0       |DQN|
-|- MsPacman-v0||
-|- Enduro-v0||
-|- Super mario||
-|||
-|{ Algorithms } | NB. *difficult action spaces* |
-| - Copy-v0 | |
-|||
-|{ Box 2D }
-|||
-|{ MuJoCo }
-|||
-|{ Robotics }
-|||
-|{ Non-OpenAI gym }
-|VizDoom
-|||
