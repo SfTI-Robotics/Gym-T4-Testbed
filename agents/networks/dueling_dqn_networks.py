@@ -5,8 +5,6 @@ from keras.optimizers import Adam
 # TODO: maybe K instead of backend?
 from keras import backend
 
-# TODO: not tested yet!
-
 
 def build_dueling_dqn_network(obs_space, action_space, learning_rate):
     # see https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/models.py

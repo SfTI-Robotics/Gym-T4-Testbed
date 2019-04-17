@@ -1,12 +1,12 @@
 {
   "algorithm": "DuelingDQN",
   "environment": "CartPole-v1",
-  "episodes": 1000,
+  "episodes": 1500,
 
-  "batch_size": 64,
+  "batch_size": 32,
 
-  "memory_size": 2000,
-  "initial_exploration_steps": 1000,
+  "memory_size": 50000,
+  "initial_exploration_steps": 10000,
 
   "network_train_frequency": 4,
 

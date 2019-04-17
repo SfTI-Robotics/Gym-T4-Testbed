@@ -1,19 +1,19 @@
 {
   "algorithm": "DoubleDQN",
   "environment": "CartPole-v1",
-  "episodes": 500,
+  "episodes": 1500,
 
   "batch_size": 64,
 
   "memory_size": 2000,
   "initial_exploration_steps": 1000,
 
-  "target_update_frequency": 1000,
+  "target_update_frequency": 100,
   "network_train_frequency": 1,
 
   "epsilon": 1.0,
   "epsilon_min": 0.01,
-  "epsilon_explore": 1000,
+  "epsilon_explore": 20000,
 
   "learning_rate": 0.001,
   "gamma": 0.99,

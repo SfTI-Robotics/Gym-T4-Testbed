@@ -29,9 +29,9 @@ REWARD_MAX_F = 1
 #  for every episode, plot the average reward received in the last +/- n episodes
 #  (same for time, steps)
 
-# TODO: scale of execution time should adapt to actual values, without having to guess a maximum
+# TODO: adapt axis to current number of episodes, not to final number?
 
-# TODO: add plot of loss
+# TODO: add plot for loss
 #   https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/networks.py
 
 class Summary:

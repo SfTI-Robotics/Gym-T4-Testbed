@@ -25,9 +25,7 @@ MODEL_FILENAME = ''
 
 # TODO: add method comments
 # TODO: add replay mode (load previous model and let it act in environments without learning)
-# TODO: make epsilon decay configurable
 # TODO: add DDDQN with PER as comparison option
-# TODO: update gif-ing-option (store first episode, best episode from n steps)
 # TODO: update model-saving-option (store first episode, best episode from n steps)
 
 if __name__ == "__main__":
