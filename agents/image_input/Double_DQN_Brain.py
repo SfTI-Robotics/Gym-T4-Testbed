@@ -1,6 +1,5 @@
 import numpy as np
 import random
-from collections import deque
 
 import agents.image_input.AbstractBrain as AbstractBrain
 from agents.networks.dqn_networks import build_cartpole_network, build_breakout_network
@@ -29,15 +28,7 @@ class Learning(AbstractBrain.AbstractLearning):
         # copy weights from behaviour to target
         self.update_target_model()
 
-        # self.e_greedy_formula = 'e = 1-5.45^(-0.009*(episode-100))'
-        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
-        self.epsilon = self.config['epsilon']
-        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
-
-        # transitions is where we store memory of max memory length
-        self.transitions = deque(maxlen=self.config['memory_size'])
-
-    def update_epsilon(self, episode):
+    def update_epsilon(self):
         # self.epsilon \
         #     = max(self.config['min_epsilon'], 5.45 ** (-0.007 * (episode - self.config['initial_epsilon_episodes'])))
         if self.epsilon > self.config['epsilon_min']:
@@ -50,7 +41,7 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
 
-    def train_network(self, states, actions, rewards, next_states, dones, episode, step):
+    def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
             target = self.network.predict(states)
             next_predictions_network = self.network.predict(next_states)
@@ -70,9 +61,9 @@ class Learning(AbstractBrain.AbstractLearning):
 
         # update target network
         if step % self.config['target_update_frequency'] == 0:
-            print('# =========================================== UPDATE =========================================== #')
+            # print('# ========================================== UPDATE ========================================== #')
             self.update_target_model()
-        self.update_epsilon(episode)
+        self.update_epsilon()
 
     def update_target_model(self):
         self.target_network.set_weights(self.network.get_weights())

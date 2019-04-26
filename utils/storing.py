@@ -1,5 +1,4 @@
 import datetime
-
 import imageio
 import tensorflow
 import os

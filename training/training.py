@@ -1,6 +1,7 @@
 import time
 from os.path import expanduser
 import tensorflow
+import numpy as np
 
 from agents.memory import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
@@ -43,6 +44,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
+
         # storing frames as gifs, array emptied each new episode
         episode_frames = []
 
@@ -59,6 +61,8 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         while True:
             # action chooses from  simplified action space without useless keys
             action = learner.choose_action(state)
+            if action < 0 or action > 1:
+                print('WRONG ACTION')
             # actions map the simplified action space to the environment action space
             # if action space has no useless keys then action = action_mapped
             action_mapped = processor.mapping_actions_to_keys(action)
@@ -81,7 +85,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             # train algorithm using experience replay
             if len(memory.stored_transitions) >= config['initial_exploration_steps']:
                 states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
-                learner.train_network(states, actions, rewards, next_states, dones, episode, training_step)
+                learner.train_network(states, actions, rewards, next_states, dones, training_step)
 
             step += 1
             state = next_state

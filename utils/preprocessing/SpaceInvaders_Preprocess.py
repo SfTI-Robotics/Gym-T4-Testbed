@@ -40,9 +40,6 @@ class Processor(AbstractProcessor):
     def get_state_space(self):
         return np.shape(self.deque)
 
-    def discounted_rewards(self, rewards, gamma):
-        return rewards
-
     def new_action_space(self, actions):
         return actions
 

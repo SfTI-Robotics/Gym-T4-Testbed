@@ -7,6 +7,13 @@ from keras import backend
 
 
 def build_dueling_dqn_network(obs_space, action_space, learning_rate):
+    """
+
+    :param obs_space:
+    :param action_space:
+    :param learning_rate:
+    :return:
+    """
     # see https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/models.py
     state_input = Input(shape=obs_space)
     x = Conv2D(32, kernel_size=(8, 8), strides=(4, 4), activation='relu',

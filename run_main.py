@@ -104,6 +104,10 @@ if __name__ == "__main__":
         from agents.image_input.Dueling_Brain import Learning
         PATH = PATH + '/Gym-T4-Testbed/output/DuelingDQN/'
         print('Dueling works')
+    elif config['algorithm'] == 'ActorCritic':
+        from agents.image_input.Actor_Critic_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/ActorCritic/'
+        print('Dueling works')
     else:
         sys.exit("Algorithm not found")
 

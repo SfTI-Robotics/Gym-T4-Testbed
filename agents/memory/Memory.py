@@ -5,6 +5,7 @@ import numpy as np
 
 # TODO: Which folder?
 # TODO: Make this adaptable?
+# TODO: Different version needed for Policy Gradient
 class Memory:
     """
     stores tuples of (state, action, reward, next_state, done) for network-training

@@ -1,19 +1,19 @@
 {
-  "algorithm": "DoubleDQN",
+  "algorithm": "ActorCritic",
   "environment": "CartPole-v1",
-  "episodes": 1500,
+  "episodes": 2500,
 
   "batch_size": 64,
 
-  "memory_size": 10000,
-  "initial_exploration_steps": 10000,
+  "memory_size": 2000,
+  "initial_exploration_steps": 1000,
 
-  "target_update_frequency": 100,
+  "target_update_frequency": -1,
   "network_train_frequency": 1,
 
-  "epsilon": 1.0,
+  "epsilon": -1,
   "epsilon_min": 0.01,
-  "epsilon_explore": 50000,
+  "epsilon_explore": 1,
 
   "learning_rate": 0.001,
   "gamma": 0.99,
@@ -27,5 +27,6 @@
 
   "model_save_frequency": 1000,
   "gif_save_frequency": 500,
-  "model_load_path": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
+  "model_load_path": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
+
 }

@@ -17,11 +17,7 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             self.network = build_dueling_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
 
-        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
-        self.epsilon = self.config['epsilon']
-        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
-
-    def update_epsilon(self, episode):
+    def update_epsilon(self):
         if self.epsilon > self.config['epsilon_min']:
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
@@ -33,7 +29,7 @@ class Learning(AbstractBrain.AbstractLearning):
             # this exploits by choosing your max of your calculated q values
             return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
 
-    def train_network(self, states, actions, rewards, next_states, dones, episode, step):
+    def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
             target = self.network.predict(states)
             target_next = self.network.predict(next_states)
@@ -46,7 +42,7 @@ class Learning(AbstractBrain.AbstractLearning):
 
             self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
 
-        self.update_epsilon(episode)
+        self.update_epsilon()
 
     # after some time interval update the target model to be same with model
     def update_target_model(self):

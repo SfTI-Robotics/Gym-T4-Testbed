@@ -19,9 +19,6 @@ class Processor(AbstractProcessor):
     def get_state_space(self):
         return " No shape"
 
-    def discounted_rewards(self, rewards, gamma):
-        return rewards
-
     def new_action_space(self, actions):
         return actions
 

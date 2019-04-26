@@ -16,7 +16,7 @@ class Processor(AbstractProcessor):
         self.reward_min = 0
         self.reward_max = 1000
 
-    def preprocessing(self, frame, is_new_episode):
+    def preprocessing(self, frame, is_new_episode) -> np.ndarray:
         # see https://github.com/gsurma/atari/blob/master/gym_wrappers.py
         img = np.reshape(frame, [210, 160, 3]).astype(np.float32)
         img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
@@ -44,9 +44,6 @@ class Processor(AbstractProcessor):
 
     def get_state_space(self):
         return np.shape(self.deque)
-
-    def discounted_rewards(self, rewards, gamma):
-        return rewards
 
     def new_action_space(self, actions):
         return actions
