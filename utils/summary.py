@@ -33,6 +33,9 @@ REWARD_MAX_F = 1
 # TODO: add plot for loss
 #   https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/networks.py
 
+# TODO: make plot for epsilon optional (not used in actor-critic learning)
+
+
 class Summary:
     def __init__(
             self,

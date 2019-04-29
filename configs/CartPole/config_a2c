@@ -1,5 +1,5 @@
 {
-  "algorithm": "ActorCritic",
+  "algorithm": "A2C",
   "environment": "CartPole-v1",
   "episodes": 1000,
 

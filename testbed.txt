@@ -1,2 +1,4 @@
-/Gym-T4-Testbed/configs/CartPole/config_dqn
+/Gym-T4-Testbed/configs/CartPole/config_ac
+/Gym-T4-Testbed/configs/CartPole/config_a2c
+/Gym-T4-Testbed/configs/MsPacman/config_ac
 #

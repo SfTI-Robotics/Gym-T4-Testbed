@@ -107,7 +107,11 @@ if __name__ == "__main__":
     elif config['algorithm'] == 'ActorCritic':
         from agents.image_input.Actor_Critic_Brain import Learning
         PATH = PATH + '/Gym-T4-Testbed/output/ActorCritic/'
-        print('Dueling works')
+        print('Actor Critic works')
+    elif config['algorithm'] == 'A2C':
+        from agents.image_input.A2C_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/A2C/'
+        print('A2C works')
     else:
         sys.exit("Algorithm not found")
 

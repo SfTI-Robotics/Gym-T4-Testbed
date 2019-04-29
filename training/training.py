@@ -1,6 +1,7 @@
 import time
 from os.path import expanduser
 import tensorflow
+from keras.utils import to_categorical
 import numpy as np
 
 from agents.memory import Memory
@@ -42,6 +43,8 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
     training_step = 0
 
+    prev_action = -1
+
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
 
@@ -59,10 +62,12 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         step = 0  # count total steps for each episode for the graph
 
         while True:
+            # env.render()
             # action chooses from  simplified action space without useless keys
             action = learner.choose_action(state)
-            if action < 0 or action > 1:
-                print('WRONG ACTION')
+            if action != prev_action:
+                print('Chose unusual action')
+            prev_action = action
             # actions map the simplified action space to the environment action space
             # if action space has no useless keys then action = action_mapped
             action_mapped = processor.mapping_actions_to_keys(action)
@@ -82,9 +87,15 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             # TODO: remember action or action_mapped?
             # append <s, a, r, s', d> to learner.transitions
             memory.store_transition(state, action, reward, next_state, done)
+
             # train algorithm using experience replay
-            if len(memory.stored_transitions) >= config['initial_exploration_steps']:
+            if len(memory.stored_transitions) >= config['initial_exploration_steps'] \
+                    and config['algorithm'] != 'A2C' and config['algorithm'] != 'Actor_Critic':
                 states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
+                learner.train_network(states, actions, rewards, next_states, dones, training_step)
+
+            if config['environment'] == 'Actor_Critic':
+                states, actions, rewards, next_states, dones = memory.sample_last()
                 learner.train_network(states, actions, rewards, next_states, dones, training_step)
 
             step += 1
@@ -92,6 +103,11 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
             training_step += 1
 
             if done:
+
+                if config['algorithm'] == 'A2C':
+                    states, actions, rewards, next_states, dones = memory.sample_all()
+                    learner.train_network(states, actions, rewards, next_states, dones, training_step)
+
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.epsilon, ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
                 # update data for best episode

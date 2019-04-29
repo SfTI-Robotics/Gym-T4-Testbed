@@ -18,11 +18,6 @@ class AbstractLearning(ABC):
         self.epsilon = self.config['epsilon']
         self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
-    # TODO: not used outside of learner
-    # @abstractmethod
-    # def update_epsilon(self, episode):
-    #     pass
-
     @abstractmethod
     def choose_action(self, state):
         pass
