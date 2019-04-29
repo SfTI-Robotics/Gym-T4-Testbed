@@ -1,6 +1,6 @@
 {
   "algorithm": "ActorCritic",
-  "environment": "MsPacman-v0",
+  "environment": "SpaceInvaders-v0",
   "episodes": 500000,
 
   "batch_size": 64,

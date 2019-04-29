@@ -94,16 +94,12 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
                 states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
                 learner.train_network(states, actions, rewards, next_states, dones, training_step)
 
-            if config['environment'] == 'Actor_Critic':
-                states, actions, rewards, next_states, dones = memory.sample_last()
-                learner.train_network(states, actions, rewards, next_states, dones, training_step)
-
             step += 1
             state = next_state
             training_step += 1
 
             if done:
-
+                # train algorithm with data from one complete episode
                 if config['algorithm'] == 'A2C':
                     states, actions, rewards, next_states, dones = memory.sample_all()
                     learner.train_network(states, actions, rewards, next_states, dones, training_step)

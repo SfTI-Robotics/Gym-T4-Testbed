@@ -11,7 +11,7 @@ from agents.networks.actor_critic_networks import build_actor_cartpole_network, 
 #   Learner proceeds to only choose this one action, regardless of reward
 #   implementation according to https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
 #   and https://github.com/rlcode/reinforcement-learning/blob/master/2-cartpole/4-actor-critic/cartpole_a2c.py
-
+#       here trained with experience replay because it is much faster than just training with one tuple after every step
 
 class Learning(AbstractBrain.AbstractLearning):
 
@@ -20,11 +20,6 @@ class Learning(AbstractBrain.AbstractLearning):
     # create networks
     def __init__(self, observations, actions, config):
         super().__init__(observations, actions, config)
-
-        self.states = []
-        self.gradients = []
-        self.rewards = []
-        self.prob = []
 
         if config['environment'] == 'CartPole-v1':
             self.network = \
@@ -69,5 +64,6 @@ class Learning(AbstractBrain.AbstractLearning):
         self.critic_network.fit(states, targets, epochs=1, verbose=0)
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
-        self.train_actor(states, actions, rewards, next_states, dones)
-        self.train_critic(states, rewards, next_states, dones)
+        if step % self.config['network_train_frequency'] == 0:
+            self.train_actor(states, actions, rewards, next_states, dones)
+            self.train_critic(states, rewards, next_states, dones)

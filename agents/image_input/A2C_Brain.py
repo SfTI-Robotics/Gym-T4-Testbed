@@ -26,6 +26,10 @@ class Learning(AbstractBrain.AbstractLearning):
             self.actor = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
             self.critic = build_critic_network(self.state_space, self.value_size, self.config['learning_rate'])
 
+    def choose_action(self, state):
+        policy = self.actor.predict(np.array([state])).flatten()
+        return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
+
     def discount_rewards(self, rewards):
         discounted_rewards = np.zeros_like(rewards)
         running_add = 0
@@ -35,10 +39,6 @@ class Learning(AbstractBrain.AbstractLearning):
             running_add = running_add * self.config['gamma'] + rewards[t]
             discounted_rewards[t] = running_add
         return discounted_rewards
-
-    def choose_action(self, state):
-        policy = self.actor.predict(np.array([state])).flatten()
-        return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         # A2C is trained at the end of an episode, not after n steps

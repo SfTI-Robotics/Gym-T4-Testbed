@@ -3,10 +3,10 @@
   "environment": "CartPole-v1",
   "episodes": 1000,
 
-  "batch_size": 1,
+  "batch_size": 64,
 
   "memory_size": 2000,
-  "initial_exploration_steps": 1,
+  "initial_exploration_steps": 100,
 
   "target_update_frequency": -1,
   "network_train_frequency": 1,
