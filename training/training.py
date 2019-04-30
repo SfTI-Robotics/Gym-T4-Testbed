@@ -1,26 +1,22 @@
 import time
 from os.path import expanduser
 import tensorflow
-from keras.utils import to_categorical
-import numpy as np
 
 from agents.memory import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 from utils.storing import load_model_from_file, make_gif, save_episode_to_summary, save_model_to_file
-from utils.summary import Summary
 
 home = expanduser("~")
 
 
-def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, processor: AbstractProcessor,
+def train(env: any, learner: AbstractLearning, memory: Memory, processor: AbstractProcessor,
           config, save_path) -> None:
     """
     Trains learner in env and plots results
     :param env: gym environment
     :param learner: untrained learner
     :param memory: memory for storing experiences as tuples containing state, action, reward, next_state, done
-    :param graph: summary for result plotting
     :param processor: pre-processor for given environment
     :param config: configurations for training
     :param save_path: path to folder: [home]/Gym-T4-Testbed/output/[algorithm]/
@@ -43,8 +39,6 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
     training_step = 0
 
-    prev_action = -1
-
     # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
 
@@ -62,12 +56,9 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
         step = 0  # count total steps for each episode for the graph
 
         while True:
-            # env.render()
             # action chooses from  simplified action space without useless keys
             action = learner.choose_action(state)
-            if action != prev_action:
-                print('Chose unusual action')
-            prev_action = action
+
             # actions map the simplified action space to the environment action space
             # if action space has no useless keys then action = action_mapped
             action_mapped = processor.mapping_actions_to_keys(action)
@@ -90,7 +81,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
             # train algorithm using experience replay
             if len(memory.stored_transitions) >= config['initial_exploration_steps'] \
-                    and config['algorithm'] != 'A2C' and config['algorithm'] != 'Actor_Critic':
+                    and config['algorithm'] != 'A2C' and config['algorithm'] != 'PolicyGradient':
                 states, actions, rewards, next_states, dones = memory.sample(config['batch_size'])
                 learner.train_network(states, actions, rewards, next_states, dones, training_step)
 
@@ -100,7 +91,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
 
             if done:
                 # train algorithm with data from one complete episode
-                if config['algorithm'] == 'A2C':
+                if config['algorithm'] == 'A2C' or config['algorithm'] == 'PolicyGradient':
                     states, actions, rewards, next_states, dones = memory.sample_all()
                     learner.train_network(states, actions, rewards, next_states, dones, training_step)
 
@@ -114,11 +105,6 @@ def train(env: any, learner: AbstractLearning, memory: Memory, graph: Summary, p
                 break
 
     # ============================================================================================================== #
-
-        # summarize plots the graph
-        if config['save_plot']:
-            graph.summarize(episode, step, time.time() - start_time, sum_rewards_array, learner.epsilon,
-                            learner.e_greedy_formula)
 
         # make gif from episode frames
         # no image data available for cartpole

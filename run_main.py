@@ -112,6 +112,10 @@ if __name__ == "__main__":
         from agents.image_input.A2C_Brain import Learning
         PATH = PATH + '/Gym-T4-Testbed/output/A2C/'
         print('A2C works')
+    elif config['algorithm'] == 'PolicyGradient':
+        from agents.image_input.Policy_Gradient_Brain import Learning
+        PATH = PATH + '/Gym-T4-Testbed/output/PolicyGradient/'
+        print('Policy Gradient works')
     else:
         sys.exit("Algorithm not found")
 
@@ -124,27 +128,5 @@ if __name__ == "__main__":
 
     # ============================================================================================================== #
 
-    # Graphing results
-    now = datetime.datetime.now()
-    # our graphing function
-    # summary sets the ranges and targets and saves the graph
-    graph = Summary(summary_types=['sumiz_step', 'sumiz_time', 'sumiz_reward', 'sumiz_average_reward', 'sumiz_epsilon'],
-                    # maximum exploitation value
-                    epsilon_goal=0.99,
-                    # desired name for file
-                    name=MODEL_FILENAME + str(now),
-                    # file path to save graph. i.e "/Desktop/Py/Scenario_Comparision/Maze/Model/"
-                    save_path=PATH + '/graphs/',
-                    # episode upper bound for graph
-                    episode_max=config['episodes'],
-                    # step upper bound for graph
-                    step_max_m=processor.step_max,
-                    # reward upper bound for graph
-                    reward_min_m=processor.reward_min,
-                    # reward lower bound for graph
-                    reward_max_m=processor.reward_max)
-
-    # ============================================================================================================== #
-
     # train learner and plot results
-    train(env, learner, memory, graph, processor, config, PATH)
+    train(env, learner, memory, processor, config, PATH)

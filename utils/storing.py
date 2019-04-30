@@ -43,6 +43,9 @@ def save_episode_to_summary(summary_writer: tensorflow.summary.FileWriter,
     summary_writer.add_summary(summary, episode)
     summary_writer.flush()
 
+    # to extract data, maybe try
+    #   https://stackoverflow.com/questions/37304461/tensorflow-importing-data-from-a-tensorboard-tfevent-file/37411543
+
 
 def save_model_to_file(learner: AbstractLearning, save_path: str, environment_name: str, episode: int) -> None:
     """

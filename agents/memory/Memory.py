@@ -66,6 +66,8 @@ class Memory:
             next_states[i] = batch[i][3]
             dones.append(batch[i][4])
 
+        self.stored_transitions = deque(maxlen=self.capacity)
+
         return states, actions, rewards, next_states, dones
 
     def sample_last(self):

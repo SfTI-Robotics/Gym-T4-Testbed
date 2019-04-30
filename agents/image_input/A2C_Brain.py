@@ -11,6 +11,7 @@ from agents.networks.actor_critic_networks import build_actor_cartpole_network, 
 #   Learner proceeds to only choose this one action, regardless of reward
 #   implementation according to https://github.com/flyyufelix/VizDoom-Keras-RL
 
+# TODO: add save and load function for actor and critic
 
 class Learning(AbstractBrain.AbstractLearning):
 

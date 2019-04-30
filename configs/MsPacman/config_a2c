@@ -1,20 +1,19 @@
 {
-  "_comment": "DQN (and, to an extend, DoubleDQN) is more stable and learns faster when updating target network after every CartPole episode",
-  "algorithm": "DQN",
-  "environment": "CartPole-v1",
-  "episodes": 2500,
+  "algorithm": "A2C",
+  "environment": "MsPacman-v0",
+  "episodes": 500000,
 
-  "batch_size": 64,
+  "batch_size": -1,
 
-  "memory_size": 2000,
-  "initial_exploration_steps": 1000,
+  "memory_size": 20000,
+  "initial_exploration_steps": -1,
 
-  "target_update_frequency": 1000,
+  "target_update_frequency": -1,
   "network_train_frequency": 1,
 
-  "epsilon": 1.0,
+  "epsilon": -1,
   "epsilon_min": 0.01,
-  "epsilon_explore": 1000,
+  "epsilon_explore": 1,
 
   "learning_rate": 0.001,
   "gamma": 0.99,
