@@ -18,11 +18,10 @@
   "learning_rate": 0.001,
   "gamma": 0.99,
 
-  "save_model": true,
+  "save_model": false,
   "load_model": false,
 
   "save_gif": true,
-  "save_plot": true,
   "save_tensorboard_summary": true,
 
   "model_save_frequency": 10000,

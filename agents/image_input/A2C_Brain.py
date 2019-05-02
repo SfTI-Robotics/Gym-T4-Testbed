@@ -31,7 +31,7 @@ class Learning(AbstractBrain.AbstractLearning):
         policy = self.actor.predict(np.array([state])).flatten()
         return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
-    def discount_rewards(self, rewards):
+    def discount_and_standardize_rewards(self, rewards):
         discounted_rewards = np.zeros_like(rewards)
         running_add = 0
         for t in reversed(range(0, len(rewards))):
@@ -39,21 +39,17 @@ class Learning(AbstractBrain.AbstractLearning):
                 running_add = 0
             running_add = running_add * self.config['gamma'] + rewards[t]
             discounted_rewards[t] = running_add
+        # Standardized discounted rewards
+        discounted_rewards -= np.mean(discounted_rewards)
+        discounted_rewards /= np.std(discounted_rewards)
         return discounted_rewards
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
+        # TODO: compare this to ViZDoom again!
         # A2C is trained at the end of an episode, not after n steps
         episode_length = len(states)
 
-        discounted_rewards = self.discount_rewards(rewards)
-
-        # Standardized discounted rewards
-        discounted_rewards -= np.mean(discounted_rewards)
-        if np.std(discounted_rewards):
-            discounted_rewards /= np.std(discounted_rewards)
-        else:
-            print('std = 0!')
-            return 0
+        discounted_rewards = self.discount_and_standardize_rewards(rewards)
 
         # Prediction of state values for each state appears in the episode
         values = self.critic.predict(states)

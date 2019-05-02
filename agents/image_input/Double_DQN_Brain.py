@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 import agents.image_input.AbstractBrain as AbstractBrain
-from agents.networks.dqn_networks import build_cartpole_network, build_breakout_network
+from agents.networks.dqn_networks import build_dqn_cartpole_network, build_dqn_network
 
 
 class Learning(AbstractBrain.AbstractLearning):
@@ -12,17 +12,16 @@ class Learning(AbstractBrain.AbstractLearning):
 
         # for classic control environments without any image data
         if self.config['environment'] == 'CartPole-v1':
-            self.network = build_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.network = build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
             # create a new network object for the target network
             self.target_network \
-                = build_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
+                = build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
 
         # for atari games
         else:
-            self.network = build_breakout_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.network = build_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
             # create a new network object for the target network
-            self.target_network = \
-                build_breakout_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.target_network = build_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
             # use e_greedy formula with longer exploring period
 
         # copy weights from behaviour to target

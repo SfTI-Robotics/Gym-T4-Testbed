@@ -34,6 +34,9 @@ class Memory:
         :param batch_size: amount of random samples
         :return: states, actions, rewards, next_states, dones of randomly sampled episodes
         """
+        # update batch size in case memory doesn't contain enough values
+        batch_size = min(len(self.stored_transitions), batch_size)
+
         batch = random.sample(self.stored_transitions, batch_size)
         states = np.zeros((batch_size,) + self.state_space)
         next_states = np.zeros((batch_size,) + self.state_space)

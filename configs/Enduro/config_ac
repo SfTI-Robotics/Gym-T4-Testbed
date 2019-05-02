@@ -1,0 +1,31 @@
+{
+  "algorithm": "ActorCritic",
+  "environment": "Enduro-v0",
+  "episodes": 500000,
+
+  "batch_size": 32,
+
+  "memory_size": 100000,
+  "initial_exploration_steps": 20000,
+
+  "target_update_frequency": -1,
+  "network_train_frequency": 4,
+
+  "epsilon": 1,
+  "epsilon_min": 0.01,
+  "epsilon_explore": 1000000,
+
+  "learning_rate": 0.0001,
+  "gamma": 0.99,
+
+  "save_model": false,
+  "load_model": false,
+
+  "save_gif": true,
+  "save_tensorboard_summary": true,
+
+  "model_save_frequency": 1000,
+  "gif_save_frequency": 500,
+  "model_load_path": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
+
+}

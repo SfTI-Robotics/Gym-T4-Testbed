@@ -4,20 +4,26 @@ this is the universal run script for all environments
 """
 # import dependencies
 import argparse
-from argparse import RawTextHelpFormatter
+# for parameters
+import datetime
+import json
 import sys
+from argparse import RawTextHelpFormatter
 from os.path import expanduser
+from random import seed
 
 import gym
-import datetime
 
 # for graphing
-from agents.memory.Memory import Memory
-from utils.summary import Summary
-from training.training import train
+from tensorflow import set_random_seed
 
-# for parameters
-import json
+from agents.memory.Memory import Memory
+from training.training_functions import train
+from utils.summary import Summary
+
+seed(2)
+set_random_seed(2)
+
 
 PATH = expanduser("~")
 MODEL_FILENAME = ''
@@ -63,6 +69,10 @@ if __name__ == "__main__":
     elif config['environment'] == 'Breakout-v0':
         import utils.preprocessing.Breakout_Preprocess as Preprocess
         MODEL_FILENAME = MODEL_FILENAME + "Breakout"
+        print('Breakout works')
+    elif config['environment'] == 'Enduro-v0':
+        import utils.preprocessing.Enduro_Preprocess as Preprocess
+        MODEL_FILENAME = MODEL_FILENAME + "Enduro"
         print('Breakout works')
     elif config['environment'] == 'CartPole-v1':
         import utils.preprocessing.Cartpole_Preprocess as Preprocess
@@ -128,5 +138,13 @@ if __name__ == "__main__":
 
     # ============================================================================================================== #
 
+    summary = Summary(['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'],
+                      name=MODEL_FILENAME + str(datetime.datetime.now()),
+                      save_path=PATH + '/hybrid_comparison/',
+                      min_reward=processor.reward_min,
+                      max_reward=processor.reward_max)
+
+    # ============================================================================================================== #
+
     # train learner and plot results
-    train(env, learner, memory, processor, config, PATH)
+    train(env, learner, memory, processor, config, PATH, summary=summary)

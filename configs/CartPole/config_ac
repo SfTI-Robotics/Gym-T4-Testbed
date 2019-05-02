@@ -1,12 +1,12 @@
 {
   "algorithm": "ActorCritic",
   "environment": "CartPole-v1",
-  "episodes": 1000,
+  "episodes": 1500,
 
   "batch_size": 64,
 
   "memory_size": 2000,
-  "initial_exploration_steps": 100,
+  "initial_exploration_steps": 1000,
 
   "target_update_frequency": -1,
   "network_train_frequency": 1,
@@ -18,11 +18,10 @@
   "learning_rate": 0.001,
   "gamma": 0.99,
 
-  "save_model": true,
+  "save_model": false,
   "load_model": false,
 
   "save_gif": true,
-  "save_plot": true,
   "save_tensorboard_summary": true,
 
   "model_save_frequency": 1000,

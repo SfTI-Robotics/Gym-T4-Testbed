@@ -25,7 +25,7 @@ def save_episode_to_summary(summary_writer: tensorflow.summary.FileWriter,
                             episode: int, step: int, time: float, reward: float, epsilon: float) -> None:
     """
     Adds summary of episode to summary file
-    HINT: to view summary execute "tensorboard --logdir output/[algorithm]/tensorboard_summary
+    NOTE: to view summary execute "tensorboard --logdir output/[algorithm]/tensorboard_summary"
     :param summary_writer: summary writer
     :param episode: number of episode
     :param step: total steps of episode
@@ -50,7 +50,7 @@ def save_episode_to_summary(summary_writer: tensorflow.summary.FileWriter,
 def save_model_to_file(learner: AbstractLearning, save_path: str, environment_name: str, episode: int) -> None:
     """
     Saves current model to .h5 file, overrides previous model for same environment and algorithm
-    HINT: to avoid overriding, add episode number and/or time string to model name
+    NOTE: to avoid overriding, add episode number and/or time string to model name
     :param learner: learner containing model that should be saved
     :param save_path: path to model folder
     :param environment_name: name of the environment

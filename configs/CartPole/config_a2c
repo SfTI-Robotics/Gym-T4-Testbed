@@ -1,15 +1,15 @@
 {
   "algorithm": "A2C",
   "environment": "CartPole-v1",
-  "episodes": 1000,
+  "episodes": 1500,
 
-  "batch_size": 1,
+  "batch_size": -1,
 
   "memory_size": 2000,
-  "initial_exploration_steps": 1,
+  "initial_exploration_steps": -1,
 
   "target_update_frequency": -1,
-  "network_train_frequency": 1,
+  "network_train_frequency": -1,
 
   "epsilon": -1,
   "epsilon_min": 0.01,
@@ -22,7 +22,6 @@
   "load_model": false,
 
   "save_gif": true,
-  "save_plot": true,
   "save_tensorboard_summary": true,
 
   "model_save_frequency": 1000,

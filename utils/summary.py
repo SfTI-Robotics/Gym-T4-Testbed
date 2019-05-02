@@ -55,16 +55,9 @@ class Summary:
             name="default_image",
             # file path to save graph. i.e "/Desktop/Py/Scenario_Comparasion/Maze/Model/"
             save_path='',
-            # episode lower bound for graph
-            episode_min=0,
-            # episode upper bound for graph
-            episode_max=100,
-            # step upper bound for graph
-            step_max_m=500,
-            # reward lower bound for graph
-            reward_min_m=-100,
-            # reward upper bound for graph
-            reward_max_m=100
+            # optional focus on reward space
+            min_reward=None,
+            max_reward=None
     ):
         self.summary_types = summary_types
         self.step_goal = step_goal
@@ -74,11 +67,9 @@ class Summary:
         self.end_focus = end_focus
         self.general_filename = name
         self.save_path = save_path
-        self.EPISODE_MIN = episode_min
-        self.EPISODE_MAX = episode_max
-        self.STEP_MAX_M = step_max_m
-        self.REWARD_MIN_M = reward_min_m
-        self.REWARD_MAX_M = reward_max_m
+
+        self.min_reward = min_reward
+        self.max_reward = max_reward
 
         self.step_summary = []
         self.time_summary = []
@@ -123,27 +114,24 @@ class Summary:
     def summarize(
             self,
             # for the current iteration
-            episode_count,
+            episode_counts=[],
             # an array that records steps taken in each episode. Index indicates episode
-            step_count=1,
+            step_counts=[],
             # an array that records the operation time for each episode
-            time_count=0,
+            time_counts=[],
             # an array that records total reward collected in each episode
-            reward_count=0,
+            reward_counts=[],
             # epsilon greedy value
-            epsilon_value=0,
+            epsilon_values=[],
             e_greedy_formula='e-greedy formula = '
     ):
-        self.update(step_count, time_count, reward_count, epsilon_value)
+        self.update(step_counts, time_counts, reward_counts, epsilon_values)
 
-        # generate summary graphs
-        if episode_count % FREQUENCY == 0:
-            self.plot_summary_graphs(e_greedy_formula)
+        self.plot_summary_graphs(e_greedy_formula)
 
         # generate index-focused summary graph
         if self.num_focus_axes != 0 and self.start_focus != self.end_focus:
-            if episode_count % FREQUENCY == 0 and self.start_focus < episode_count < self.end_focus:
-                self.plot_index_focused_summary_graphs(episode_count)
+            self.plot_index_focused_summary_graphs(episode_counts)
 
     def plot_summary_graphs(self, e_greedy_formula):
         fig1 = plt.figure(figsize=(5, 10))  # plotting normally takes ~0.5 seconds
@@ -151,7 +139,7 @@ class Summary:
         if 'sumiz_step' in self.summary_types:
             ax1 = fig1.add_subplot(self.num_main_axes, 1, i)
             # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, STEP_MIN_M, self.STEP_MAX_M])
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.step_summary)])
+            plt.axis([0, len(self.step_summary), np.min(self.step_summary), np.max(self.step_summary)])
             ax1.plot(range(len(self.step_summary)), self.step_summary)
             # only plot additional line if goal was specified
             if self.step_goal is not None:
@@ -162,7 +150,8 @@ class Summary:
             i += 1
         if 'sumiz_time' in self.summary_types:
             ax2 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.time_summary)])
+            # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, np.max(self.time_summary)])
+            plt.axis([0, len(self.time_summary), 0, np.max(self.time_summary)])
             ax2.plot(range(len(self.time_summary)), self.time_summary)
             ax2.set_title('Execution time in each episode')
             ax2.set_xlabel('Episode')
@@ -171,8 +160,10 @@ class Summary:
         if 'sumiz_reward' in self.summary_types:
             ax3 = fig1.add_subplot(self.num_main_axes, 1, i)
             # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, self.REWARD_MIN_M, self.REWARD_MAX_M])
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX,
-                      np.min([0, np.min(self.reward_summary)]), np.max(self.reward_summary)])
+            min_val = self.min_reward if self.min_reward is not None else np.min(self.reward_summary)
+            max_val = self.max_reward if self.max_reward is not None else np.max(self.reward_summary)
+
+            plt.axis([0, len(self.reward_summary), min_val, max_val])
             ax3.plot(range(len(self.reward_summary)), self.reward_summary)
             # only plot additional line if goal was specified
             if self.reward_goal is not None:
@@ -184,7 +175,9 @@ class Summary:
             i += 1
         if 'sumiz_epsilon' in self.summary_types:
             ax4 = fig1.add_subplot(self.num_main_axes, 1, i)
-            plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, 1])
+            # plt.axis([self.EPISODE_MIN, self.EPISODE_MAX, 0, 1])
+            plt.axis([0, len(self.epsilon_summary),
+                      np.min([0, np.min(self.epsilon_summary)]), np.min([np.max(self.epsilon_summary), 1])])
             ax4.plot(range(len(self.epsilon_summary)), self.epsilon_summary, label=e_greedy_formula)
             # only plot additional line if goal was specified
             if self.epsilon_goal is not None:
@@ -206,7 +199,7 @@ class Summary:
             ax5.set_ylabel('Reward per step')
             i += 1
         plt.tight_layout()
-        fig1.savefig(self.save_path + self.general_filename + ".png")
+        fig1.savefig(self.save_path + self.general_filename + "_focused_summary.svg", format="svg")
         plt.close(fig1)
 
     def plot_index_focused_summary_graphs(self, episode_count):
@@ -247,23 +240,24 @@ class Summary:
             ax3.set_ylabel('Epsilon')
             i += 1
         plt.tight_layout()
-        fig2.savefig(self.save_path + self.general_filename + "_focused_summary.png")
+        fig2.savefig(self.save_path + self.general_filename + "_focused_summary.svg", format="svg")
         plt.close(fig2)
 
-    def update(self, step_count, time_count, reward_count, epsilon_value):
-        self.step_summary.append(step_count)
-        self.time_summary.append(time_count)
-        self.reward_summary.append(reward_count)
-        self.epsilon_summary.append(epsilon_value)
+    def update(self, step_counts, time_counts, reward_counts, epsilon_values):
+        self.step_summary = self.step_summary + step_counts
+        self.time_summary = self.time_summary + time_counts
+        self.reward_summary = self.reward_summary + reward_counts
+        self.epsilon_summary = self.epsilon_summary + epsilon_values
 
+        # TODO: not tested!
         if self.is_average_reward_axes:
             # check for divide by zero error
-            if step_count == 0:
+            if step_counts == 0:
                 print("Step array contains zero(s). Reward-per-step graph will be omitted.")
-                self.average_reward_summary.append(0)
+                self.average_reward_summary.append(np.zeros(len(reward_counts)))
             else:
                 # find average reward in each episode
-                self.average_reward_summary.append(reward_count / float(step_count))
+                self.average_reward_summary.append(reward_counts / float(step_counts))
 
     @staticmethod
     def display_parameters(initial_epsilon=None, max_epsilon=None, learning_rate=None, reward_decay=None,

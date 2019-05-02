@@ -1,17 +1,21 @@
+import datetime
 import time
 from os.path import expanduser
 import tensorflow
 
 from agents.memory import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
+from training.testing_functions import test
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 from utils.storing import load_model_from_file, make_gif, save_episode_to_summary, save_model_to_file
 
 home = expanduser("~")
 
+summary_save_step = 5000
+
 
 def train(env: any, learner: AbstractLearning, memory: Memory, processor: AbstractProcessor,
-          config, save_path) -> None:
+          config, save_path, summary=None) -> None:
     """
     Trains learner in env and plots results
     :param env: gym environment
@@ -20,6 +24,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
     :param processor: pre-processor for given environment
     :param config: configurations for training
     :param save_path: path to folder: [home]/Gym-T4-Testbed/output/[algorithm]/
+    :param summary: optional summary to save plots during training
     """
 
     # loading neural network weights and parameters
@@ -36,6 +41,8 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
     max_reward = -1
     max_episode_number = -1
     max_episode_frames = []
+    # data for summary-plots
+    summary_rewards, summary_epsilons, summary_steps = [], [], []
 
     training_step = 0
 
@@ -102,6 +109,20 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
                     max_reward = sum_rewards_array
                     max_episode_number = episode
                     max_episode_frames = episode_frames
+                # update data for summary-plot
+                summary_steps.append(step)
+                summary_epsilons.append(learner.epsilon)
+                summary_rewards.append(sum_rewards_array)
+
+                # update summary-plot
+                if summary is not None and episode % summary_save_step == 0:
+                    # test(learner, env, 'test_results_' + str(datetime.datetime.now()), save_path + '/hybrid_comparison/', config,
+                    #      processor, min_reward=processor.reward_min, max_reward=processor.reward_max)
+                    summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
+                                      epsilon_values=summary_epsilons,
+                                      e_greedy_formula=learner.e_greedy_formula)
+                    summary_steps, summary_epsilons, summary_rewards = [], [], []
+
                 break
 
     # ============================================================================================================== #
@@ -127,6 +148,15 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
             save_model_to_file(learner, save_path + '/models/', config['environment'], episode)
 
     # ============================================================================================================== #
+
+    print('# =========================================== TEST AGENT =========================================== #')
+
+    # don't act randomly
+    learner.epsilon = 0
+    learner.min_epsilon = 0
+
+    test(learner, env, 'test_results_' + str(datetime.datetime.now()), save_path + '/graphs/', config, processor,
+         min_reward=processor.reward_min, max_reward=processor.reward_max)
 
     # killing environment to prevent memory leaks
     env.close()

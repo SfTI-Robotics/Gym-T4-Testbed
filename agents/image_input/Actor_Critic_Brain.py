@@ -6,12 +6,12 @@ from agents.networks.actor_critic_networks import build_actor_cartpole_network, 
 
 
 # TODO: This implementation does not learn for Atari Games!
-#   The initial policy heavily favours one action (99%)
+#   The initial policy heavily favours one action (~99%)
 #   After the first network-update, the favourite action has a probability of 1.0, all others have 0
 #   Learner proceeds to only choose this one action, regardless of reward
 #   implementation according to https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
 #   and https://github.com/rlcode/reinforcement-learning/blob/master/2-cartpole/4-actor-critic/cartpole_a2c.py
-#       here trained with experience replay because it is much faster than just training with one tuple after every step
+#       https://github.com/iocfinc/A2C-CartPole/blob/master/A2C%20-%20Cartpole.py (experience replay after every step)
 
 class Learning(AbstractBrain.AbstractLearning):
 
@@ -64,6 +64,8 @@ class Learning(AbstractBrain.AbstractLearning):
         self.critic_network.fit(states, targets, epochs=1, verbose=0)
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
+        # TODO: move this to training-loop to avoid unnecessary sampling
         if step % self.config['network_train_frequency'] == 0:
+            # TODO: train functions should be unified to avoid double predictions
             self.train_actor(states, actions, rewards, next_states, dones)
             self.train_critic(states, rewards, next_states, dones)

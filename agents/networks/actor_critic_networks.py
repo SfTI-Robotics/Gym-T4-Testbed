@@ -47,12 +47,17 @@ def build_critic_network(obs_space, value_size, learning_rate):
     return critic
 
 
-# see https://github.com/rlcode/reinforcement-learning/blob/master/2-cartpole/4-actor-critic/cartpole_a2c.py
+# see https://github.com/simoninithomas/reinforcement-learning-1/blob/master/2-cartpole/3-reinforce/cartpole_reinforce.py
 def build_actor_cartpole_network(obs_space, action_space, learning_rate):
     actor = Sequential()
     actor.add(Dense(24, input_dim=obs_space[0], activation='relu', kernel_initializer='he_uniform'))
     actor.add(Dense(action_space, activation='softmax'))
     actor.summary()
+    # Using categorical crossentropy as a loss is a trick to easily implement the policy gradient.
+    # Categorical cross entropy is defined as (p, q) = sum(p_i * log(q_i)).
+    # For the action taken, a, you set p_a = advantage.
+    # q_a is the output of the policy network, which is the probability of taking the action a, i.e. policy(s, a).
+    # All other p_i are zero, thus we have H(p, q) = A * log(policy(s, a))
     actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=learning_rate))
     return actor
 

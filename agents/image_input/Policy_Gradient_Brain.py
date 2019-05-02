@@ -6,6 +6,7 @@ from agents.networks.actor_critic_networks import \
 
 
 # see https://github.com/ShuvenduBikash/Deep-reinforcement-learning/blob/master/policy_gradient/cart-pole%20keras.py
+#     https://github.com/simoninithomas/reinforcement-learning-1
 
 
 class Learning(AbstractBrain.AbstractLearning):

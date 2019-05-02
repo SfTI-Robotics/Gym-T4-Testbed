@@ -1,6 +1,6 @@
 from keras import Sequential
 from keras.layers import Conv2D, Flatten, Dense
-from keras.optimizers import Adam, RMSprop
+from keras.optimizers import Adam
 
 
 def build_dqn_network(obs_space, action_space, learning_rate):
@@ -10,7 +10,7 @@ def build_dqn_network(obs_space, action_space, learning_rate):
     model.add(Conv2D(32, kernel_size=(8, 8), strides=(4, 4), padding='valid', activation='relu',
                      input_shape=obs_space, data_format='channels_first'))
     model.add(Conv2D(64, kernel_size=(4, 4), strides=(2, 2), activation='relu',))
-    model.add(Conv2D(32, kernel_size=(4, 4), activation='relu',))
+    model.add(Conv2D(32, kernel_size=(3, 3), strides=(1, 1), activation='relu',))
     # convert image from 2D to 1D
     model.add(Flatten())
 
@@ -27,46 +27,27 @@ def build_dqn_network(obs_space, action_space, learning_rate):
     return model
 
 
-def build_cartpole_network(obs_space, action_space, learning_rate):
+def build_dqn_cartpole_network(obs_space, action_space, learning_rate):
     model = Sequential()
     model.add(Dense(24, input_shape=obs_space, activation="relu", kernel_initializer='he_uniform'))
-    model.add(Dense(24, activation='relu', kernel_initializer='he_uniform'))
     model.add(Dense(action_space, activation='linear', kernel_initializer='he_uniform'))
     model.compile(optimizer=Adam(lr=learning_rate), loss='mse')
     # self.model.summary()
     return model
 
 
-def build_breakout_network(obs_space, action_space, learning_rate):
+def build_simple_conv_net(obs_space, action_space, learning_rate):
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
-                     padding='valid',
+    model.add(Conv2D(16, 8, strides=(4, 4),
                      activation='relu',
                      input_shape=obs_space,
                      data_format='channels_first'))
-    model.add(Conv2D(64, kernel_size=(4, 4), strides=(2, 2),
-                     padding='valid',
-                     activation='relu',
-                     input_shape=obs_space,
-                     data_format='channels_first'))
-    model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
-                     padding='valid',
-                     activation='relu',
-                     input_shape=obs_space,
-                     data_format='channels_first'))
-    # convert image from 2D to 1D
+    model.add(Conv2D(32, 4, strides=(2, 2),
+                     activation='relu'))
     model.add(Flatten())
 
-    model.add(Dense(units=512, activation='relu'))
+    model.add(Dense(256, activation='relu'))
+    model.add(Dense(action_space, activation=None))
 
-    # output layer
-    model.add(Dense(units=action_space))
-
-    # compile the self.model using traditional Machine Learning losses and optimizers
-    model.compile(loss="mean_squared_error",
-                  optimizer=RMSprop(lr=learning_rate,
-                                    rho=0.95,
-                                    epsilon=0.01),
-                  metrics=["accuracy"])
-    # self.model.summary()
+    model.compile(optimizer=Adam(lr=learning_rate), loss='mse')
     return model
