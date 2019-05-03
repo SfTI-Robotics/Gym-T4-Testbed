@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
     summary = Summary(['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'],
                       name=MODEL_FILENAME + str(datetime.datetime.now()),
-                      save_path=PATH + '/hybrid_comparison/',
+                      save_path=PATH + '/graphs/',
                       min_reward=processor.reward_min,
                       max_reward=processor.reward_max)
 

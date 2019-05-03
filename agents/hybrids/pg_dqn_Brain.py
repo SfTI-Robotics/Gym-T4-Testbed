@@ -1,5 +1,3 @@
-import numpy as np
-
 import agents.image_input.AbstractBrain as AbstractBrain
 import agents.image_input.DQN_Brain as DQN
 import agents.image_input.Policy_Gradient_Brain as PG

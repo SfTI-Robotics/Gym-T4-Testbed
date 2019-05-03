@@ -57,20 +57,21 @@ class Learning(AbstractBrain.AbstractLearning):
         self.target_network.set_weights(self.network.get_weights())
 
     def train_hybrid_network(self, states, actions, rewards, next_states, dones, step, switch):
-        # TODO: policy gradient trains with episode data, dqn agent trains with memory-sample!
-        target = self.network.predict(states)
-        target_next = self.target_network.predict(next_states)
-        for i in range(len(dones)):
-            if dones[i]:
-                target[i][actions[i]] = rewards[i]
-            else:
-                # bellman equation
-                target[i][actions[i]] = rewards[i] + self.config['gamma'] * np.amax(target_next[i])
+        if step % self.config['network_train_frequency'] == 0:
+            target = self.network.predict(states)
+            target_next = self.target_network.predict(next_states)
+            for i in range(len(dones)):
+                if dones[i]:
+                    target[i][actions[i]] = rewards[i]
+                else:
+                    # bellman equation
+                    target[i][actions[i]] = rewards[i] + self.config['gamma'] * np.amax(target_next[i])
 
-        self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
+            self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
 
         if step % self.config['target_update_frequency'] == 0:
             self.update_target_model()
-        # only start reducing epsilon after switch
+
+        # only start reducing epsilon after switch, when q-learner chooses actions
         if switch:
             self.update_epsilon()

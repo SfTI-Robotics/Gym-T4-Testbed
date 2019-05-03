@@ -5,13 +5,15 @@ import time
 from os.path import expanduser
 
 import gym
+import tensorflow
 from numpy.random import seed
 from tensorflow import set_random_seed
 
 import utils.preprocessing.Cartpole_Preprocess as Preprocess
-from agents.image_input.Hybrid_Brain import Learning
+from agents.hybrids.pg_dqn_Brain import Learning
 from agents.memory import Memory
 from training.testing_functions import test
+from utils.storing import save_episode_to_summary
 from utils.summary import Summary
 
 seed(2)
@@ -24,7 +26,6 @@ MODEL_FILENAME = ''
 def test_hybrid():
     print('# =========================================== TEST DQN =========================================== #')
     prev_epsilon = learner.dqn_agent.epsilon
-    prev_min_epsilon = learner.dqn_agent.min_epsilon
     prev_switch = learner.switch
 
     # don't act randomly
@@ -42,22 +43,18 @@ def test_hybrid():
 
     test(learner.pg_agent, env, MODEL_FILENAME, PATH + '/test_pg/', config, processor, min_reward=0, max_reward=500)
 
+    # reset values in case of continued training
     learner.dqn_agent.epsilon = prev_epsilon
-    learner.dqn_agent.min_epsilon = prev_min_epsilon
     learner.switch = prev_switch
 
 
 if __name__ == "__main__":
+    # combination of run_main and train, adapted for pg+dqn hybrid
 
-    # For more on how argparse works see documentation
-    # create argument options
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-file", "--filename", help='name of file containing parameters in json-format', )
-
-    # retrieve user inputted args from cmd line
     args = parser.parse_args()
 
-    # Read JSON data into the datastore variable
     config_file_path = PATH + args.filename
     if config_file_path:
         with open(config_file_path, 'r') as f:
@@ -66,40 +63,28 @@ if __name__ == "__main__":
     # ============================================================================================================== #
 
     MODEL_FILENAME = MODEL_FILENAME + "CartPole"
-
-    # create gym env
     env = gym.make(config['environment'])
-    # initialise processing class specific to environment
     processor = Preprocess.Processor()
-    # state space is determined by the deque storing the frames from the env
     state_space = processor.get_state_space()
-
     if config['environment'] == 'CartPole-v1':
         state_space = (env.observation_space.shape[0],)
-
-    # action space given by the environment
     action_space = env.action_space.n
-
-    # here we change the action space if it contains 'useless' keys or actions that do the same thing
-    # if no useless keys it just returns the envs defined action space
-    # This function is created in the preprocess file
     action_space = processor.new_action_space(action_space)
 
     # ============================================================================================================== #
 
-    PATH = PATH + '/Gym-T4-Testbed/hybrid/output/Hybrid/'
+    PATH = PATH + '/Gym-T4-Testbed/output/Hybrid/'
     learner = Learning(state_space, action_space, config)
 
     # ============================================================================================================== #
 
-    # create memory
     dqn_memory = Memory.Memory(config['memory_size'], state_space)
     pg_memory = Memory.Memory(config['memory_size'], state_space)
 
     # ============================================================================================================== #
 
     # train learner and plot results
-    # summary_writer = tensorflow.summary.FileWriter(PATH + 'tensorboard_summary/')
+    summary_writer = tensorflow.summary.FileWriter(PATH + 'tensorboard_summary/')
     summary = Summary(['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'],
                       name=MODEL_FILENAME + str(datetime.datetime.now()),
                       save_path=PATH + '/graphs/',
@@ -111,12 +96,9 @@ if __name__ == "__main__":
 
     training_step = 0
 
-    # for episode in range(int(episodes)):
     for episode in range(config['episodes']):
 
         state = env.reset()
-
-        # Processing initial image cropping, grayscale, and stacking 4 of them
         state = processor.preprocessing(state, True)
 
         start_time = time.time()
@@ -151,23 +133,20 @@ if __name__ == "__main__":
             if done:
                 if episode == config['switch_steps']:
                     test_hybrid()
-                    print(
-                        '# =========================================== SWITCH =========================================== #')
+                    print('# ======================================= SWITCH ======================================= #')
                     learner.switch = True
-                    # learner.update_weights()
 
                 # train pg with episode data after every episode
                 states, actions, rewards, next_states, dones = pg_memory.sample_all()
                 learner.pg_agent.train_network(states, actions, rewards, next_states, dones, step)
-                # learner.dqn_agent.train_hybrid_network(states, actions, rewards, next_states, dones, step, learner.switch)
 
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.dqn_agent.epsilon,
                       ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
+
                 summary_rewards.append(sum_rewards_array)
                 summary_steps.append(step)
                 summary_epsilons.append(learner.dqn_agent.epsilon)
-
                 if episode % 50 == 0:
                     summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
                                       epsilon_values=summary_epsilons,
@@ -179,10 +158,10 @@ if __name__ == "__main__":
 
         # ============================================================================================================== #
 
-        # if config['save_tensorboard_summary']:
+        if config['save_tensorboard_summary']:
             # save episode data to tensorboard summary
-            # save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
-            #                         sum_rewards_array, learner.epsilon)
+            save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
+                                    sum_rewards_array, learner.epsilon)
 
     # ============================================================================================================== #
 
@@ -192,8 +171,4 @@ if __name__ == "__main__":
     # ============================================================================================================== #
 
     test_hybrid()
-
-    # ============================================================================================================== #
-
-    # killing environment to prevent memory leaks
     env.close()

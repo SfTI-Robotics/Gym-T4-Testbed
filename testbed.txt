@@ -1,3 +1,3 @@
-/Gym-T4-Testbed/config/Enduro/config_dqn
-/Gym-T4-Testbed/config/Enduro/config_double_dqn
+/Gym-T4-Testbed/configs/Enduro/config_dqn
+/Gym-T4-Testbed/configs/Enduro/config_double_dqn
 #

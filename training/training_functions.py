@@ -11,6 +11,7 @@ from utils.storing import load_model_from_file, make_gif, save_episode_to_summar
 
 home = expanduser("~")
 
+# save summary-plot after n episodes
 summary_save_step = 5000
 
 
@@ -116,8 +117,6 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
 
                 # update summary-plot
                 if summary is not None and episode % summary_save_step == 0:
-                    # test(learner, env, 'test_results_' + str(datetime.datetime.now()), save_path + '/hybrid_comparison/', config,
-                    #      processor, min_reward=processor.reward_min, max_reward=processor.reward_max)
                     summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
                                       epsilon_values=summary_epsilons,
                                       e_greedy_formula=learner.e_greedy_formula)
