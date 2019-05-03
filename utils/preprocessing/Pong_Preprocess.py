@@ -2,6 +2,7 @@ import sys
 from collections import deque
 import cv2
 import numpy as np
+from PIL import Image
 
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 
@@ -44,6 +45,9 @@ class Processor(AbstractProcessor):
             # append new frame to deque
             # in other steps one slot is already filled and the second one needs to be filled
             self.deque.append(frame)
+
+            # img = Image.fromarray(frame)
+            # img.show()
         # reshape the deque so that network recognises that its two frames stacked together
         stacked_state = np.stack(self.deque, axis=0)
         return stacked_state

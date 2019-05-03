@@ -2,27 +2,22 @@
 this is the universal run script for all environments
 
 """
-# import dependencies
 import argparse
-# for parameters
 import datetime
 import json
 import sys
 from argparse import RawTextHelpFormatter
 from os.path import expanduser
 from random import seed
-
 import gym
-
-# for graphing
 from tensorflow import set_random_seed
 
 from agents.memory.Memory import Memory
 from training.training_functions import train
 from utils.summary import Summary
 
-seed(2)
-set_random_seed(2)
+seed(0)
+set_random_seed(0)
 
 
 PATH = expanduser("~")

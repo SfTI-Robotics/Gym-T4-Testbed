@@ -7,7 +7,7 @@
 
   "memory_size": 2000,
   "initial_exploration_steps": 1000,
-  "switch_steps": 500,
+  "switch_steps": 1000,
 
   "target_update_frequency": 100,
   "network_train_frequency": 1,

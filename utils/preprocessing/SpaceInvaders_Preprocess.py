@@ -1,6 +1,7 @@
 from collections import deque
 import cv2
 import numpy as np
+from PIL import Image
 
 from utils.preprocessing.Abstract_Preprocess import AbstractProcessor
 
@@ -14,6 +15,8 @@ class Processor(AbstractProcessor):
         self.time_max = 30
         self.reward_min = 0
         self.reward_max = 1000
+
+        self.standardize_image = False
 
     def preprocessing(self, frame, is_new_episode):
         # see https://github.com/gsurma/atari/blob/master/gym_wrappers.py
@@ -33,6 +36,9 @@ class Processor(AbstractProcessor):
             self.deque.append(frame)
         else:
             self.deque.append(frame)
+
+            # img = Image.fromarray(frame)
+            # img.show()
         # reshape the deque
         stacked_state = np.stack(self.deque, axis=0)
         return stacked_state

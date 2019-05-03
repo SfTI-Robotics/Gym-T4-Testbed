@@ -106,44 +106,39 @@ if __name__ == "__main__":
         step = 0  # count total steps for each episode for the graph
 
         while True:
+            # perform next step
             action = learner.choose_action(state)
             next_state, reward, done, _ = env.step(action)
-
             if config['environment'] == 'CartPole-v1':
                 # punish if terminal state reached
                 if done:
                     reward = -reward
-
             sum_rewards_array += reward
             next_state = processor.preprocessing(next_state, False)
-
+            # update memories
             dqn_memory.store_transition(state, action, reward, next_state, done)
             pg_memory.store_transition(state, action, reward, next_state, done)
-
-            step += 1
+            # update counters
             state = next_state
+            step += 1
             training_step += 1
 
             # train dqn with batch data at every step
             if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
                 states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'])
-                learner.dqn_agent.train_hybrid_network(states, actions, rewards, next_states, dones, training_step,
-                                                       learner.switch)
+                learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
 
             if done:
-                if episode == config['switch_steps']:
-                    test_hybrid()
-                    print('# ======================================= SWITCH ======================================= #')
-                    learner.switch = True
-
                 # train pg with episode data after every episode
                 states, actions, rewards, next_states, dones = pg_memory.sample_all()
-                learner.pg_agent.train_network(states, actions, rewards, next_states, dones, step)
+                learner.train_pg_network(states, actions, rewards, next_states, dones, step)
 
+                # print episode results
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.dqn_agent.epsilon,
                       ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
 
+                # update plot summary
                 summary_rewards.append(sum_rewards_array)
                 summary_steps.append(step)
                 summary_epsilons.append(learner.dqn_agent.epsilon)
@@ -153,18 +148,18 @@ if __name__ == "__main__":
                                       e_greedy_formula=learner.dqn_agent.e_greedy_formula)
                     summary_rewards, summary_epsilons, summary_steps = [], [], []
                     test_hybrid()
-
                 break
 
         # ============================================================================================================== #
 
+        # save episode data to tensorboard summary
         if config['save_tensorboard_summary']:
-            # save episode data to tensorboard summary
             save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
                                     sum_rewards_array, learner.epsilon)
 
     # ============================================================================================================== #
 
+    # update plot summary
     summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards, epsilon_values=summary_epsilons,
                       e_greedy_formula=learner.dqn_agent.e_greedy_formula)
 

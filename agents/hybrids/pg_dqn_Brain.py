@@ -15,10 +15,6 @@ class Learning(AbstractBrain.AbstractLearning):
         self.train_counter = 0
         self.switch_point = 100
 
-        # make sure DQN actually trains in ever
-        self.config['network_train_frequency'] = 1
-        self.config['target_update_frequency'] = 1
-
     def choose_action(self, state):
         if self.switch:
             return self.dqn_agent.choose_action(state)
@@ -26,19 +22,20 @@ class Learning(AbstractBrain.AbstractLearning):
             return self.pg_agent.choose_action(state)
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
+        print('WARNING: training with train_network not possible, '
+              'Policy Gradient and Deep Q-Learning need different training data '
+              '(episode sequences vs random batch)')
 
-        if self.train_counter == self.config['switch_steps']:
+    def train_pg_network(self, states, actions, rewards, next_states, dones, step):
+        if step == self.config['switch_steps']:
             print('# =========================================== SWITCH =========================================== #')
             self.switch = True
+        self.pg_agent.train_network(states, actions, rewards, next_states, dones, step)
+
+    def train_dqn_network(self, states, actions, rewards, next_states, dones, step):
+        temp_epsilon = self.dqn_agent.epsilon
+
+        self.dqn_agent.train_network(states, actions, rewards, next_states, dones, step)
 
         if not self.switch:
-            # only train policy gradient before switch
-            self.pg_agent.train_network(states, actions, rewards, next_states, dones, step)
-
-        # always train dqn
-        self.dqn_agent.train_hybrid_network(states, actions, rewards, next_states, dones, step, self.switch)
-
-        self.train_counter += 1
-
-    def update_weights(self):
-        self.dqn_agent.network.set_weights(self.pg_agent.network.get_weights())
+            self.dqn_agent.epsilon = temp_epsilon

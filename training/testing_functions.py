@@ -40,6 +40,7 @@ def test(learner, env, filename, path, config, processor, min_reward=None, max_r
                 test_steps.append(test_step)
                 break
 
+    # plot test-results
     test_summary.summarize(step_counts=test_steps, reward_counts=test_rewards)
     print('Sum Rewards = ', np.sum(test_rewards),
           ' Mean Reward = ', np.mean(test_rewards),

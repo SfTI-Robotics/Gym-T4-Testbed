@@ -14,8 +14,6 @@ class Learning(AbstractBrain.AbstractLearning):
     def __init__(self, observations, actions, config):
         super().__init__(observations, actions, config)
 
-        self.action_policies = []
-
         if self.config['environment'] == 'CartPole-v1':
             self.network = \
                 build_actor_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
@@ -24,7 +22,6 @@ class Learning(AbstractBrain.AbstractLearning):
 
     def choose_action(self, state):
         policy = self.network.predict(np.array([state])).flatten()
-        self.action_policies.append(policy)
         return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
     def discount_and_standardize_rewards(self, rewards):

@@ -41,12 +41,8 @@ def build_dqn_cartpole_network(input_shape, output_shape, learning_rate):
 # see https://github.com/rohitgirdhar/Deep-Q-Networks
 def build_simple_conv_net(input_shape, output_shape, learning_rate):
     model = Sequential()
-    model.add(Conv2D(16, 8, strides=(4, 4),
-                     activation='relu',
-                     input_shape=input_shape,
-                     data_format='channels_first'))
-    model.add(Conv2D(32, 4, strides=(2, 2),
-                     activation='relu'))
+    model.add(Conv2D(16, 8, strides=(4, 4), activation='relu', input_shape=input_shape))
+    model.add(Conv2D(32, 4, strides=(2, 2), activation='relu'))
     model.add(Flatten())
 
     model.add(Dense(256, activation='relu'))

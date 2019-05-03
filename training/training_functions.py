@@ -2,6 +2,7 @@ import datetime
 import time
 from os.path import expanduser
 import tensorflow
+import numpy as np
 
 from agents.memory import Memory
 from agents.image_input.AbstractBrain import AbstractLearning
@@ -82,6 +83,9 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Abstra
 
             sum_rewards_array += reward
             next_state = processor.preprocessing(next_state, False)
+            # try reward clipping
+            if 'reward_clipping' in config and config['reward_clipping']:
+                reward = np.sign(reward)
 
             # TODO: remember action or action_mapped?
             # append <s, a, r, s', d> to learner.transitions
