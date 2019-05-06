@@ -16,6 +16,7 @@ from agents.memory.Memory import Memory
 from training.training_functions import train
 from utils.summary import Summary
 
+# add random seed and tensorflow seed to make results reproducible
 seed(0)
 set_random_seed(0)
 
@@ -78,6 +79,11 @@ if __name__ == "__main__":
 
     # create gym env
     env = gym.make(config['environment'])
+    # add seed to make results reproducible
+    env.seed(0)
+
+    # ============================================================================================================== #
+
     # initialise processing class specific to environment
     processor = Preprocess.Processor()
     # state space is determined by the deque storing the frames from the env
@@ -90,11 +96,6 @@ if __name__ == "__main__":
     action_space = env.action_space.n
 
     # ============================================================================================================== #
-
-    # here we change the action space if it contains 'useless' keys or actions that do the same thing
-    # if no useless keys it just returns the envs defined action space
-    # This function is created in the preprocess file
-    action_space = processor.new_action_space(action_space)
 
     # algorithm folder
     if config['algorithm'] == 'DQN':

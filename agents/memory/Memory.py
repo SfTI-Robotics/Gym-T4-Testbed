@@ -27,10 +27,11 @@ class Memory:
         """
         self.stored_transitions.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size):
+    def sample(self, batch_size, processor):
         """
         Samples batch_size random episodes from memory
         :param batch_size: amount of random samples
+        :param processor: processor used to convert samples from memory-format to network-format
         :return: states, actions, rewards, next_states, dones of randomly sampled episodes
         """
         # update batch size in case memory doesn't contain enough values
@@ -42,10 +43,10 @@ class Memory:
         actions, rewards, dones = [], [], []
 
         for i in range(batch_size):
-            states[i] = batch[i][0]
+            states[i] = processor.process_state_for_network(batch[i][0])
             actions.append(batch[i][1])
             rewards.append(batch[i][2])
-            next_states[i] = batch[i][3]
+            next_states[i] = processor.process_state_for_network(batch[i][3])
             dones.append(batch[i][4])
 
         return states, actions, rewards, next_states, dones

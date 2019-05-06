@@ -1,8 +1,9 @@
 import random
+
 import numpy as np
 
 import agents.image_input.AbstractBrain as AbstractBrain
-from agents.networks.dqn_networks import build_dqn_cartpole_network, build_dqn_network, build_simple_conv_net
+from agents.networks.dqn_networks import build_dqn_cartpole_network, build_simple_convoluted_net
 
 
 class Learning(AbstractBrain.AbstractLearning):
@@ -16,10 +17,8 @@ class Learning(AbstractBrain.AbstractLearning):
                 build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
         # use network suitable for Atari games
         else:
-            self.network = build_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
-            self.target_network = build_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
-            # self.network = build_simple_conv_net(self.state_space, self.action_space, self.config['learning_rate'])
-            # self.target_network = build_simple_conv_net(self.state_space, self.action_space, self.config['learning_rate'])
+            self.network = build_simple_convoluted_net(self.state_space, self.action_space, self.config['learning_rate'])
+            self.target_network = build_simple_convoluted_net(self.state_space, self.action_space, self.config['learning_rate'])
 
         self.update_target_model()
 
@@ -46,7 +45,8 @@ class Learning(AbstractBrain.AbstractLearning):
                     # bellman equation
                     target[i][actions[i]] = rewards[i] + self.config['gamma'] * np.amax(target_next[i])
 
-            self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
+            # self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
+            self.network.train_on_batch(states, target)
 
         if step % self.config['target_update_frequency'] == 0:
             self.update_target_model()

@@ -1,4 +1,5 @@
 import argparse
+import copy
 import datetime
 import json
 import time
@@ -22,6 +23,9 @@ set_random_seed(2)
 PATH = expanduser("~")
 MODEL_FILENAME = ''
 
+summary_frequency = 50
+test_frequency = 50
+
 
 def test_hybrid():
     print('# =========================================== TEST DQN =========================================== #')
@@ -31,9 +35,9 @@ def test_hybrid():
     # don't act randomly
     learner.switch = True
     learner.dqn_agent.epsilon = 0
-    learner.dqn_agent.min_epsilon = 0
 
-    test(learner.dqn_agent, env, MODEL_FILENAME, PATH + '/test_dqn/', config, processor, min_reward=0, max_reward=500)
+    test(learner.dqn_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
+         MODEL_FILENAME, PATH + '/test_dqn/')
 
     # ============================================================================================================== #
 
@@ -41,7 +45,8 @@ def test_hybrid():
 
     learner.switch = False
 
-    test(learner.pg_agent, env, MODEL_FILENAME, PATH + '/test_pg/', config, processor, min_reward=0, max_reward=500)
+    test(learner.pg_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
+         MODEL_FILENAME, PATH + '/test_dqn/')
 
     # reset values in case of continued training
     learner.dqn_agent.epsilon = prev_epsilon
@@ -69,7 +74,6 @@ if __name__ == "__main__":
     if config['environment'] == 'CartPole-v1':
         state_space = (env.observation_space.shape[0],)
     action_space = env.action_space.n
-    action_space = processor.new_action_space(action_space)
 
     # ============================================================================================================== #
 
@@ -99,7 +103,7 @@ if __name__ == "__main__":
     for episode in range(config['episodes']):
 
         state = env.reset()
-        state = processor.preprocessing(state, True)
+        state = processor.process_state_for_memory(state, True)
 
         start_time = time.time()
         sum_rewards_array = 0  # total rewards for graphing
@@ -107,17 +111,21 @@ if __name__ == "__main__":
 
         while True:
             # perform next step
-            action = learner.choose_action(state)
+            action = learner.choose_action(processor.process_state_for_network(state))
             next_state, reward, done, _ = env.step(action)
+            reward = processor.process_reward(reward)
+            next_state = processor.process_state_for_memory(next_state, False)
+
             if config['environment'] == 'CartPole-v1':
                 # punish if terminal state reached
                 if done:
                     reward = -reward
             sum_rewards_array += reward
-            next_state = processor.preprocessing(next_state, False)
+
             # update memories
             dqn_memory.store_transition(state, action, reward, next_state, done)
             pg_memory.store_transition(state, action, reward, next_state, done)
+
             # update counters
             state = next_state
             step += 1
@@ -125,7 +133,7 @@ if __name__ == "__main__":
 
             # train dqn with batch data at every step
             if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
-                states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'])
+                states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'], processor)
                 learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
 
             if done:
@@ -142,11 +150,12 @@ if __name__ == "__main__":
                 summary_rewards.append(sum_rewards_array)
                 summary_steps.append(step)
                 summary_epsilons.append(learner.dqn_agent.epsilon)
-                if episode % 50 == 0:
+                if episode % summary_frequency == 0:
                     summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
                                       epsilon_values=summary_epsilons,
                                       e_greedy_formula=learner.dqn_agent.e_greedy_formula)
                     summary_rewards, summary_epsilons, summary_steps = [], [], []
+                if episode % test_frequency == 0:
                     test_hybrid()
                 break
 
