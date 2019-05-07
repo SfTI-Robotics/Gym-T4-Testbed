@@ -24,7 +24,7 @@ PATH = expanduser("~")
 MODEL_FILENAME = ''
 
 summary_frequency = 50
-test_frequency = 50
+test_frequency = 100
 
 
 def test_hybrid():
@@ -46,7 +46,7 @@ def test_hybrid():
     learner.switch = False
 
     test(learner.pg_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
-         MODEL_FILENAME, PATH + '/test_dqn/')
+         MODEL_FILENAME, PATH + '/test_pg/')
 
     # reset values in case of continued training
     learner.dqn_agent.epsilon = prev_epsilon
@@ -132,19 +132,22 @@ if __name__ == "__main__":
             training_step += 1
 
             # train dqn with batch data at every step
-            if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
+            # if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
+            if len(dqn_memory.stored_transitions) > config['initial_exploration_steps'] and learner.switch:
                 states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'], processor)
                 learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
 
             if done:
-                # train pg with episode data after every episode
-                states, actions, rewards, next_states, dones = pg_memory.sample_all()
-                learner.train_pg_network(states, actions, rewards, next_states, dones, step)
 
                 # print episode results
                 print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.dqn_agent.epsilon,
                       ', steps = ', step,
                       ", total reward = ", sum_rewards_array)
+
+                # train pg with episode data after every episode
+                states, actions, rewards, next_states, dones = pg_memory.sample_all(processor)
+                learner.train_pg_network(states, actions, rewards, next_states, dones, step)
+                # learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
 
                 # update plot summary
                 summary_rewards.append(sum_rewards_array)

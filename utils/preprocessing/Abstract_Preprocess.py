@@ -41,6 +41,7 @@ class AbstractProcessor(ABC):
         state_image = state_image.convert('L')  # to gray
         state_image = state_image.resize((self.new_size, self.new_size), Image.ANTIALIAS)
         state_image = np.array(state_image).astype('uint8')
+
         if is_new_episode:
             self.deque.append(state_image)
             self.deque.append(state_image)
@@ -79,5 +80,6 @@ class AbstractProcessor(ABC):
     @staticmethod
     def process_reward(reward):
         """Clip reward between -1 and 1."""
+        # TODO make reward clipping optional
         return np.sign(reward)
 

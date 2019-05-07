@@ -38,7 +38,7 @@ class Learning(AbstractBrain.AbstractLearning):
         if step % self.config['network_train_frequency'] == 0:
             target = self.network.predict(states)
             target_next = self.target_network.predict(next_states)
-            for i in range(self.config['batch_size']):
+            for i in range(len(dones)):
                 if dones[i]:
                     target[i][actions[i]] = rewards[i]
                 else:

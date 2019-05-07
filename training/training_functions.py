@@ -73,7 +73,8 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
             # add new frame to use for gif
             episode_frames.append(next_state)
 
-            reward = processor.process_reward(reward)
+            if 'reward_clipping' in config and config['reward_clipping']:
+                reward = processor.process_reward(reward)
             next_state = processor.process_state_for_memory(next_state, False)
 
             if config['environment'] == 'CartPole-v1':

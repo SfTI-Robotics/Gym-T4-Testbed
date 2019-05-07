@@ -8,10 +8,9 @@ from keras import backend as K
 def build_dueling_dqn_network(obs_space, action_space, learning_rate):
     # see https://github.com/UoA-RL/Gym-T4-Testbed/blob/henry_test/models.py
     state_input = Input(shape=obs_space)
-    x = Conv2D(32, kernel_size=(8, 8), strides=(4, 4), activation='relu',
+    x = Conv2D(16, kernel_size=(8, 8), strides=(4, 4), activation='relu',
                data_format='channels_first')(state_input)
-    x = Conv2D(64, kernel_size=(4, 4), strides=(2, 2), activation='relu')(x)
-    x = Conv2D(64, kernel_size=(3, 3), activation='relu')(x)
+    x = Conv2D(32, kernel_size=(4, 4), strides=(2, 2), activation='relu')(x)
     x = Flatten()(x)
 
     # state value tower - V

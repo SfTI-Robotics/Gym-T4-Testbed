@@ -50,3 +50,5 @@ def build_simple_convoluted_net(input_shape, output_shape, learning_rate):
 
     model.compile(optimizer=Adam(lr=learning_rate), loss='mse')
     return model
+
+

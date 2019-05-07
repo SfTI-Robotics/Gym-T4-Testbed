@@ -17,9 +17,7 @@ def test(learner, env, config, processor, filename, path):
                            max_reward=processor.reward_max)
 
     temp_epsilon = learner.epsilon
-
     learner.epsilon = 0.0
-    learner.min_epsilon = 0.0
 
     test_rewards = []
     test_steps = []

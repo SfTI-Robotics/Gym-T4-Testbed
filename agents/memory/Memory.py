@@ -51,7 +51,7 @@ class Memory:
 
         return states, actions, rewards, next_states, dones
 
-    def sample_all(self):
+    def sample_all(self, processor):
         """
         Gets all episodes from memory in order of occurrence, clears memory
         :return: states, actions, rewards, next_states, dones of all episodes in order of occurrence
@@ -63,17 +63,17 @@ class Memory:
         actions, rewards, dones = [], [], []
 
         for i in range(batch_size):
-            states[i] = batch[i][0]
+            states[i] = processor.process_state_for_network(batch[i][0])
             actions.append(batch[i][1])
             rewards.append(batch[i][2])
-            next_states[i] = batch[i][3]
+            next_states[i] = processor.process_state_for_network(batch[i][3])
             dones.append(batch[i][4])
 
         self.stored_transitions = deque(maxlen=self.capacity)
 
         return states, actions, rewards, next_states, dones
 
-    def sample_last(self):
+    def sample_last(self, processor):
         """
         Gets most recently added episode from memory
         :return: state, action, reward, next_state and done of most recent episode
@@ -85,10 +85,10 @@ class Memory:
         actions, rewards, dones = [], [], []
 
         for i in range(batch_size):
-            states[i] = self.stored_transitions[pos][0]
+            states[i] = processor.process_state_for_network(self.stored_transitions[pos][0])
             actions.append(self.stored_transitions[pos][1])
             rewards.append(self.stored_transitions[pos][2])
-            next_states[i] = self.stored_transitions[pos][3]
+            next_states[i] = processor.process_state_for_network(self.stored_transitions[pos][3])
             dones.append(self.stored_transitions[pos][4])
 
         return states, actions, rewards, next_states, dones
