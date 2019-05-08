@@ -20,37 +20,26 @@ from utils.summary import Summary
 seed(2)
 set_random_seed(2)
 
+HOME_PATH = expanduser("~")
 PATH = expanduser("~")
 MODEL_FILENAME = ''
 
-summary_frequency = 50
-test_frequency = 100
+summary_frequency = 50000
+test_frequency = 50000
 
 
 def test_hybrid():
     print('# =========================================== TEST DQN =========================================== #')
-    prev_epsilon = learner.dqn_agent.epsilon
-    prev_switch = learner.switch
-
-    # don't act randomly
-    learner.switch = True
-    learner.dqn_agent.epsilon = 0
 
     test(learner.dqn_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
-         MODEL_FILENAME, PATH + '/test_dqn/')
+         'test_' + config['environment'] + '_' + str(datetime.datetime.now()), PATH + '/test_dqn/')
 
     # ============================================================================================================== #
 
     print('# =========================================== TEST PG =========================================== #')
 
-    learner.switch = False
-
     test(learner.pg_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
-         MODEL_FILENAME, PATH + '/test_pg/')
-
-    # reset values in case of continued training
-    learner.dqn_agent.epsilon = prev_epsilon
-    learner.switch = prev_switch
+         'test_' + config['environment'] + '_' + str(datetime.datetime.now()), PATH + '/test_pg/')
 
 
 if __name__ == "__main__":
@@ -82,6 +71,12 @@ if __name__ == "__main__":
 
     # ============================================================================================================== #
 
+    # loading neural network weights and parameters
+    if config['load_model']:
+        learner.load_network(PATH + 'models/', config['model_file'])
+
+    # ============================================================================================================== #
+
     dqn_memory = Memory.Memory(config['memory_size'], state_space)
     pg_memory = Memory.Memory(config['memory_size'], state_space)
 
@@ -98,84 +93,104 @@ if __name__ == "__main__":
 
     # ============================================================================================================== #
 
-    training_step = 0
+    state = env.reset()
+    state = processor.process_state_for_memory(state, True)
+    episode_start_time = time.time()
+    episode_reward = 0
+    episode_steps = 0
+    episode = 0
 
-    for episode in range(config['episodes']):
+    # ============================================================================================================== #
 
-        state = env.reset()
-        state = processor.process_state_for_memory(state, True)
+    for step in range(config['steps']):
 
-        start_time = time.time()
-        sum_rewards_array = 0  # total rewards for graphing
-        step = 0  # count total steps for each episode for the graph
+        # perform next step
+        action = learner.choose_action(processor.process_state_for_network(state))
+        next_state, reward, done, _ = env.step(action)
+        reward = processor.process_reward(reward)
+        next_state = processor.process_state_for_memory(next_state, False)
 
-        while True:
-            # perform next step
-            action = learner.choose_action(processor.process_state_for_network(state))
-            next_state, reward, done, _ = env.step(action)
-            reward = processor.process_reward(reward)
-            next_state = processor.process_state_for_memory(next_state, False)
+    # ============================================================================================================== #
 
-            if config['environment'] == 'CartPole-v1':
-                # punish if terminal state reached
-                if done:
-                    reward = -reward
-            sum_rewards_array += reward
-
-            # update memories
-            dqn_memory.store_transition(state, action, reward, next_state, done)
-            pg_memory.store_transition(state, action, reward, next_state, done)
-
-            # update counters
-            state = next_state
-            step += 1
-            training_step += 1
-
-            # train dqn with batch data at every step
-            # if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
-            if len(dqn_memory.stored_transitions) > config['initial_exploration_steps'] and learner.switch:
-                states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'], processor)
-                learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
-
+        if config['environment'] == 'CartPole-v1':
+            # punish if terminal state reached
             if done:
+                reward = -reward
 
-                # print episode results
-                print('Completed Episode = ' + str(episode), ' epsilon =', "%.4f" % learner.dqn_agent.epsilon,
-                      ', steps = ', step,
-                      ", total reward = ", sum_rewards_array)
+        # update memories
+        dqn_memory.store_transition(state, action, reward, next_state, done)
+        pg_memory.store_transition(state, action, reward, next_state, done)
 
-                # train pg with episode data after every episode
-                states, actions, rewards, next_states, dones = pg_memory.sample_all(processor)
-                learner.train_pg_network(states, actions, rewards, next_states, dones, step)
-                # learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
+        # update counters
+        state = next_state
+        episode_reward += reward
+        episode_steps += 1
 
-                # update plot summary
-                summary_rewards.append(sum_rewards_array)
-                summary_steps.append(step)
-                summary_epsilons.append(learner.dqn_agent.epsilon)
-                if episode % summary_frequency == 0:
-                    summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
-                                      epsilon_values=summary_epsilons,
-                                      e_greedy_formula=learner.dqn_agent.e_greedy_formula)
-                    summary_rewards, summary_epsilons, summary_steps = [], [], []
-                if episode % test_frequency == 0:
-                    test_hybrid()
-                break
-
-        # ============================================================================================================== #
-
-        # save episode data to tensorboard summary
-        if config['save_tensorboard_summary']:
-            save_episode_to_summary(summary_writer, episode, step, time.time() - start_time,
-                                    sum_rewards_array, learner.epsilon)
+        # train dqn with batch data at every step
+        # if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
+        if len(dqn_memory.stored_transitions) > config['initial_exploration_steps'] and learner.switch:
+            states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'], processor)
+            learner.train_dqn_network(states, actions, rewards, next_states, dones, step)
 
     # ============================================================================================================== #
 
-    # update plot summary
-    summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards, epsilon_values=summary_epsilons,
-                      e_greedy_formula=learner.dqn_agent.e_greedy_formula)
+        if done:
+
+            # print episode results
+            print('Completed Episode = ' + str(episode),
+                  ', epsilon =', "%.4f" % learner.dqn_agent.epsilon,
+                  ", reward = ", episode_reward,
+                  ", steps = ", episode_steps,
+                  ', total steps = ', step,
+                  ", episode time = ", "{0:.2f}".format(time.time() - episode_start_time))
+
+            # train pg with episode data after every episode
+            states, actions, rewards, next_states, dones = pg_memory.sample_all(processor)
+            learner.train_pg_network(states, actions, rewards, next_states, dones, step)
+            # learner.train_dqn_network(states, actions, rewards, next_states, dones, training_step)
+
+            # update plot summary
+            summary_rewards.append(episode_reward)
+            summary_steps.append(episode_steps)
+            summary_epsilons.append(learner.dqn_agent.epsilon)
+
+            # save episode data to tensorboard summary
+            if config['save_tensorboard_summary']:
+                save_episode_to_summary(summary_writer, episode, step, time.time() - episode_start_time,
+                                        episode_reward, learner.epsilon)
 
     # ============================================================================================================== #
+
+            # reset episode data
+            episode += 1
+            state = env.reset()
+            episode_frames = [state]
+            state = processor.process_state_for_memory(state, True)
+            episode_start_time = time.time()
+            episode_reward = 0
+            episode_steps = 0
+
+    # ============================================================================================================== #
+
+        # update plot summary
+        if (step % summary_frequency == 0 and step != 0) or step == config['steps'] - 1:
+            summary.summarize(step_counts=summary_steps, reward_counts=summary_rewards,
+                              epsilon_values=summary_epsilons,
+                              e_greedy_formula=learner.dqn_agent.e_greedy_formula)
+            summary_rewards, summary_epsilons, summary_steps = [], [], []
+
+    # ============================================================================================================== #
+
+        if step % test_frequency == 0:
+            test_hybrid()
+
+    # ============================================================================================================== #
+
+        if config['save_model'] and \
+                ((step != 0 and step % config['model_save_frequency'] == 0) or step == config['steps'] - 1):
+            # store model weights and parameters when episode rewards are above a certain amount
+            # and after every number of episodes
+            learner.save_network(PATH + 'models/', config['environment'] + '_' + str(episode))
 
     test_hybrid()
     env.close()

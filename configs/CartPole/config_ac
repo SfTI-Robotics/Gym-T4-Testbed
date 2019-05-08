@@ -1,9 +1,9 @@
 {
   "algorithm": "ActorCritic",
   "environment": "CartPole-v1",
-  "episodes": 1500,
+  "steps": 100000,
 
-  "batch_size": 64,
+  "batch_size": 32,
 
   "memory_size": 2000,
   "initial_exploration_steps": 1000,
@@ -12,7 +12,7 @@
   "network_train_frequency": 1,
 
   "epsilon": -1,
-  "epsilon_min": 0.01,
+  "epsilon_min": 0.1,
   "epsilon_explore": 1,
 
   "learning_rate": 0.001,
@@ -24,8 +24,8 @@
   "save_gif": true,
   "save_tensorboard_summary": true,
 
-  "model_save_frequency": 1000,
-  "gif_save_frequency": 500,
-  "model_load_path": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
+  "model_save_frequency": 100000,
+  "gif_save_frequency": 50000,
+  "model_file": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
 
 }

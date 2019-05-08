@@ -1,22 +1,8 @@
-import datetime
-import imageio
-import tensorflow
 import os
+
+import imageio
 import numpy as np
-
-from agents.image_input.AbstractBrain import AbstractLearning
-
-
-def load_model_from_file(learner: AbstractLearning, model_path: str) -> None:
-    """
-    Loads previously saved model file to learner.network
-    :param learner: learner where model will be stored
-    :param model_path: path to model file
-    :return:
-    """
-    if os.path.isfile(model_path):
-        learner.network.model.load_weights(model_path)
-        print('Loaded model ' + model_path + ' from disk')
+import tensorflow
 
 
 # TODO: now we store all of this twice, once as a tensorboard summary (for recovery of info in case of a crash),
@@ -45,23 +31,6 @@ def save_episode_to_summary(summary_writer: tensorflow.summary.FileWriter,
 
     # to extract data, maybe try
     #   https://stackoverflow.com/questions/37304461/tensorflow-importing-data-from-a-tensorboard-tfevent-file/37411543
-
-
-def save_model_to_file(learner: AbstractLearning, save_path: str, environment_name: str, episode: int) -> None:
-    """
-    Saves current model to .h5 file, overrides previous model for same environment and algorithm
-    NOTE: to avoid overriding, add episode number and/or time string to model name
-    :param learner: learner containing model that should be saved
-    :param save_path: path to model folder
-    :param environment_name: name of the environment
-    :param episode: episode during which model is saved
-    """
-    # create folder for model, if necessary
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
-    # save model weights
-    learner.network.save_weights(save_path + '/' + environment_name + '_model_episode' + str(episode) + '_' +
-                                 str(datetime.datetime.now()) + '.h5', overwrite=True)
 
 
 def make_gif(episode: int, reward: int, save_path: str, episode_frames: []) -> None:

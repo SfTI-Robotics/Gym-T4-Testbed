@@ -1,3 +1,7 @@
+import datetime
+import os
+import sys
+
 import numpy as np
 
 from agents.image_input import AbstractBrain
@@ -7,7 +11,7 @@ from agents.networks.actor_critic_networks import build_actor_cartpole_network, 
 
 # TODO: This implementation does not learn for Atari Games!
 #   The initial policy heavily favours one action (99%)
-#   After the first network-update, the favourite action has a probability of 1.0, all others have 0
+#   After the first network-update, the favourite action has a probability of ~1.0, all others have ~0
 #   Learner proceeds to only choose this one action, regardless of reward
 #   implementation according to https://github.com/flyyufelix/VizDoom-Keras-RL
 
@@ -45,7 +49,6 @@ class Learning(AbstractBrain.AbstractLearning):
         return discounted_rewards
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
-        # TODO: compare this to ViZDoom again!
         # A2C is trained at the end of an episode, not after n steps
         episode_length = len(states)
 
@@ -63,3 +66,23 @@ class Learning(AbstractBrain.AbstractLearning):
         actor_loss = self.actor.fit(states, advantages, epochs=1, verbose=0)
         critic_loss = self.critic.fit(states, discounted_rewards, epochs=1, verbose=0)
         return actor_loss.history['loss'], critic_loss.history['loss']
+
+    def save_network(self, save_path, model_name, timestamp=None):
+        # create folder for model, if necessary
+        if not os.path.exists(save_path + 'actors/'):
+            os.makedirs(save_path + 'actors/')
+        if not os.path.exists(save_path + 'critics/'):
+            os.makedirs(save_path + 'critics/')
+        if timestamp is None:
+            timestamp = str(datetime.datetime.now())
+        # save model weights
+        self.actor.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.critic.save_weights(save_path + 'critics/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+
+    def load_network(self, save_path, model_name) -> None:
+        if os.path.exists(save_path + 'actors/') and os.path.exists(save_path + 'critics/'):
+            self.actor.load_weights(save_path + 'actors/' + model_name)
+            self.critic.load_weights(save_path + 'critics/' + model_name)
+            print('Loaded model ' + model_name + ' from disk')
+        else:
+            sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")

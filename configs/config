@@ -1,7 +1,7 @@
 {
-  "algorithm": "DoubleDQN",
+  "algorithm": "PolicyGradient",
   "environment": "CartPole-v1",
-  "steps": 100000,
+  "steps": 5000,
 
   "batch_size": 32,
 
@@ -11,20 +11,21 @@
   "target_update_frequency": 100,
   "network_train_frequency": 1,
 
-  "epsilon": 1.0,
+  "epsilon": 1,
   "epsilon_min": 0.1,
   "epsilon_explore": 1000,
 
   "learning_rate": 0.001,
   "gamma": 0.99,
+  "reward_clipping": true,
 
-  "save_model": false,
-  "load_model": false,
+  "save_model": true,
+  "load_model": true,
 
-  "save_gif": true,
-  "save_tensorboard_summary": true,
+  "save_gif": false,
+  "save_tensorboard_summary": false,
 
-  "model_save_frequency": 1000,
+  "model_save_frequency": 50000,
   "gif_save_frequency": 50000,
-  "model_file": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
+  "model_file": "CartPole-v1_90_2019-05-09 09:15:09.136857.h5"
 }

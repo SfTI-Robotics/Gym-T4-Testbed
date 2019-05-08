@@ -20,7 +20,7 @@ def build_actor_network(obs_space, action_space, learning_rate):
 
     # compile the self.model using traditional Machine Learning losses and optimizers
     actor.compile(loss='categorical_crossentropy', optimizer=Adam(lr=learning_rate))
-    # self.model.summary()
+    # actor.summary()
     return actor
 
 
@@ -43,7 +43,7 @@ def build_critic_network(obs_space, value_size, learning_rate):
 
     # compile the self.model using traditional Machine Learning losses and optimizers
     critic.compile(loss="mse", optimizer=Adam(lr=learning_rate))
-    # self.model.summary()
+    # model.summary()
     return critic
 
 

@@ -1,7 +1,7 @@
 {
   "algorithm": "DoubleDQN",
   "environment": "SpaceInvaders-v0",
-  "episodes": 1000000,
+  "steps": 1000000,
 
   "batch_size": 32,
 
@@ -25,7 +25,7 @@
   "save_gif": true,
   "save_tensorboard_summary": true,
 
-  "model_save_frequency": 10000,
-  "gif_save_frequency": 500,
-  "model_load_path": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
+  "model_save_frequency": 100000,
+  "gif_save_frequency": 50000,
+  "model_file": "/Gym-T4-Testbed/output/DoubleDQN/models/some_model.h5"
 }

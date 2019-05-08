@@ -23,7 +23,7 @@ def build_dqn_network(input_shape, output_shape, learning_rate):
 
     # compile the self.model using traditional Machine Learning losses and optimizers
     model.compile(loss='mse', optimizer=Adam(lr=learning_rate), metrics=['accuracy'])
-    # self.model.summary()
+    # model.summary()
     return model
 
 
@@ -31,10 +31,11 @@ def build_dqn_cartpole_network(input_shape, output_shape, learning_rate):
     model = Sequential()
     # input layer
     model.add(Dense(24, input_shape=input_shape, activation="relu", kernel_initializer='he_uniform'))
+    model.add(Dense(24, activation='relu', kernel_initializer='he_uniform'))
     # output layer
     model.add(Dense(output_shape, activation='linear', kernel_initializer='he_uniform'))
     model.compile(optimizer=Adam(lr=learning_rate), loss='mse')
-    # self.model.summary()
+    # model.summary()
     return model
 
 

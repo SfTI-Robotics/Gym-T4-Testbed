@@ -1,4 +1,7 @@
+import datetime
+import os
 import random
+import sys
 
 import numpy as np
 
@@ -45,8 +48,7 @@ class Learning(AbstractBrain.AbstractLearning):
                     # bellman equation
                     target[i][actions[i]] = rewards[i] + self.config['gamma'] * np.amax(target_next[i])
 
-            # self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
-            self.network.train_on_batch(states, target)
+            self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
 
         if step % self.config['target_update_frequency'] == 0:
             self.update_target_model()
@@ -55,3 +57,24 @@ class Learning(AbstractBrain.AbstractLearning):
     # after some time interval update the target model to be same with model
     def update_target_model(self):
         self.target_network.set_weights(self.network.get_weights())
+
+    def save_network(self, save_path, model_name, timestamp=None):
+        # create folder for model, if necessary
+        if not os.path.exists(save_path + 'networks/'):
+            os.makedirs(save_path + 'networks/')
+        if not os.path.exists(save_path + 'target_networks/'):
+            os.makedirs(save_path + 'target_networks/')
+        if timestamp is None:
+            timestamp = str(datetime.datetime.now())
+        # save model weights
+        self.network.save_weights(save_path + 'networks/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.target_network.save_weights(save_path + 'target_networks/' + model_name + '_' + timestamp + '.h5',
+                                         overwrite=True)
+
+    def load_network(self, save_path, model_name) -> None:
+        if os.path.exists(save_path + 'networks/') and os.path.exists(save_path + 'target_networks/'):
+            self.network.load_weights(save_path + 'networks/' + model_name)
+            self.target_network.load_weights(save_path + 'target_networks/' + model_name)
+            print('Loaded model ' + model_name + ' from disk')
+        else:
+            sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")

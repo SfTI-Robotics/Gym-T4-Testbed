@@ -199,7 +199,7 @@ class Summary:
             ax5.set_ylabel('Reward per step')
             i += 1
         plt.tight_layout()
-        fig1.savefig(self.save_path + self.general_filename + "_focused_summary.svg", format="svg")
+        fig1.savefig(self.save_path + self.general_filename + ".svg", format="svg")
         plt.close(fig1)
 
     def plot_index_focused_summary_graphs(self, episode_count):

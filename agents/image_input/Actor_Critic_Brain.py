@@ -1,3 +1,7 @@
+import datetime
+import os
+import sys
+
 import numpy as np
 
 from agents.image_input import AbstractBrain
@@ -12,6 +16,7 @@ from agents.networks.actor_critic_networks import build_actor_cartpole_network, 
 #   implementation according to https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
 #   and https://github.com/rlcode/reinforcement-learning/blob/master/2-cartpole/4-actor-critic/cartpole_a2c.py
 #       https://github.com/iocfinc/A2C-CartPole/blob/master/A2C%20-%20Cartpole.py (experience replay after every step)
+
 
 class Learning(AbstractBrain.AbstractLearning):
 
@@ -69,3 +74,24 @@ class Learning(AbstractBrain.AbstractLearning):
             # TODO: train functions should be unified to avoid double predictions
             self.train_actor(states, actions, rewards, next_states, dones)
             self.train_critic(states, rewards, next_states, dones)
+
+    def save_network(self, save_path, model_name, timestamp=None):
+        # create folder for model, if necessary
+        if not os.path.exists(save_path + 'actors/'):
+            os.makedirs(save_path + 'actors/')
+        if not os.path.exists(save_path + 'critics/'):
+            os.makedirs(save_path + 'critics/')
+        # set timestamp if none was specified
+        if timestamp is None:
+            timestamp = str(datetime.datetime.now())
+        # save model weights
+        self.network.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.critic_network.save_weights(save_path + 'critics/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+
+    def load_network(self, save_path, model_name) -> None:
+        if os.path.exists(save_path + 'actors/') and os.path.exists(save_path + 'critics/'):
+            self.network.load_weights(save_path + 'actors/' + model_name)
+            self.critic_network.load_weights(save_path + 'critics/' + model_name)
+            print('Loaded model ' + model_name + ' from disk')
+        else:
+            sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
