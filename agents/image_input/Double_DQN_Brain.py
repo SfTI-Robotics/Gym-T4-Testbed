@@ -1,3 +1,4 @@
+import copy
 import datetime
 import os
 import sys
@@ -30,17 +31,22 @@ class Learning(AbstractBrain.AbstractLearning):
 
         # copy weights from behaviour to target
         self.update_target_model()
+        self.all_predictions = []
 
     def update_epsilon(self):
         if self.epsilon > self.config['epsilon_min']:
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
     # the processed state is used in choosing action
-    def choose_action(self, state):
+    def choose_action(self, state, print_predictions=False):
+        prediction = self.network.predict(np.expand_dims(state, axis=0))
         if random.random() <= self.epsilon:
-            return random.randrange(self.action_space)
+            action = random.randrange(self.action_space)
         else:
-            return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
+            action = np.argmax(prediction)
+        if print_predictions:
+            self.all_predictions.append(prediction[0])
+        return action
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
@@ -89,3 +95,8 @@ class Learning(AbstractBrain.AbstractLearning):
             print('Loaded model ' + model_name + ' from disk')
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
+
+    def get_predictions(self):
+        predictions = copy.deepcopy(self.all_predictions)
+        self.all_predictions = []
+        return predictions

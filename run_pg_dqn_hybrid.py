@@ -2,6 +2,7 @@ import argparse
 import copy
 import datetime
 import json
+import sys
 import time
 from os.path import expanduser
 
@@ -10,7 +11,6 @@ import tensorflow
 from numpy.random import seed
 from tensorflow import set_random_seed
 
-import utils.preprocessing.Cartpole_Preprocess as Preprocess
 from agents.hybrids.pg_dqn_Brain import Learning
 from agents.memory import Memory
 from training.testing_functions import test
@@ -24,7 +24,7 @@ HOME_PATH = expanduser("~")
 PATH = expanduser("~")
 MODEL_FILENAME = ''
 
-summary_frequency = 50000
+summary_frequency = 500000
 test_frequency = 50000
 
 
@@ -32,14 +32,17 @@ def test_hybrid():
     print('# =========================================== TEST DQN =========================================== #')
 
     test(learner.dqn_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
-         'test_' + config['environment'] + '_' + str(datetime.datetime.now()), PATH + '/test_dqn/')
+         config['environment'] + '_' + str(datetime.datetime.now()),
+         PATH + '/test_dqn/', episode=episode)
 
     # ============================================================================================================== #
 
-    print('# =========================================== TEST PG =========================================== #')
+    if not learner.switch:
+        print('# =========================================== TEST PG =========================================== #')
 
-    test(learner.pg_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
-         'test_' + config['environment'] + '_' + str(datetime.datetime.now()), PATH + '/test_pg/')
+        test(learner.pg_agent, copy.deepcopy(env), config, copy.deepcopy(processor),
+             config['environment'] + '_' + str(datetime.datetime.now()),
+             PATH + '/test_pg/', episode=episode)
 
 
 if __name__ == "__main__":
@@ -56,12 +59,55 @@ if __name__ == "__main__":
 
     # ============================================================================================================== #
 
-    MODEL_FILENAME = MODEL_FILENAME + "CartPole"
+    # Prepossessing folder
+    # this takes care of the environment specifics and image processing
+    if config['environment'] == 'Pong-v0':
+        import utils.preprocessing.Pong_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "Pong"
+        print('Pong works')
+    elif config['environment'] == 'SpaceInvaders-v0':
+        import utils.preprocessing.SpaceInvaders_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "SpaceInvaders"
+        print('SpaceInvaders works')
+    elif config['environment'] == 'MsPacman-v0':
+        import utils.preprocessing.MsPacman_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "MsPacman"
+        print('MsPacman works')
+    elif config['environment'] == 'Breakout-v0':
+        import utils.preprocessing.Breakout_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "Breakout"
+        print('Breakout works')
+    elif config['environment'] == 'Enduro-v0':
+        import utils.preprocessing.Enduro_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "Enduro"
+        print('Breakout works')
+    elif config['environment'] == 'CartPole-v1':
+        import utils.preprocessing.Cartpole_Preprocess as Preprocess
+
+        MODEL_FILENAME = MODEL_FILENAME + "CartPole"
+        print('Cartpole works')
+    else:
+        sys.exit("Environment not found")
+
+    # create gym env
     env = gym.make(config['environment'])
+    # add seed to make results reproducible
+    env.seed(0)
+
+    # initialise processing class specific to environment
     processor = Preprocess.Processor()
+    # state space is determined by the deque storing the frames from the env
     state_space = processor.get_state_space()
+
     if config['environment'] == 'CartPole-v1':
         state_space = (env.observation_space.shape[0],)
+
+    # action space given by the environment
     action_space = env.action_space.n
 
     # ============================================================================================================== #
@@ -127,8 +173,8 @@ if __name__ == "__main__":
         episode_steps += 1
 
         # train dqn with batch data at every step
-        # if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
-        if len(dqn_memory.stored_transitions) > config['initial_exploration_steps'] and learner.switch:
+        # if len(dqn_memory.stored_transitions) > config['initial_exploration_steps'] and learner.switch:
+        if len(dqn_memory.stored_transitions) > config['initial_exploration_steps']:
             states, actions, rewards, next_states, dones = dqn_memory.sample(config['batch_size'], processor)
             learner.train_dqn_network(states, actions, rewards, next_states, dones, step)
 

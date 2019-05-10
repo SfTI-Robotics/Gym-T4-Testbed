@@ -18,7 +18,7 @@ class AbstractLearning(ABC):
         self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
     @abstractmethod
-    def choose_action(self, state):
+    def choose_action(self, state, print_predictions=False):
         pass
 
     @abstractmethod
@@ -42,4 +42,7 @@ class AbstractLearning(ABC):
         :param save_path: path to model folder
         :param model_name: name of model file
         """
+        pass
+
+    def get_predictions(self):
         pass

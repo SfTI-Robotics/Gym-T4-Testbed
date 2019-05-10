@@ -3,8 +3,9 @@ import os
 import sys
 
 import agents.image_input.AbstractBrain as AbstractBrain
-# import agents.image_input.DQN_Brain as DQN
-import agents.image_input.Double_DQN_Brain as DoubleDQN
+import agents.image_input.DQN_Brain as DQN
+# import agents.image_input.Double_DQN_Brain as DoubleDQN
+import agents.image_input.Dueling_Brain as DuelingDQN
 import agents.image_input.Policy_Gradient_Brain as PG
 
 
@@ -14,13 +15,14 @@ class Learning(AbstractBrain.AbstractLearning):
         super().__init__(observations, actions, config)
 
         # self.dqn_agent = DQN.Learning(observations, actions, config)
-        self.dqn_agent = DoubleDQN.Learning(observations, actions, config)
+        # self.dqn_agent = DoubleDQN.Learning(observations, actions, config)
+        self.dqn_agent = DuelingDQN.Learning(observations, actions, config)
         self.pg_agent = PG.Learning(observations, actions, config)
 
         self.step = 0
         self.switch = False
 
-    def choose_action(self, state):
+    def choose_action(self, state, print_predictions=False):
         # switch to q-learning
         if self.step == self.config['switch_steps']:
             print('# =========================================== SWITCH =========================================== #')
@@ -28,7 +30,7 @@ class Learning(AbstractBrain.AbstractLearning):
         self.step += 1
 
         if self.switch:
-            return self.dqn_agent.choose_action(state)
+            return self.dqn_agent.choose_action(state, print_predictions=print_predictions)
         else:
             return self.pg_agent.choose_action(state)
 

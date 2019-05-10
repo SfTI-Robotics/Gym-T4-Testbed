@@ -1,3 +1,4 @@
+import copy
 import datetime
 import os
 import sys
@@ -23,9 +24,12 @@ class Learning(AbstractBrain.AbstractLearning):
                 build_actor_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
         else:
             self.network = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
+        self.all_predictions = []
 
-    def choose_action(self, state):
+    def choose_action(self, state, print_predictions=False):
         policy = self.network.predict(np.array([state])).flatten()
+        if print_predictions:
+            self.all_predictions.append(policy)
         return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
     def discount_and_standardize_rewards(self, rewards):
@@ -64,3 +68,8 @@ class Learning(AbstractBrain.AbstractLearning):
             print('Loaded model ' + model_name + ' from disk')
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
+
+    def get_predictions(self):
+        predictions = copy.deepcopy(self.all_predictions)
+        self.all_predictions = []
+        return predictions
