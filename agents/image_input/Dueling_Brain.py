@@ -1,9 +1,7 @@
-import copy
 import datetime
 import os
 import random
 import sys
-
 import numpy as np
 
 import agents.image_input.AbstractBrain as AbstractBrain
@@ -21,21 +19,15 @@ class Learning(AbstractBrain.AbstractLearning):
         # use network suitable for Atari games
         else:
             self.network = build_dueling_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
-        self.all_predictions = []
 
     def update_epsilon(self):
         if self.epsilon > self.config['epsilon_min']:
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
-    def choose_action(self, state, print_predictions=False):
-        prediction = self.network.predict(np.expand_dims(state, axis=0))
+    def choose_action(self, state):
         if random.random() <= self.epsilon:
-            action = random.randrange(self.action_space)
-        else:
-            action = np.argmax(prediction)
-        if print_predictions:
-            self.all_predictions.append(prediction[0])
-        return action
+            return random.randrange(self.action_space)
+        return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
@@ -73,7 +65,8 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
 
-    def get_predictions(self):
-        predictions = copy.deepcopy(self.all_predictions)
-        self.all_predictions = []
-        return predictions
+    def get_test_learner(self):
+        test_learner = Learning(self.state_space, self.action_space, self.config)
+        # use current network weights for testing
+        test_learner.network.set_weights(self.network.get_weights())
+        return test_learner

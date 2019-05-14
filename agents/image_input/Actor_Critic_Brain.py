@@ -27,17 +27,17 @@ class Learning(AbstractBrain.AbstractLearning):
         super().__init__(observations, actions, config)
 
         if config['environment'] == 'CartPole-v1':
-            self.network = \
+            self.actor_network = \
                 build_actor_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
             self.critic_network = \
                 build_critic_cartpole_network(self.state_space, self.value_size, self.config['learning_rate'])
         else:
-            self.network = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.actor_network = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
             self.critic_network = build_critic_network(self.state_space, self.value_size, self.config['learning_rate'])
 
     def choose_action(self, state):
         # get policy from network
-        policy = self.network.predict(np.array([state])).flatten()
+        policy = self.actor_network.predict(np.array([state])).flatten()
         # pick action (stochastic)
         return np.random.choice(self.action_space, 1, p=policy)[0]
 
@@ -54,7 +54,7 @@ class Learning(AbstractBrain.AbstractLearning):
                 #   see https://towardsdatascience.com/understanding-actor-critic-methods-931b97b6df3f
                 advantages[i][actions[i]] = rewards[i] + self.config['gamma'] * (next_values[i]) - values[i]
 
-        self.network.fit(states, advantages, epochs=1, verbose=0)
+        self.actor_network.fit(states, advantages, epochs=1, verbose=0)
 
     def train_critic(self, states, rewards, next_states, dones):
         targets = np.zeros((self.config['batch_size'], self.value_size))
@@ -85,13 +85,20 @@ class Learning(AbstractBrain.AbstractLearning):
         if timestamp is None:
             timestamp = str(datetime.datetime.now())
         # save model weights
-        self.network.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.actor_network.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
         self.critic_network.save_weights(save_path + 'critics/' + model_name + '_' + timestamp + '.h5', overwrite=True)
 
     def load_network(self, save_path, model_name) -> None:
         if os.path.exists(save_path + 'actors/') and os.path.exists(save_path + 'critics/'):
-            self.network.load_weights(save_path + 'actors/' + model_name)
+            self.actor_network.load_weights(save_path + 'actors/' + model_name)
             self.critic_network.load_weights(save_path + 'critics/' + model_name)
             print('Loaded model ' + model_name + ' from disk')
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
+
+    def get_test_learner(self):
+        test_learner = Learning(self.state_space, self.action_space, self.config)
+        # use current network weights for testing
+        test_learner.actor_network.set_weights(self.actor_network.get_weights())
+        test_learner.critic_network.set_weights(self.critic_network.get_weights())
+        return test_learner

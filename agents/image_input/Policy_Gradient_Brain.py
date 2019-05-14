@@ -1,4 +1,3 @@
-import copy
 import datetime
 import os
 import sys
@@ -26,10 +25,8 @@ class Learning(AbstractBrain.AbstractLearning):
             self.network = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
         self.all_predictions = []
 
-    def choose_action(self, state, print_predictions=False):
+    def choose_action(self, state):
         policy = self.network.predict(np.array([state])).flatten()
-        if print_predictions:
-            self.all_predictions.append(policy)
         return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
     def discount_and_standardize_rewards(self, rewards):
@@ -69,7 +66,8 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
 
-    def get_predictions(self):
-        predictions = copy.deepcopy(self.all_predictions)
-        self.all_predictions = []
-        return predictions
+    def get_test_learner(self):
+        test_learner = Learning(self.state_space, self.action_space, self.config)
+        # use current network weights for testing
+        test_learner.network.set_weights(self.network.get_weights())
+        return test_learner

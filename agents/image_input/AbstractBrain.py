@@ -18,7 +18,7 @@ class AbstractLearning(ABC):
         self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
     @abstractmethod
-    def choose_action(self, state, print_predictions=False):
+    def choose_action(self, state):
         pass
 
     @abstractmethod
@@ -44,5 +44,11 @@ class AbstractLearning(ABC):
         """
         pass
 
-    def get_predictions(self):
+    @abstractmethod
+    def get_test_learner(self):
+        """
+        Creates a version of the current learner that can be used for testing
+        (with the same model weights, but without disrupting any data of the original agent)
+        :return: duplicate of the current learner that can be used for testing
+        """
         pass

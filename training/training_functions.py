@@ -6,7 +6,7 @@ from os.path import expanduser
 import tensorflow
 
 from agents.image_input.AbstractBrain import AbstractLearning
-from agents.memory import Memory
+from agents.memory.Memory import AbstractMemory
 from training.testing_functions import test
 from utils.preprocessing.Pong_Preprocess import Processor
 from utils.storing import make_gif, save_episode_to_summary
@@ -18,7 +18,7 @@ summary_save_step = 10000
 test_frequency = 10000
 
 
-def train(env: any, learner: AbstractLearning, memory: Memory, processor: Processor,
+def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor: Processor,
           config, save_path, summary=None) -> None:
     """
     Trains learner in env and plots results
@@ -46,7 +46,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
     max_episode_number = -1
     max_episode_frames = []
     # data for summary-plots
-    summary_rewards, summary_epsilons, summary_steps = [], [], []
+    summary_rewards, summary_epsilons, summary_steps, summary_time = [], [], [], []
 
     # ============================================================================================================== #
 
@@ -80,12 +80,17 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
                 reward = -reward
 
         # append <s, a, r, s', d> to learner.transitions
-        memory.store_transition(state, action, reward, next_state, done)
+        memory.add_tuple(state, action, reward, next_state, done)
 
         # train algorithm using experience replay
         if step >= config['initial_exploration_steps'] \
-                and config['algorithm'] != 'A2C' and config['algorithm'] != 'PolicyGradient':
-            states, actions, rewards, next_states, dones = memory.sample(config['batch_size'], processor)
+                and config['algorithm'] != 'A2C' and config['algorithm'] != 'PolicyGradient' \
+                and config['algorithm'] != 'PPO':
+            states, actions, rewards, next_states, dones = memory.sample(processor, batch_size=config['batch_size'])
+            learner.train_network(states, actions, rewards, next_states, dones, step)
+
+        if config['algorithm'] == 'PPO' and config['memory_size'] == memory.get_memory_size():
+            states, actions, rewards, next_states, dones = memory.sample(processor)
             learner.train_network(states, actions, rewards, next_states, dones, step)
 
         episode_reward += reward
@@ -97,14 +102,15 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
         if done:
             # train algorithm with data from one complete episode
             if config['algorithm'] == 'A2C' or config['algorithm'] == 'PolicyGradient':
-                states, actions, rewards, next_states, dones = memory.sample_all(processor)
+                states, actions, rewards, next_states, dones = memory.sample(processor)
                 learner.train_network(states, actions, rewards, next_states, dones, step)
 
             print('Completed Episode = ' + str(episode),
                   ' epsilon =', "%.4f" % learner.epsilon,
                   ', steps = ', episode_step,
                   ", total reward = ", episode_reward,
-                  ", episode time = ", "{0:.2f}".format(time.time() - episode_start_time))
+                  ", episode time = ", "{0:.2f}".format(time.time() - episode_start_time),
+                  ", total steps = ", step)
 
             # save episode data to tensorboard summary
             if config['save_tensorboard_summary']:
@@ -123,6 +129,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
             summary_steps.append(episode_step)
             summary_epsilons.append(learner.epsilon)
             summary_rewards.append(episode_reward)
+            summary_time.append(time.time() - episode_start_time)
 
             # reset episode data
             episode += 1
@@ -137,7 +144,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
 
         # test current model
         if (step % test_frequency == 0 and step != 0) or step == config['steps'] - 1:
-            test(learner,
+            test(learner.get_test_learner(),
                  copy.deepcopy(env),
                  config,
                  copy.deepcopy(processor),
@@ -150,6 +157,7 @@ def train(env: any, learner: AbstractLearning, memory: Memory, processor: Proces
         if summary is not None and ((step % summary_save_step == 0 and step != 0) or step == config['steps'] - 1):
             summary.summarize(step_counts=summary_steps,
                               reward_counts=summary_rewards,
+                              time_counts=summary_time,
                               epsilon_values=summary_epsilons,
                               e_greedy_formula=learner.e_greedy_formula)
             summary_steps, summary_epsilons, summary_rewards = [], [], []

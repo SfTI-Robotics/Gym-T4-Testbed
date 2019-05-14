@@ -1,4 +1,3 @@
-import copy
 import datetime
 import os
 import sys
@@ -17,41 +16,34 @@ class Learning(AbstractBrain.AbstractLearning):
 
         # for classic control environments without any image data
         if self.config['environment'] == 'CartPole-v1':
-            self.network = build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.behaviour_network = build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
             # create a new network object for the target network
             self.target_network \
                 = build_dqn_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
 
         # for atari games
         else:
-            self.network = build_simple_convoluted_net(self.state_space, self.action_space,
-                                                       self.config['learning_rate'])
+            self.behaviour_network = build_simple_convoluted_net(self.state_space, self.action_space,
+                                                                 self.config['learning_rate'])
             self.target_network = build_simple_convoluted_net(self.state_space, self.action_space,
                                                               self.config['learning_rate'])
 
         # copy weights from behaviour to target
         self.update_target_model()
-        self.all_predictions = []
 
     def update_epsilon(self):
         if self.epsilon > self.config['epsilon_min']:
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
-    # the processed state is used in choosing action
-    def choose_action(self, state, print_predictions=False):
-        prediction = self.network.predict(np.expand_dims(state, axis=0))
+    def choose_action(self, state):
         if random.random() <= self.epsilon:
-            action = random.randrange(self.action_space)
-        else:
-            action = np.argmax(prediction)
-        if print_predictions:
-            self.all_predictions.append(prediction[0])
-        return action
+            return random.randrange(self.action_space)
+        return np.argmax(self.behaviour_network.predict(np.expand_dims(state, axis=0)))
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
-            target = self.network.predict(states)
-            next_predictions_network = self.network.predict(next_states)
+            target = self.behaviour_network.predict(states)
+            next_predictions_network = self.behaviour_network.predict(next_states)
             next_predictions_target = self.target_network.predict(next_states)
 
             for i in range(self.config['batch_size']):
@@ -64,7 +56,7 @@ class Learning(AbstractBrain.AbstractLearning):
                     a = np.argmax(next_predictions_network[i])
                     target[i][actions[i]] = rewards[i] + self.config['gamma'] * (next_predictions_target[i][a])
 
-            self.network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
+            self.behaviour_network.fit(states, target, batch_size=len(dones), epochs=1, verbose=0)
 
         # update target network
         if step % self.config['target_update_frequency'] == 0:
@@ -72,7 +64,7 @@ class Learning(AbstractBrain.AbstractLearning):
         self.update_epsilon()
 
     def update_target_model(self):
-        self.target_network.set_weights(self.network.get_weights())
+        self.target_network.set_weights(self.behaviour_network.get_weights())
 
     def save_network(self, save_path, model_name, timestamp=None):
         # create folder for model, if necessary
@@ -84,19 +76,21 @@ class Learning(AbstractBrain.AbstractLearning):
         if timestamp is None:
             timestamp = str(datetime.datetime.now())
         # save model weights
-        self.network.save_weights(save_path + 'networks/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.behaviour_network.save_weights(save_path + 'networks/' + model_name + '_' + timestamp + '.h5', overwrite=True)
         self.target_network.save_weights(save_path + 'target_networks/' + model_name + '_' + timestamp + '.h5',
                                          overwrite=True)
 
     def load_network(self, save_path, model_name) -> None:
         if os.path.exists(save_path + 'networks/') and os.path.exists(save_path + 'target_networks/'):
-            self.network.load_weights(save_path + 'networks/' + model_name)
+            self.behaviour_network.load_weights(save_path + 'networks/' + model_name)
             self.target_network.load_weights(save_path + 'target_networks/' + model_name)
             print('Loaded model ' + model_name + ' from disk')
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
 
-    def get_predictions(self):
-        predictions = copy.deepcopy(self.all_predictions)
-        self.all_predictions = []
-        return predictions
+    def get_test_learner(self):
+        test_learner = Learning(self.state_space, self.action_space, self.config)
+        # use current network weights for testing
+        test_learner.behaviour_network.set_weights(self.behaviour_network.get_weights())
+        test_learner.target_network.set_weights(self.target_network.get_weights())
+        return test_learner

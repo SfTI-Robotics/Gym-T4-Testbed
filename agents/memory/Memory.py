@@ -1,12 +1,11 @@
 import copy
 import random
+from abc import ABC, abstractmethod
 from collections import deque
 import numpy as np
 
 
-# TODO: Which folder?
-# TODO: Make this adaptable! (episodic, prioritized, linear, ...)
-class Memory:
+class AbstractMemory(ABC):
     """
     stores tuples of (state, action, reward, next_state, done) for network-training
     """
@@ -14,9 +13,9 @@ class Memory:
     def __init__(self, capacity, state_space):
         self.state_space = state_space
         self.capacity = capacity
-        self.stored_transitions = deque(maxlen=capacity)
+        self.tuples = deque(maxlen=capacity)
 
-    def store_transition(self, state, action, reward, next_state, done) -> None:
+    def add_tuple(self, state, action, reward, next_state, done) -> None:
         """
         Stores episode in memory
         :param state: state of episode
@@ -25,19 +24,46 @@ class Memory:
         :param next_state: resulting state of environment
         :param done: flag, true if episode ended after action
         """
-        self.stored_transitions.append((state, action, reward, next_state, done))
+        self.tuples.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size, processor):
+    @abstractmethod
+    def sample(self, processor, batch_size=None):
         """
-        Samples batch_size random episodes from memory
+        Samples data from memory
         :param batch_size: amount of random samples
         :param processor: processor used to convert samples from memory-format to network-format
         :return: states, actions, rewards, next_states, dones of randomly sampled episodes
         """
-        # update batch size in case memory doesn't contain enough values
-        batch_size = min(len(self.stored_transitions), batch_size)
+        pass
 
-        batch = random.sample(self.stored_transitions, batch_size)
+    def get_memory_size(self):
+        return len(self.tuples)
+
+
+class RandomBatchMemory(AbstractMemory):
+    """
+    stores tuples of (state, action, reward, next_state, done)
+    following a first-in-first-out principle
+    provides random fixed-size batches of tuples for network-training
+    """
+
+    def __init__(self, capacity, state_space):
+        super().__init__(capacity, state_space)
+
+    def sample(self, processor, batch_size=None):
+        """
+        Samples batch_size random episodes from memory
+        :param processor: processor used to convert samples from memory-format to network-format
+        :param batch_size: amount of random samples, default: amount of stored transition tuples
+        :return: states, actions, rewards, next_states, dones of randomly sampled episodes
+        """
+        # update batch size in case memory doesn't contain enough values
+        if batch_size is None:
+            batch_size = len(self.tuples)
+        else:
+            batch_size = min(len(self.tuples), batch_size)
+
+        batch = random.sample(self.tuples, batch_size)
         states = np.zeros((batch_size,) + self.state_space)
         next_states = np.zeros((batch_size,) + self.state_space)
         actions, rewards, dones = [], [], []
@@ -51,12 +77,21 @@ class Memory:
 
         return states, actions, rewards, next_states, dones
 
-    def sample_all(self, processor):
-        """
-        Gets all episodes from memory in order of occurrence, clears memory
-        :return: states, actions, rewards, next_states, dones of all episodes in order of occurrence
-        """
-        batch = copy.deepcopy(self.stored_transitions)
+
+class EpisodicMemory(AbstractMemory):
+    """
+    stores tuples of (state, action, reward, next_state, done)
+    following a first-in-first-out principle
+    tuples should be added in order of appearance in episode
+    provides sets of all added tuples in order of addition for network-training
+    tuples are removed from memory after sampling
+    """
+
+    def __init__(self, capacity, state_space):
+        super().__init__(capacity, state_space)
+
+    def sample(self, processor, batch_size=None):
+        batch = copy.deepcopy(self.tuples)
         batch_size = len(batch)
         states = np.zeros((batch_size,) + self.state_space)
         next_states = np.zeros((batch_size,) + self.state_space)
@@ -69,26 +104,12 @@ class Memory:
             next_states[i] = processor.process_state_for_network(batch[i][3])
             dones.append(batch[i][4])
 
-        self.stored_transitions = deque(maxlen=self.capacity)
+        self.reset_memory()
 
         return states, actions, rewards, next_states, dones
 
-    def sample_last(self, processor):
+    def reset_memory(self) -> None:
         """
-        Gets most recently added episode from memory
-        :return: state, action, reward, next_state and done of most recent episode
+        Removes all tuples from memory
         """
-        batch_size = 1
-        pos = len(self.stored_transitions) - 1
-        states = np.zeros((batch_size,) + self.state_space)
-        next_states = np.zeros((batch_size,) + self.state_space)
-        actions, rewards, dones = [], [], []
-
-        for i in range(batch_size):
-            states[i] = processor.process_state_for_network(self.stored_transitions[pos][0])
-            actions.append(self.stored_transitions[pos][1])
-            rewards.append(self.stored_transitions[pos][2])
-            next_states[i] = processor.process_state_for_network(self.stored_transitions[pos][3])
-            dones.append(self.stored_transitions[pos][4])
-
-        return states, actions, rewards, next_states, dones
+        self.tuples = deque(maxlen=self.capacity)

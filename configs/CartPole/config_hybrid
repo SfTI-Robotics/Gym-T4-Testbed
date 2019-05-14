@@ -1,21 +1,21 @@
 {
   "algorithm": "Hybrid",
-  "environment": "Pong-v0",
-  "steps": 10000000,
+  "environment": "CartPole-v1",
+  "steps": 200000,
   "batch_size": 32,
 
-  "memory_size": 100000,
-  "initial_exploration_steps": 20000,
-  "switch_steps": 100000000000000,
+  "memory_size": 2000,
+  "initial_exploration_steps": 1000,
+  "switch_steps": 50000,
 
-  "target_update_frequency": 10000,
-  "network_train_frequency": 4,
+  "target_update_frequency": 250,
+  "network_train_frequency": 1,
 
-  "epsilon": 1.0,
+  "epsilon": 1,
   "epsilon_min": 0.1,
-  "epsilon_explore": 1000000,
+  "epsilon_explore": 1000,
 
-  "learning_rate": 0.00025,
+  "learning_rate": 0.001,
   "gamma": 0.99,
   "reward_clipping": true,
 

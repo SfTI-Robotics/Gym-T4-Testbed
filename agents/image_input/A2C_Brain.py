@@ -25,14 +25,14 @@ class Learning(AbstractBrain.AbstractLearning):
         super().__init__(observations, actions, config)
 
         if self.config['environment'] == 'CartPole-v1':
-            self.actor = build_actor_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
-            self.critic = build_critic_cartpole_network(self.state_space, self.value_size, self.config['learning_rate'])
+            self.actor_network = build_actor_cartpole_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.critic_network = build_critic_cartpole_network(self.state_space, self.value_size, self.config['learning_rate'])
         else:
-            self.actor = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
-            self.critic = build_critic_network(self.state_space, self.value_size, self.config['learning_rate'])
+            self.actor_network = build_actor_network(self.state_space, self.action_space, self.config['learning_rate'])
+            self.critic_network = build_critic_network(self.state_space, self.value_size, self.config['learning_rate'])
 
     def choose_action(self, state):
-        policy = self.actor.predict(np.array([state])).flatten()
+        policy = self.actor_network.predict(np.array([state])).flatten()
         return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
 
     def discount_and_standardize_rewards(self, rewards):
@@ -55,7 +55,7 @@ class Learning(AbstractBrain.AbstractLearning):
         discounted_rewards = self.discount_and_standardize_rewards(rewards)
 
         # Prediction of state values for each state appears in the episode
-        values = self.critic.predict(states)
+        values = self.critic_network.predict(states)
 
         # Similar to one-hot target but the "1" is replaced by Advantage Function i.e. discounted_rewards R_t - Value
         advantages = np.zeros((episode_length, self.action_space))
@@ -63,8 +63,8 @@ class Learning(AbstractBrain.AbstractLearning):
         for i in range(episode_length):
             advantages[i][actions[i]] = discounted_rewards[i] - values[i]
 
-        actor_loss = self.actor.fit(states, advantages, epochs=1, verbose=0)
-        critic_loss = self.critic.fit(states, discounted_rewards, epochs=1, verbose=0)
+        actor_loss = self.actor_network.fit(states, advantages, epochs=1, verbose=0)
+        critic_loss = self.critic_network.fit(states, discounted_rewards, epochs=1, verbose=0)
         return actor_loss.history['loss'], critic_loss.history['loss']
 
     def save_network(self, save_path, model_name, timestamp=None):
@@ -76,13 +76,20 @@ class Learning(AbstractBrain.AbstractLearning):
         if timestamp is None:
             timestamp = str(datetime.datetime.now())
         # save model weights
-        self.actor.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
-        self.critic.save_weights(save_path + 'critics/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.actor_network.save_weights(save_path + 'actors/' + model_name + '_' + timestamp + '.h5', overwrite=True)
+        self.critic_network.save_weights(save_path + 'critics/' + model_name + '_' + timestamp + '.h5', overwrite=True)
 
     def load_network(self, save_path, model_name) -> None:
         if os.path.exists(save_path + 'actors/') and os.path.exists(save_path + 'critics/'):
-            self.actor.load_weights(save_path + 'actors/' + model_name)
-            self.critic.load_weights(save_path + 'critics/' + model_name)
+            self.actor_network.load_weights(save_path + 'actors/' + model_name)
+            self.critic_network.load_weights(save_path + 'critics/' + model_name)
             print('Loaded model ' + model_name + ' from disk')
         else:
             sys.exit("Model can't be loaded. Model file " + model_name + " doesn't exist at " + save_path + ".")
+
+    def get_test_learner(self):
+        test_learner = Learning(self.state_space, self.action_space, self.config)
+        # use current network weights for testing
+        test_learner.actor_network.set_weights(self.actor_network.get_weights())
+        test_learner.critic_network.set_weights(self.critic_network.get_weights())
+        return test_learner

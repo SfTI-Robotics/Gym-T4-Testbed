@@ -12,7 +12,6 @@ from random import seed
 import gym
 from tensorflow import set_random_seed
 
-from agents.memory.Memory import Memory
 from training.training_functions import train
 from utils.summary import Summary
 
@@ -99,42 +98,58 @@ if __name__ == "__main__":
 
     # algorithm folder
     if config['algorithm'] == 'DQN':
+        # import chosen Agent
         from agents.image_input.DQN_Brain import Learning
+        # import memory for agent
+        from agents.memory.Memory import RandomBatchMemory as Memory
+        # set path for output data
         PATH = PATH + '/Gym-T4-Testbed/output/DQN/'
         print('DQN works')
     elif config['algorithm'] == 'DoubleDQN':
         from agents.image_input.Double_DQN_Brain import Learning
+        from agents.memory.Memory import RandomBatchMemory as Memory
         PATH = PATH + '/Gym-T4-Testbed/output/DoubleDQN/'
         print('Double works')
     elif config['algorithm'] == 'DuelingDQN':
         from agents.image_input.Dueling_Brain import Learning
+        from agents.memory.Memory import RandomBatchMemory as Memory
         PATH = PATH + '/Gym-T4-Testbed/output/DuelingDQN/'
         print('Dueling works')
     elif config['algorithm'] == 'ActorCritic':
         from agents.image_input.Actor_Critic_Brain import Learning
+        from agents.memory.Memory import RandomBatchMemory as Memory
         PATH = PATH + '/Gym-T4-Testbed/output/ActorCritic/'
         print('Actor Critic works')
     elif config['algorithm'] == 'A2C':
         from agents.image_input.A2C_Brain import Learning
+        from agents.memory.Memory import EpisodicMemory as Memory
         PATH = PATH + '/Gym-T4-Testbed/output/A2C/'
         print('A2C works')
     elif config['algorithm'] == 'PolicyGradient':
         from agents.image_input.Policy_Gradient_Brain import Learning
+        from agents.memory.Memory import EpisodicMemory as Memory
         PATH = PATH + '/Gym-T4-Testbed/output/PolicyGradient/'
         print('Policy Gradient works')
+    elif config['algorithm'] == 'PPO':
+        from agents.image_input.PPO_Brain import Learning
+        from agents.memory.Memory import EpisodicMemory as Memory
+        PATH = PATH + '/Gym-T4-Testbed/output/PPO/'
+        print('ProximalPolicyOptimization works')
     else:
         sys.exit("Algorithm not found")
 
     learner = Learning(state_space, action_space, config)
-
-    # ============================================================================================================== #
-
     # create memory
     memory = Memory(config['memory_size'], state_space)
 
     # ============================================================================================================== #
 
-    summary = Summary(['sumiz_step', 'sumiz_reward', 'sumiz_epsilon'],
+    if config['environment'] == 'DQN' or config['environment'] == 'DoubleDQN' or config['environment'] == 'DuelingDQN':
+        plots = ['sumiz_step', 'sumiz_reward', 'sumiz_epsilon', 'sumiz_time']
+    else:
+        plots = ['sumiz_step', 'sumiz_reward', 'sumiz_time']
+
+    summary = Summary(plots,
                       name=MODEL_FILENAME + str(datetime.datetime.now()),
                       save_path=PATH + '/graphs/',
                       min_reward=processor.reward_min,
