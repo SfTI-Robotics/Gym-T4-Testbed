@@ -5,6 +5,9 @@ from collections import deque
 import numpy as np
 
 
+# TODO: Make different memories and differentiation prettier
+#  (how to include policy? different add- and sample functions?)
+
 class AbstractMemory(ABC):
     """
     stores tuples of (state, action, reward, next_state, done) for network-training
@@ -15,7 +18,7 @@ class AbstractMemory(ABC):
         self.capacity = capacity
         self.tuples = deque(maxlen=capacity)
 
-    def add_tuple(self, state, action, reward, next_state, done) -> None:
+    def add_tuple(self, state, action, reward, next_state, done, policy=None) -> None:
         """
         Stores episode in memory
         :param state: state of episode
@@ -23,8 +26,9 @@ class AbstractMemory(ABC):
         :param reward: reward received for state-action pair
         :param next_state: resulting state of environment
         :param done: flag, true if episode ended after action
+        :param policy: policy that was used to choose the action
         """
-        self.tuples.append((state, action, reward, next_state, done))
+        self.tuples.append((state, action, reward, next_state, done, policy))
 
     @abstractmethod
     def sample(self, processor, batch_size=None):
@@ -87,8 +91,9 @@ class EpisodicMemory(AbstractMemory):
     tuples are removed from memory after sampling
     """
 
-    def __init__(self, capacity, state_space):
+    def __init__(self, capacity, state_space, action_space):
         super().__init__(capacity, state_space)
+        self.action_space = action_space
 
     def sample(self, processor, batch_size=None):
         batch = copy.deepcopy(self.tuples)
@@ -96,6 +101,7 @@ class EpisodicMemory(AbstractMemory):
         states = np.zeros((batch_size,) + self.state_space)
         next_states = np.zeros((batch_size,) + self.state_space)
         actions, rewards, dones = [], [], []
+        policies = np.zeros((batch_size, self.action_space))
 
         for i in range(batch_size):
             states[i] = processor.process_state_for_network(batch[i][0])
@@ -103,10 +109,10 @@ class EpisodicMemory(AbstractMemory):
             rewards.append(batch[i][2])
             next_states[i] = processor.process_state_for_network(batch[i][3])
             dones.append(batch[i][4])
-
+            policies[i] = batch[i][5]
+        # remove all tuples from memory
         self.reset_memory()
-
-        return states, actions, rewards, next_states, dones
+        return states, actions, rewards, next_states, dones, policies
 
     def reset_memory(self) -> None:
         """

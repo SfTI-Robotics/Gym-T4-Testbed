@@ -1,31 +1,37 @@
 {
   "algorithm": "PolicyGradient",
   "environment": "CartPole-v1",
+
   "steps": 100000,
-
-  "batch_size": -1,
-
-  "memory_size": 2000,
-  "initial_exploration_steps": -1,
-
-  "target_update_frequency": -1,
-  "network_train_frequency": -1,
-
-  "epsilon": -1,
-  "epsilon_min": -1,
-  "epsilon_explore": -1,
-
+  "memory_size": 20000,
+  "network_train_frequency": 1,
   "learning_rate": 0.001,
   "gamma": 0.99,
+  "reward_clipping": false,
 
   "save_model": false,
   "load_model": false,
+  "save_gif": false,
+  "save_tensorboard_summary": false,
 
-  "save_gif": true,
-  "save_tensorboard_summary": true,
+  "save_plot_frequency": 1000000,
+  "save_model_frequency": null,
+  "save_gif_frequency": null,
+  "test_frequency": 10000,
+  "model_file": null,
 
-  "model_save_frequency": 100000,
-  "gif_save_frequency": 50000,
-  "model_file": "/Gym-T4-Testbed/output/DQN/models/CartPole-v1_model_episode0_2019-04-11 13:28:51.990779.h5"
+  "batch_size": 32,
+
+  "target_update_frequency": null,
+
+  "initial_exploration_steps": null,
+  "epsilon": null,
+  "epsilon_min": null,
+  "epsilon_explore": null,
+
+  "clipping_loss_ratio": null,
+  "lambda": null,
+  "epochs": null,
+  "horizon": null
 
 }

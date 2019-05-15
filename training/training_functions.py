@@ -6,19 +6,16 @@ from os.path import expanduser
 import tensorflow
 
 from agents.image_input.AbstractBrain import AbstractLearning
-from agents.memory.Memory import AbstractMemory
+from agents.memory.Memory import AbstractMemory as Memory
 from training.testing_functions import test
-from utils.preprocessing.Pong_Preprocess import Processor
+from utils.preprocessing.Abstract_Preprocess import AbstractProcessor as Processor
 from utils.storing import make_gif, save_episode_to_summary
+
 
 home = expanduser("~")
 
-# save summary-plot after n episodes
-summary_save_step = 10000
-test_frequency = 10000
 
-
-def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor: Processor,
+def train(env: any, learner: AbstractLearning, memory: Memory, processor: Processor,
           config, save_path, summary=None) -> None:
     """
     Trains learner in env and plots results
@@ -63,7 +60,7 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
     for step in range(config['steps']):
 
         # action chooses from  simplified action space without useless keys
-        action = learner.choose_action(processor.process_state_for_network(state))
+        action, policy = learner.choose_action(processor.process_state_for_network(state))
         # takes a step
         next_state, reward, done, _ = env.step(action)
 
@@ -71,7 +68,7 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
         episode_frames.append(next_state)
 
         if 'reward_clipping' in config and config['reward_clipping']:
-            reward = processor.process_reward(reward)
+            reward = processor.process_reward(reward, reward_clipping=config['reward_clipping'])
         next_state = processor.process_state_for_memory(next_state, False)
 
         if config['environment'] == 'CartPole-v1':
@@ -80,18 +77,17 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
                 reward = -reward
 
         # append <s, a, r, s', d> to learner.transitions
-        memory.add_tuple(state, action, reward, next_state, done)
+        memory.add_tuple(state, action, reward, next_state, done, policy=policy)
 
         # train algorithm using experience replay
-        if step >= config['initial_exploration_steps'] \
-                and config['algorithm'] != 'A2C' and config['algorithm'] != 'PolicyGradient' \
-                and config['algorithm'] != 'PPO':
+        if config['algorithm'] != 'A2C' and config['algorithm'] != 'PolicyGradient' and config['algorithm'] != 'PPO' \
+                and step >= config['initial_exploration_steps']:
             states, actions, rewards, next_states, dones = memory.sample(processor, batch_size=config['batch_size'])
             learner.train_network(states, actions, rewards, next_states, dones, step)
 
-        if config['algorithm'] == 'PPO' and config['memory_size'] == memory.get_memory_size():
-            states, actions, rewards, next_states, dones = memory.sample(processor)
-            learner.train_network(states, actions, rewards, next_states, dones, step)
+        if config['algorithm'] == 'PPO' and config['horizon'] == memory.get_memory_size():
+            states, actions, rewards, next_states, dones, policy = memory.sample(processor)
+            learner.train_network(states, actions, rewards, next_states, dones, policy)
 
         episode_reward += reward
         episode_step += 1
@@ -102,7 +98,7 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
         if done:
             # train algorithm with data from one complete episode
             if config['algorithm'] == 'A2C' or config['algorithm'] == 'PolicyGradient':
-                states, actions, rewards, next_states, dones = memory.sample(processor)
+                states, actions, rewards, next_states, dones, policy = memory.sample(processor)
                 learner.train_network(states, actions, rewards, next_states, dones, step)
 
             print('Completed Episode = ' + str(episode),
@@ -143,7 +139,7 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
     # ============================================================================================================== #
 
         # test current model
-        if (step % test_frequency == 0 and step != 0) or step == config['steps'] - 1:
+        if (step % config['test_frequency'] == 0 and step != 0) or step == config['steps'] - 1:
             test(learner.get_test_learner(),
                  copy.deepcopy(env),
                  config,
@@ -154,21 +150,21 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
     # ============================================================================================================== #
 
         # update summary-plot
-        if summary is not None and ((step % summary_save_step == 0 and step != 0) or step == config['steps'] - 1):
+        if summary is not None and ((step % config['save_plot_frequency'] == 0 and step != 0)
+                                    or step == config['steps'] - 1):
             summary.summarize(step_counts=summary_steps,
                               reward_counts=summary_rewards,
                               time_counts=summary_time,
                               epsilon_values=summary_epsilons,
                               e_greedy_formula=learner.e_greedy_formula)
-            summary_steps, summary_epsilons, summary_rewards = [], [], []
+            summary_steps, summary_epsilons, summary_rewards, summary_time = [], [], [], []
 
     # ============================================================================================================== #
 
         # make gif from episode frames
         # no image data available for cartpole
-        if config['save_gif'] \
-                and config['environment'] != 'CartPole-v1' \
-                and ((step != 0 and step % config['gif_save_frequency'] == 0) or step == config['steps'] - 1):
+        if config['save_gif'] and config['environment'] != 'CartPole-v1' \
+                and ((step != 0 and step % config['save_gif_frequency'] == 0) or step == config['steps'] - 1):
             make_gif(max_episode_number, max_reward, save_path + 'gifs/', max_episode_frames)
             max_reward = -1
             max_episode_number = -1
@@ -177,7 +173,7 @@ def train(env: any, learner: AbstractLearning, memory: AbstractMemory, processor
     # ============================================================================================================== #
 
         if config['save_model'] and \
-                ((step != 0 and step % config['model_save_frequency'] == 0) or step == config['steps'] - 1):
+                ((step != 0 and step % config['save_model_frequency'] == 0) or step == config['steps'] - 1):
             # store model weights and parameters when episode rewards are above a certain amount
             # and after every number of episodes
             learner.save_network(save_path + 'models/', config['environment'] + '_' + str(episode))

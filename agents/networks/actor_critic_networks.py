@@ -52,7 +52,7 @@ def build_actor_cartpole_network(obs_space, action_space, learning_rate):
     actor = Sequential()
     actor.add(Dense(24, input_dim=obs_space[0], activation='relu', kernel_initializer='he_uniform'))
     actor.add(Dense(action_space, activation='softmax'))
-    actor.summary()
+    # actor.summary()
     # Using categorical crossentropy as a loss is a trick to easily implement the policy gradient.
     # Categorical cross entropy is defined as (p, q) = sum(p_i * log(q_i)).
     # For the action taken, a, you set p_a = advantage.
@@ -67,6 +67,6 @@ def build_critic_cartpole_network(obs_space, value_size, learning_rate):
     critic = Sequential()
     critic.add(Dense(24, input_dim=obs_space[0], activation='relu', kernel_initializer='he_uniform'))
     critic.add(Dense(value_size, activation='linear'))
-    critic.summary()
+    # critic.summary()
     critic.compile(loss="mse", optimizer=Adam(lr=learning_rate))
     return critic

@@ -28,6 +28,7 @@ MODEL_FILENAME = ''
 # TODO: add replay mode (load previous model and let it act in environments without learning)
 # TODO: add DDDQN with PER as comparison option
 # TODO: update model-saving-option (store first episode, best episode from n steps)
+# TODO: reduce number of optional config parameters used (e.g. target_update_frequency)
 
 if __name__ == "__main__":
 
@@ -102,45 +103,51 @@ if __name__ == "__main__":
         from agents.image_input.DQN_Brain import Learning
         # import memory for agent
         from agents.memory.Memory import RandomBatchMemory as Memory
+        # create memory
+        memory = Memory(config['memory_size'], state_space)
         # set path for output data
         PATH = PATH + '/Gym-T4-Testbed/output/DQN/'
         print('DQN works')
     elif config['algorithm'] == 'DoubleDQN':
         from agents.image_input.Double_DQN_Brain import Learning
         from agents.memory.Memory import RandomBatchMemory as Memory
+        memory = Memory(config['memory_size'], state_space)
         PATH = PATH + '/Gym-T4-Testbed/output/DoubleDQN/'
         print('Double works')
     elif config['algorithm'] == 'DuelingDQN':
         from agents.image_input.Dueling_Brain import Learning
         from agents.memory.Memory import RandomBatchMemory as Memory
+        memory = Memory(config['memory_size'], state_space)
         PATH = PATH + '/Gym-T4-Testbed/output/DuelingDQN/'
         print('Dueling works')
     elif config['algorithm'] == 'ActorCritic':
         from agents.image_input.Actor_Critic_Brain import Learning
         from agents.memory.Memory import RandomBatchMemory as Memory
+        memory = Memory(config['memory_size'], state_space)
         PATH = PATH + '/Gym-T4-Testbed/output/ActorCritic/'
         print('Actor Critic works')
     elif config['algorithm'] == 'A2C':
         from agents.image_input.A2C_Brain import Learning
         from agents.memory.Memory import EpisodicMemory as Memory
+        memory = Memory(config['memory_size'], state_space, action_space)
         PATH = PATH + '/Gym-T4-Testbed/output/A2C/'
         print('A2C works')
     elif config['algorithm'] == 'PolicyGradient':
         from agents.image_input.Policy_Gradient_Brain import Learning
         from agents.memory.Memory import EpisodicMemory as Memory
+        memory = Memory(config['memory_size'], state_space, action_space)
         PATH = PATH + '/Gym-T4-Testbed/output/PolicyGradient/'
         print('Policy Gradient works')
     elif config['algorithm'] == 'PPO':
         from agents.image_input.PPO_Brain import Learning
         from agents.memory.Memory import EpisodicMemory as Memory
+        memory = Memory(config['memory_size'], state_space, action_space)
         PATH = PATH + '/Gym-T4-Testbed/output/PPO/'
         print('ProximalPolicyOptimization works')
     else:
         sys.exit("Algorithm not found")
 
     learner = Learning(state_space, action_space, config)
-    # create memory
-    memory = Memory(config['memory_size'], state_space)
 
     # ============================================================================================================== #
 

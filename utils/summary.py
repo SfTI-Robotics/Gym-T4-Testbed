@@ -114,17 +114,27 @@ class Summary:
     def summarize(
             self,
             # for the current iteration
-            episode_counts=[],
+            episode_counts=None,
             # an array that records steps taken in each episode. Index indicates episode
-            step_counts=[],
+            step_counts=None,
             # an array that records the operation time for each episode
-            time_counts=[],
+            time_counts=None,
             # an array that records total reward collected in each episode
-            reward_counts=[],
+            reward_counts=None,
             # epsilon greedy value
-            epsilon_values=[],
+            epsilon_values=None,
             e_greedy_formula='e-greedy formula = '
     ):
+        if epsilon_values is None:
+            epsilon_values = []
+        if reward_counts is None:
+            reward_counts = []
+        if time_counts is None:
+            time_counts = []
+        if step_counts is None:
+            step_counts = []
+        if episode_counts is None:
+            episode_counts = []
         self.update(step_counts, time_counts, reward_counts, epsilon_values)
 
         self.plot_summary_graphs(e_greedy_formula)

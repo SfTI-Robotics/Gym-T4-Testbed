@@ -27,7 +27,7 @@ class Learning(AbstractBrain.AbstractLearning):
 
     def choose_action(self, state):
         policy = self.network.predict(np.array([state])).flatten()
-        return np.random.choice(np.arange(self.action_space), 1, p=policy)[0]
+        return np.random.choice(np.arange(self.action_space), 1, p=policy)[0], policy[0]
 
     def discount_and_standardize_rewards(self, rewards):
         discounted_rewards = np.zeros_like(rewards)

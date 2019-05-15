@@ -32,10 +32,10 @@ def test(learner: AbstractBrain, env, config, processor, filename, path, episode
         test_sum = 0
         test_step = 0
         while True:
-            test_action = learner.choose_action(processor.process_state_for_network(test_state))
+            test_action, _ = learner.choose_action(processor.process_state_for_network(test_state))
             test_next_state, test_reward, test_done, _ = env.step(test_action)
             test_next_state = processor.process_state_for_memory(test_next_state, False)
-            test_reward = processor.process_reward(test_reward)
+            test_reward = processor.process_reward(test_reward, reward_clipping=config['reward_clipping'])
 
             if config['environment'] == 'CartPole-v1':
                 # punish if terminal state reached

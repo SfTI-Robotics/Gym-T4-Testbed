@@ -62,24 +62,24 @@ def animate_line(frame, line):
     line.set_ydata(current_y_data)
 
     # This comma is necessary!
-    return (line,)
+    return line,
 
 
-def load_stuff_from_file(path, train_episode, test_episode):
+def load_stuff_from_file(file_path, train_episode, test_episode):
     base_name = 'test' + str(test_episode)
     base_name = 'episode' + str(train_episode) + '_' + base_name
     # path += 'episode' + str(train_episode) + '/'
     # create folder, if necessary
-    if not os.path.exists(path):
-        os.makedirs(path)
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
 
-    rewards = np.loadtxt(path + base_name + '_rewards.txt')
-    actions = np.loadtxt(path + base_name + '_actions.txt')
-    predictions = np.loadtxt(path + base_name + '_predictions.txt')
+    rewards = np.loadtxt(file_path + base_name + '_rewards.txt')
+    actions = np.loadtxt(file_path + base_name + '_actions.txt')
+    predictions = np.loadtxt(file_path + base_name + '_predictions.txt')
     return rewards, actions, predictions
 
 
-def plot_predictions_bars(predictions, path, filename):
+def plot_predictions_bars(predictions, file_path, filename):
     global bars, heights, values
 
     values = predictions
@@ -110,11 +110,11 @@ def plot_predictions_bars(predictions, path, filename):
     plt.grid(True)
 
     animation = FuncAnimation(fig, animate_bars, init_func=init, frames=predictions.shape[0], interval=1000 / 25)
-    animation.save(path + filename + "_predictions.mp4")
+    animation.save(file_path + filename + "_predictions.mp4")
     plt.close(fig)
 
 
-def plot_discounted_reward_bar(rewards, path, filename):
+def plot_discounted_reward_bar(rewards, file_path, filename):
     global bars, heights
 
     heights = discount_rewards(rewards)
@@ -139,7 +139,7 @@ def plot_discounted_reward_bar(rewards, path, filename):
     plt.grid(False)
 
     animation = FuncAnimation(fig, animate_bar, init_func=init, frames=len(heights), interval=1000 / 25)
-    animation.save(path + filename + "_discounted_reward_bar.mp4")
+    animation.save(file_path + filename + "_discounted_reward_bar.mp4")
     plt.close(fig)
 
 
@@ -154,7 +154,7 @@ def discount_rewards(rewards):
     return discounted_rewards
 
 
-def plot_discounted_reward_lines(rewards, path, filename):
+def plot_discounted_reward_lines(rewards, file_path, filename):
     global heights, values
 
     heights = discount_rewards(rewards)
@@ -187,28 +187,35 @@ def plot_discounted_reward_lines(rewards, path, filename):
         # Frame-time in ms; i.e. for a given frame-rate x, 1000/x
         interval=1000 / 25
     )
-    animation.save(path + filename + "_discounted_rewards_line.mp4")
+    animation.save(file_path + filename + "_discounted_rewards_line.mp4")
     plt.close(fig)
 
 
-def plot_all_predictions(path, train_episode):
+def plot_all_predictions(file_path, train_episode):
     for e in range(test_episodes):
-        rewards, actions, predictions = load_stuff_from_file(path, train_episode, e)
-        plot_discounted_reward_bar(rewards, path, 'episode'+str(train_episode)+'test'+str(e))
-        plot_discounted_reward_lines(rewards, path, 'episode'+str(train_episode)+'test'+str(e))
-        plot_predictions_bars(predictions, path, 'episode'+str(train_episode)+'test'+str(e))
+        rewards, actions, predictions = load_stuff_from_file(file_path, train_episode, e)
+        plot_discounted_reward_bar(rewards, file_path, 'episode' + str(train_episode) + 'test' + str(e))
+        plot_discounted_reward_lines(rewards, file_path, 'episode' + str(train_episode) + 'test' + str(e))
+        plot_predictions_bars(predictions, file_path, 'episode' + str(train_episode) + 'test' + str(e))
+
+
+# used to save rewards, actions, predictions to txt-files
+def save_stuff_to_file(episode_rewards, episode_actions, predictions, test_episode, file_path, train_episode=None):
+    base_name = 'test' + str(test_episode)
+    if train_episode is not None:
+        base_name = 'episode' + str(train_episode) + '_' + base_name
+        file_path += 'episode' + str(train_episode) + '/'
+        # create folder, if necessary
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+
+    np.savetxt(file_path + base_name + '_rewards.txt', episode_rewards, fmt='%d')
+    np.savetxt(file_path + base_name + '_actions.txt', episode_actions, fmt='%d')
+    np.savetxt(file_path + base_name + '_predictions.txt', predictions)
 
 
 if __name__ == "__main__":
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode0/'
-    plot_all_predictions(path, 0)
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode0/'
-    plot_all_predictions(path, 0)
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode426/'
-    plot_all_predictions(path, 426)
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode426/'
-    plot_all_predictions(path, 426)
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode832/'
-    plot_all_predictions(path, 832)
-    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode832/'
-    plot_all_predictions(path, 832)
+    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode743/'
+    plot_all_predictions(path, 743)
+    path = HOME_PATH + '/Gym-T4-Testbed/output/Hybrid/test_dqn/DQN/episode743/'
+    plot_all_predictions(path, 743)

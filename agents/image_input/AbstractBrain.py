@@ -1,32 +1,43 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
+import numpy as np
 
 
 class AbstractLearning(ABC):
 
-    # variables needed in all Learning classes
+    # values used for plotting
     epsilon = 0
-    e_greedy_formula = ""
+    e_greedy_formula = ''
 
     def __init__(self, observations, actions, config):
         self.state_space = observations
         self.action_space = actions
         self.config = config
 
-        # TODO: not needed for Policy Gradient
-        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
-        self.epsilon = self.config['epsilon']
-        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
-
     @abstractmethod
-    def choose_action(self, state):
+    def choose_action(self, state) -> Tuple[int, np.ndarray]:
+        """
+        Chooses action to take in the given state, depending on the current policy
+        :param state: state-object as ndarray
+        :return: int-value representing action, policy
+        """
         pass
 
     @abstractmethod
-    def train_network(self, states, actions, rewards, next_states, dones, step):
+    def train_network(self, states, actions, rewards, next_states, dones, step) -> None:
+        """
+        Trains network(s)
+        :param states: array of state-objects
+        :param actions: list of actions taken in states
+        :param rewards: list of rewards received for actions
+        :param next_states: array of state-objects, states reached after executing action
+        :param dones: flag, true if episode ended after action
+        :param step: current training step
+        """
         pass
 
     @abstractmethod
-    def save_network(self, save_path, model_name, timestamp=None):
+    def save_network(self, save_path, model_name, timestamp=None) -> None:
         """
         Saves current model to .h5 file, overrides previous model for same environment and algorithm
         :param save_path: path to model folder
@@ -36,7 +47,7 @@ class AbstractLearning(ABC):
         pass
 
     @abstractmethod
-    def load_network(self, save_path, model_name):
+    def load_network(self, save_path, model_name) -> None:
         """
         Loads previously saved model file to learner.network
         :param save_path: path to model folder
@@ -45,7 +56,7 @@ class AbstractLearning(ABC):
         pass
 
     @abstractmethod
-    def get_test_learner(self):
+    def get_test_learner(self) -> 'AbstractLearning':
         """
         Creates a version of the current learner that can be used for testing
         (with the same model weights, but without disrupting any data of the original agent)

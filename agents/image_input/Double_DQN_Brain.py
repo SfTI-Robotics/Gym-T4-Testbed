@@ -27,6 +27,10 @@ class Learning(AbstractBrain.AbstractLearning):
                                                                  self.config['learning_rate'])
             self.target_network = build_simple_convoluted_net(self.state_space, self.action_space,
                                                               self.config['learning_rate'])
+        # set values for epsilon-greedy exploration
+        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
+        self.epsilon = self.config['epsilon']
+        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
 
         # copy weights from behaviour to target
         self.update_target_model()
@@ -36,9 +40,12 @@ class Learning(AbstractBrain.AbstractLearning):
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
     def choose_action(self, state):
+        policy = self.behaviour_network.predict(np.expand_dims(state, axis=0))
         if random.random() <= self.epsilon:
-            return random.randrange(self.action_space)
-        return np.argmax(self.behaviour_network.predict(np.expand_dims(state, axis=0)))
+            action = random.randrange(self.action_space)
+        else:
+            action = np.argmax(policy)
+        return action, policy[0]
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:

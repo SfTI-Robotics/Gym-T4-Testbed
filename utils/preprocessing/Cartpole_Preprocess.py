@@ -17,6 +17,3 @@ class Processor(AbstractProcessor):
 
     def process_state_for_network(self, state):
         return state
-
-    def process_batch(self, samples):
-        return samples

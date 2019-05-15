@@ -39,7 +39,7 @@ class Learning(AbstractBrain.AbstractLearning):
         # get policy from network
         policy = self.actor_network.predict(np.array([state])).flatten()
         # pick action (stochastic)
-        return np.random.choice(self.action_space, 1, p=policy)[0]
+        return np.random.choice(self.action_space, 1, p=policy)[0], policy[0]
 
     def train_actor(self, states, actions, rewards, next_states, dones):
         advantages = np.zeros((self.config['batch_size'], self.action_space))

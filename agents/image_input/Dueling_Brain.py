@@ -20,14 +20,22 @@ class Learning(AbstractBrain.AbstractLearning):
         else:
             self.network = build_dueling_dqn_network(self.state_space, self.action_space, self.config['learning_rate'])
 
+        # set values for epsilon-greedy exploration
+        self.e_greedy_formula = 'e = min(e_min, e - e_decay)'
+        self.epsilon = self.config['epsilon']
+        self.epsilon_decay = (self.config['epsilon'] - self.config['epsilon_min']) / self.config['epsilon_explore']
+
     def update_epsilon(self):
         if self.epsilon > self.config['epsilon_min']:
             self.epsilon = max(self.config['epsilon_min'], self.epsilon - self.epsilon_decay)
 
     def choose_action(self, state):
+        policy = self.network.predict(np.expand_dims(state, axis=0))
         if random.random() <= self.epsilon:
-            return random.randrange(self.action_space)
-        return np.argmax(self.network.predict(np.expand_dims(state, axis=0)))
+            action = random.randrange(self.action_space)
+        else:
+            action = np.argmax(policy)
+        return action, policy[0]
 
     def train_network(self, states, actions, rewards, next_states, dones, step):
         if step % self.config['network_train_frequency'] == 0:
