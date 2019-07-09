@@ -50,13 +50,10 @@ def main(args):
 
                 observation = observation.astype('float32')
 
-                resized_obs = resize(observation, (64, 64), anti_aliasing=True)
+                resized_obs = cv2.resize(observation, (80,105), interpolation = cv2.INTER_CUBIC)
+                normalised_obs = resized_obs/255
                 
-                if s == 0 and t == 50:
-                    cv2.imwrite('original_img.jpg', observation)
-                    cv2.imwrite('resized_img.jpg', resized_obs)
-                
-                obs_sequence.append(resized_obs)
+                obs_sequence.append(normalised_obs)
                 action_sequence.append(action)
                 reward_sequence.append(reward)
                 done_sequence.append(done)
@@ -76,7 +73,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=('Create new training data'))
-    parser.add_argument('env_name', type=str, help='name of environment')
+    parser.add_argument('--env_name', type=str, help='name of environment', default="Breakout-v0")
     parser.add_argument('--total_episodes', type=int, default=200,
                         help='total number of episodes to generate per worker')
     parser.add_argument('--time_steps', type=int, default=300,

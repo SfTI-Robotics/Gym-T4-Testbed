@@ -1,5 +1,6 @@
 # Don't commit the contents of these folders
 output/
+**/rollout/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
