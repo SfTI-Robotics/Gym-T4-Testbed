@@ -8,7 +8,7 @@ from keras import backend as K
 # The architecture uses https://github.com/AppliedDataSciencePartners/WorldModels/blob/master/vae/arch.py?fbclid=IwAR0ARBfgNgwpAJzIxS9OM9jrIogH1nUB5IR7-6n6Pi_JJtq8rQ9f8d9Ozsc
 # as a skeleton implementation.
 
-INPUT_DIM = (105,80,3) #Want to use a sequence of frames eventually, done in Atari paper, for now we'll just use one frame
+INPUT_DIM = (64,64,3) #Want to use a sequence of frames eventually, done in Atari paper, for now we'll just use one frame
 CONV_ACTIVATION = 'relu'
 CONV_FILTERS = [32,64,64,128]
 CONV_KERNEL_SIZES = [4,4,4,4]
@@ -18,7 +18,7 @@ BATCH_SIZE = 100
 LEARNING_RATE = 0.0001
 KL_TOLERANCE = 0.5
 
-DENSE_SIZE = 1536
+DENSE_SIZE = 1024
 
 CONV_T_FILTERS = [64,64,32,3]
 CONV_T_KERNEL_SIZES = [5,5,6,6]
@@ -69,12 +69,11 @@ class VAE():
 
         #### DECODER: we instantiate these layers separately so as to reuse them later
         vae_dense = Dense(DENSE_SIZE, name='dense_layer')
-        vae_z_out = Reshape((3,2,256), name='unflatten')
-        vae_d1 = Conv2DTranspose(filters = CONV_T_FILTERS[0], kernel_size = CONV_T_KERNEL_SIZES[0] , strides = CONV_T_STRIDES[0], activation=CONV_T_ACTIVATIONS[0], name='deconv_layer_1', output_padding=(1,0))
+        vae_z_out = Reshape((1,1,1024), name='unflatten')
+        vae_d1 = Conv2DTranspose(filters = CONV_T_FILTERS[0], kernel_size = CONV_T_KERNEL_SIZES[0] , strides = CONV_T_STRIDES[0], activation=CONV_T_ACTIVATIONS[0], name='deconv_layer_1')
         vae_d2 = Conv2DTranspose(filters = CONV_T_FILTERS[1], kernel_size = CONV_T_KERNEL_SIZES[1] , strides = CONV_T_STRIDES[1], activation=CONV_T_ACTIVATIONS[1], name='deconv_layer_2')
         vae_d3 = Conv2DTranspose(filters = CONV_T_FILTERS[2], kernel_size = CONV_T_KERNEL_SIZES[2] , strides = CONV_T_STRIDES[2], activation=CONV_T_ACTIVATIONS[2], name='deconv_layer_3')
-        vae_d4 = Conv2DTranspose(filters = CONV_T_FILTERS[3], kernel_size = CONV_T_KERNEL_SIZES[3] , strides = CONV_T_STRIDES[3], activation=CONV_T_ACTIVATIONS[3], name='deconv_layer_4',
-                                    output_padding=(1,0))
+        vae_d4 = Conv2DTranspose(filters = CONV_T_FILTERS[3], kernel_size = CONV_T_KERNEL_SIZES[3] , strides = CONV_T_STRIDES[3], activation=CONV_T_ACTIVATIONS[3], name='deconv_layer_4')
         
         #### DECODER IN FULL MODEL
         vae_dense_model = vae_dense(vae_z)

@@ -6,8 +6,8 @@ import os
 DIR_NAME = './data/rollout/'
 M=300
 
-SCREEN_SIZE_X = 105
-SCREEN_SIZE_Y = 80
+SCREEN_SIZE_X = 64
+SCREEN_SIZE_Y = 64
 
 
 def import_data(N):
@@ -29,6 +29,7 @@ def import_data(N):
   for file in filelist:
       try:
         new_data = np.load(DIR_NAME + file)['obs']
+        print(new_data.shape)
         data[idx:(idx + M), :, :, :] = new_data
 
         idx = idx + M

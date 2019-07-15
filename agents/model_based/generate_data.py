@@ -48,22 +48,18 @@ def main(args):
                 if t % action_refresh_rate == 0:
                     action = env.action_space.sample()
 
-                observation = observation.astype('float32')
-
-                resized_obs = cv2.resize(observation, (80,105), interpolation = cv2.INTER_CUBIC)
-                normalised_obs = resized_obs/255
-                
+                resized_obs = cv2.resize(observation[40:200,:], (64,64), interpolation = cv2.INTER_NEAREST)
+                normalised_obs = resized_obs/255.0
                 obs_sequence.append(normalised_obs)
                 action_sequence.append(action)
                 reward_sequence.append(reward)
                 done_sequence.append(done)
 
                 observation, reward, done, _ = env.step(action) # Take a random action
-
                 t = t + 1
 
             print("Episode {} finished after {} timesteps".format(s, t))
-
+            
             np.savez_compressed(filename, obs=obs_sequence, action=action_sequence,
                                 reward=reward_sequence, done=done_sequence)  
 
@@ -80,7 +76,7 @@ if __name__ == "__main__":
                         help='how many timesteps at start of episode?')
     parser.add_argument('--render', default=0, type=int,
                         help='render the env as data is generated')
-    parser.add_argument('--action_refresh_rate', default=20, type=int,
+    parser.add_argument('--action_refresh_rate', default=4, type=int,
                         help='how often to change the random action, in frames')
     parser.add_argument('--run_all_envs', action='store_true',
                         help='if true, will ignore env_name and loop over all envs in train_envs variables in config.py')
