@@ -1,6 +1,6 @@
 import numpy as np
 
-from keras.layers import Input, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape
+from keras.layers import Input, Concatenate, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape
 from keras.models import Model
 from keras.optimizers import Adam
 from keras import backend as K
@@ -27,6 +27,7 @@ CONV_T_STRIDES = [2,2,2,2]
 CONV_T_ACTIVATIONS = ['relu','relu','relu','sigmoid']
 
 Z_DIM = 32
+ACTION_DIM = 1
 
 
 def sampling(args):
@@ -65,6 +66,12 @@ class VAE():
 
         vae_z = Lambda(sampling, name='z')([vae_z_mean, vae_z_sigma])
         
+        action_input = Input(shape=(ACTION_DIM,), name='action_input')
+        vae_action = Dense(ACTION_DIM, name='action')(action_input)
+
+        vae_merged_z_action = Concatenate([vae_z, vae_action])
+        
+
         vae_z_input = Input(shape=(Z_DIM,), name='z_input')
 
         #### DECODER: we instantiate these layers separately so as to reuse them later

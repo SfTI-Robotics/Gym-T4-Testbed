@@ -54,9 +54,9 @@ def main(args):
 
     if not new_model:
         try:
-            vae.set_weights('./vae_weights.h5')
+            vae.set_weights('./models/vae_weights.h5')
         except:
-            print("Either set --new_model or ensure ./vae/weights.h5 exists")
+            print("Either set --new_model or ensure ./models/weights.h5 exists")
             raise
 
     try:
@@ -70,7 +70,7 @@ def main(args):
     for epoch in range(epochs):
         print('EPOCH ' + str(epoch))
         vae.train(data)
-        vae.save_weights('./vae_weights.h5')
+        vae.save_weights('./models/vae_weights.h5')
         
 
 if __name__ == "__main__":
