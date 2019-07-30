@@ -16,13 +16,9 @@ def sampling(args):
     epsilon = K.random_normal(shape=(K.shape(z_mean)[0], 32), mean=0., stddev=1.0)
     return z_mean + K.exp(z_log_var / 2) * epsilon
 
-class VAE():
+class CVAE():
      def __init__(self):
-        self.models = self._build()
-        self.full_model = self.models[0]
-        self.encoder = self.models[1]
-        self.encoder_mu_log_var = self.models[2]
-        self.decoder = self.models[3]
+        self.model = self._build()
 
         self.input_dim = INPUT_DIM
         self.z_dim = Z_DIM
@@ -45,26 +41,32 @@ class VAE():
         
         vae_x = Input(shape=self.input_dim, name='observation_input')       # 84x84x4
         h = Conv2D(32, 6, strides=2, activation='relu')(vae_x)              # 40x40x32
-        h = Conv2D(64, 6, strides=2, padding=(2,2) activation='relu')(h)    # 20x20x64
-        h = Conv2D(64, 6, strides=2, padding=(2,2) activation='relu')(h)    # 10x10x64
-        h = Conv2D(64, 4, strides=2, activation='relu')(h)                  # 4x4x64
-        h = Flatten()(h)                                                    # 1024
+        h1 = Conv2D(64, 6, strides=2, activation='relu')(h)    # 20x20x64
+        h2 = Conv2D(64, 6, strides=2, activation='relu')(h1)    # 10x10x64
+        h3 = Conv2D(64, 4, strides=2, activation='relu')(h2)                  # 4x4x64
+        h4 = Flatten()(h3)                                                    # 1024
 
-        h = Concatenate([h, vae_action])                                # 1025
+        h5 = Concatenate([h4, vae_action])                                # 1025
 
-        encoder_h = Dense(ENCODER_DIM, activation='relu')
-        z_mean = Dense(self.Z_DIM, name='z_mean')(encoder_h)            # 32
-        z_log_var = Dense(self.Z_DIM, name='z_log_var')(encoder_h)      # 32
+        # encoder_h = Dense(ENCODER_DIM, activation='relu')()
+        z_mean = Dense(self.Z_DIM, name='z_mean')(h5)            # 32
+        z_log_var = Dense(self.Z_DIM, name='z_log_var')(h5)      # 32
         z = Lambda(sampling, name='sampling')([z_mean, z_log_var])
 
         # merge latent space with same action vector that was merged into observation
         zc = Concatenate([z, action])
 
         # Decoder layers
-        decoder = Conv2DTranspose(64, 4, strides=2, activation='relu')(zc)
-
-
-        return (vae_x)
+        decoder_dense = Dense(DENSE_SIZE)(zc)
+        decoder_reshape = Reshape((1,1,1024), name='unflatten')(decoder_dense)
+        decoder = Conv2DTranspose(64, 4, strides=2, activation='relu')(decoder_dense)
+        decoder_2 = Conv2DTranspose(64, 4, strides=2, activation ='relu')(decoder)
+        decoder_3 = Conv2DTranspose(64, 4, strides=2, activation ='relu')(decoder_2)
+        decoder_out = Conv2DTranspose(32, 4, strides=2, activation ='sigmoid')(decoder_3) 
+        
+        vae_full = Model(vae_x,decoder_out)
+        print(vae_full.summary())
+        return (vae_full)
     
     def train(self, data):
         self.full_model.fit(data, data,

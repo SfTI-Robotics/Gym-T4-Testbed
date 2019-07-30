@@ -3,6 +3,7 @@ import numpy as np
 import gym
 import cv2
 import random
+from collections import deque
 from PIL import Image
 
 #import matplotlib.pyplot as plt
@@ -30,11 +31,13 @@ def main(args):
         s = 0
 
         while s < total_episodes:
-
+            
             frames_file = os.path.join(FRAMES_DIR,  'frames-%d.npy' % s) 
-            actions_file = os.path.join(ACTIONS_DIR 'actions-%d.npy' % s)
+            actions_file = os.path.join(ACTIONS_DIR, 'actions-%d.npy' % s)
 
             observation = env.reset()
+            frame_queue = deque(maxlen=4)
+            
 
             t = 0
 
@@ -50,8 +53,16 @@ def main(args):
                 converted_obs = converted_obs.convert('L')  # to gray
                 converted_obs = converted_obs.resize((84, 84), Image.ANTIALIAS)
                 converted_obs = np.array(converted_obs).astype('uint8')
-
-                obs_sequence.append(converted_obs)
+                converted_obs = converted_obs/255.
+                if t == 0:
+                    for i in range(4):
+                        frame_queue.append(converted_obs)
+                else:
+                    frame_queue.pop()
+                    frame_queue.appendleft(converted_obs)
+                
+                stacked_state = np.stack(frame_queue, axis=2)
+                obs_sequence.append(stacked_state)
                 action_sequence.append(action)
 
                 observation, _, _, _ = env.step(action) # Take a random action
@@ -60,12 +71,22 @@ def main(args):
             print("Episode {} finished after {} timesteps".format(s, t))
 
 
-            np.save(os.path.join(frames_file, obs_sequence)
-            np.save(os.path.join(actions_file, action_sequence)
+            np.save(frames_file, obs_sequence)
+            np.save(actions_file, action_sequence)
 
             s = s + 1
 
         env.close()
+
+
+def encode_action(size, action):
+    action_vector = [ 0 for i in range(size) ]
+    action_vector[action] = 1
+    return action_vector
+
+def convert_queue_to_vector(frame_queue):
+    return_vector = frame_queue[0]
+    # for i in len
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=('Create new training data'))

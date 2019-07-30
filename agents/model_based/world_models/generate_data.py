@@ -24,9 +24,10 @@ def main(args):
         print("Generating data for env {}".format(current_env_name))
 
         env = gym.make(current_env_name) # Create the environment
+        action_size = env.action_space.n
 
         s = 0
-
+        print(env.action_space.n)
         while s < total_episodes:
             
             episode_id = random.randint(0, 2**31 - 1)
@@ -47,11 +48,12 @@ def main(args):
             while t < time_steps:  
                 if t % action_refresh_rate == 0:
                     action = env.action_space.sample()
-
+                    
+                action_vector = encode_action(action_size,action)
                 resized_obs = cv2.resize(observation[40:200,:], (64,64), interpolation = cv2.INTER_NEAREST)
                 normalised_obs = resized_obs/255.0
                 obs_sequence.append(normalised_obs)
-                action_sequence.append(action)
+                action_sequence.append(action_vector)
                 reward_sequence.append(reward)
                 done_sequence.append(done)
 
@@ -67,12 +69,17 @@ def main(args):
 
         env.close()
 
+def encode_action(size, action):
+    action_vector = [ 0 for i in range(size) ]
+    action_vector[action] = 1
+    return action_vector
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=('Create new training data'))
     parser.add_argument('--env_name', type=str, help='name of environment', default="Breakout-v0")
-    parser.add_argument('--total_episodes', type=int, default=200,
+    parser.add_argument('--total_episodes', type=int, default=50,
                         help='total number of episodes to generate per worker')
-    parser.add_argument('--time_steps', type=int, default=300,
+    parser.add_argument('--time_steps', type=int, default=100,
                         help='how many timesteps at start of episode?')
     parser.add_argument('--render', default=0, type=int,
                         help='render the env as data is generated')
