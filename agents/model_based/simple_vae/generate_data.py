@@ -10,8 +10,7 @@ from PIL import Image
 
 import argparse
 
-FRAMES_DIR = './data/frames/'
-ACTIONS_DIR = './data/actions/'
+ROLLOUT_DIR = './data/rollout/'
 
 
 def main(args):
@@ -32,8 +31,7 @@ def main(args):
 
         while s < total_episodes:
             
-            frames_file = os.path.join(FRAMES_DIR,  'frames-%d.npy' % s) 
-            actions_file = os.path.join(ACTIONS_DIR, 'actions-%d.npy' % s)
+            rollout_file = os.path.join(ROLLOUT_DIR,  'rollout-%d.npz' % s) 
 
             observation = env.reset()
             frame_queue = deque(maxlen=4)
@@ -49,11 +47,8 @@ def main(args):
                     action = env.action_space.sample()
                 
                 # convert image to greyscale, downsize
-                converted_obs = Image.fromarray(observation, 'RGB')
-                converted_obs = converted_obs.convert('L')  # to gray
-                converted_obs = converted_obs.resize((84, 84), Image.ANTIALIAS)
-                converted_obs = np.array(converted_obs).astype('uint8')
-                converted_obs = converted_obs/255.
+                converted_obs = preprocess_frame(observation)
+
                 if t == 0:
                     for i in range(4):
                         frame_queue.append(converted_obs)
@@ -71,8 +66,7 @@ def main(args):
             print("Episode {} finished after {} timesteps".format(s, t))
 
 
-            np.save(frames_file, obs_sequence)
-            np.save(actions_file, action_sequence)
+            np.savez_compressed(rollout_file, obs=obs_sequence, actions=action_sequence, next_frame=observation)
 
             s = s + 1
 
@@ -84,9 +78,13 @@ def encode_action(size, action):
     action_vector[action] = 1
     return action_vector
 
-def convert_queue_to_vector(frame_queue):
-    return_vector = frame_queue[0]
-    # for i in len
+def preprocess_frame(frame):
+    # convert image to greyscale, downsize
+    converted_obs = Image.fromarray(frame, 'RGB')
+    converted_obs = converted_obs.convert('L')  # to gray
+    converted_obs = converted_obs.resize((84, 84), Image.ANTIALIAS)
+    converted_obs = np.array(converted_obs).astype('uint8')
+    return converted_obs/255.
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=('Create new training data'))
