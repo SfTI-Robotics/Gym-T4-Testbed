@@ -41,6 +41,7 @@ def main(args):
 
             obs_sequence = []
             action_sequence = []
+            next_sequence = []
 
             while t < time_steps:  
                 if t % action_refresh_rate == 0:
@@ -58,15 +59,17 @@ def main(args):
                 
                 stacked_state = np.stack(frame_queue, axis=2)
                 obs_sequence.append(stacked_state)
-                action_sequence.append(action)
+                action_sequence.append(encode_action(4,action))
 
-                observation, _, _, _ = env.step(action) # Take a random action
+                observation, _, _, _ = env.step(action) # Take a random action  
                 t = t + 1
+
+                next_sequence.append(np.expand_dims(preprocess_frame(observation), axis=3))
 
             print("Episode {} finished after {} timesteps".format(s, t))
 
 
-            np.savez_compressed(rollout_file, obs=obs_sequence, actions=action_sequence, next_frame=observation)
+            np.savez_compressed(rollout_file, obs=obs_sequence, actions=action_sequence, next_frame=next_sequence)
 
             s = s + 1
 
