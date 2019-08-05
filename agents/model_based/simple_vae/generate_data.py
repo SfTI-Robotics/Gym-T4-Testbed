@@ -64,7 +64,7 @@ def main(args):
                 observation, _, _, _ = env.step(action) # Take a random action  
                 t = t + 1
 
-                next_sequence.append(np.expand_dims(preprocess_frame(observation), axis=3))
+                next_sequence.append(np.expand_dims(preprocess_frame(observation), axis=2))
 
             print("Episode {} finished after {} timesteps".format(s, t))
 

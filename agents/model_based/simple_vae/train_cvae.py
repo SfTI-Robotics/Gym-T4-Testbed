@@ -1,4 +1,5 @@
 from simple_vae import CVAE
+from random import shuffle
 import argparse
 import numpy as np
 import os
@@ -8,13 +9,12 @@ M=300
 
 SCREEN_SIZE_X = 84
 SCREEN_SIZE_Y = 84
-ACTION_SPACE_X = 1
 ACTION_SPACE_Y = 4
 
 
 def import_data(N):
   filelist = os.listdir(DIR_NAME)
-  filelist.sort()
+  shuffle(filelist)
   length_filelist = len(filelist)
 
   if length_filelist > N:
@@ -45,6 +45,9 @@ def import_data(N):
 
         if file_count%50==0:
             print('Imported {} / {} ::: Current data size = {} observations'.format(file_count, N, idx))
+        elif file_count == N:
+            break
+
     except:
         print('Skipped {}...'.format(file))
 
@@ -62,7 +65,7 @@ def main(args):
 
     if not new_model:
         try:
-            cvae.set_weights('./vae_weights.h5')
+            cvae.set_weights('./cvae_weights.h5')
         except:
             print("Either set --new_model or ensure ./models/weights.h5 exists")
             raise
@@ -83,9 +86,10 @@ def main(args):
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description=('Train VAE'))
-  parser.add_argument('--N',default = 10000, help='number of episodes to use to train')
+  parser.add_argument('--N',default = 130, help='number of episodes to use to train')
   parser.add_argument('--new_model', action='store_true', help='start a new model from scratch?')
   parser.add_argument('--epochs', default = 10, help='number of epochs to train for')
   args = parser.parse_args()
-
-  main(args)
+  
+  for i in range(3):
+    main(args)

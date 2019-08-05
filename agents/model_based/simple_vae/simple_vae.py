@@ -49,7 +49,7 @@ class CVAE():
 
 
         action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
-        encoded = Concatenate()([h4, action_input])                     # 1028
+        # encoded = Concatenate()([h4, action_input])                     # 1028
 
 
         ####################################################################
@@ -58,12 +58,12 @@ class CVAE():
         
 
         # encoder_h = Dense(ENCODER_DIM, activation='relu')()
-        z_mean = Dense(self.z_dim, name='z_mean')(encoded)                      
-        z_log_var = Dense(self.z_dim, name='z_log_var')(encoded)                
+        z_mean = Dense(self.z_dim, name='z_mean')(h4)                      
+        z_log_var = Dense(self.z_dim, name='z_log_var')(h4)                
         z = Lambda(sampling, name='sampling')([z_mean, z_log_var])
 
         # # merge latent space with same action vector that was merged into observation
-        # zc = Concatenate(axis=-1)([z, action_input])
+        zc = Concatenate(axis=-1)([z, action_input])
 
         
         ####################################################################
@@ -71,11 +71,11 @@ class CVAE():
         ####################################################################
 
 
-        decoder_dense = Dense(DENSE_SIZE, name='decoder_input')(z)
+        decoder_dense = Dense(DENSE_SIZE, name='decoder_input')(zc)
         decoder_reshape = Reshape((1,1,1024), name='unflatten')(decoder_dense)
-        decoder = Conv2DTranspose(256, 7, strides=2, activation='relu')(decoder_reshape)
-        decoder_2 = Conv2DTranspose(128, 6, strides=2, activation ='relu')(decoder)
-        decoder_3 = Conv2DTranspose(64, 6, strides=2, activation ='relu')(decoder_2)
+        decoder = Conv2DTranspose(128, 7, strides=2, activation='relu')(decoder_reshape)
+        decoder_2 = Conv2DTranspose(64, 6, strides=2, activation ='relu')(decoder)
+        decoder_3 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_2)
         # decoder_4 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_3) 
         decoder_out = Conv2DTranspose(1, 6, strides=2, activation='sigmoid')(decoder_3)
         
@@ -112,7 +112,7 @@ class CVAE():
     
     def train(self, obs, action, next_frame):
         input_data = [obs, action]
-        self.model.fit(input_data, next_frame,
+        self.model.fit(x=input_data, y=next_frame,
                 shuffle=True,
                 epochs=1,
                 batch_size=self.batch_size)
