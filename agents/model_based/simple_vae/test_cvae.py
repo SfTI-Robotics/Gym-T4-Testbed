@@ -11,7 +11,7 @@ DATA_FILE = './data/rollout/breakout/rollout-1.npz'
 
 env_name = sys.argv[1]
 cvae = CVAE()
-cvae.set_weights('./models/cvae_weights.h5')
+cvae.set_weights('./cvae_weights.h5')
 
 data_file = './data/world_models/' + 'rollout_' + env_name + '/rollout-1.npz'
 

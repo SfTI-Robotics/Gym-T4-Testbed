@@ -73,7 +73,7 @@ def main(args):
         try:
             cvae.set_weights(weights_name)
         except:
-            print("Either set --new_model or ensure ./models/weights.h5 exists")
+            print("Either set --new_model or ensure %s/weights.h5 exists" % model_dir)
             raise
 
     try:
@@ -96,7 +96,7 @@ if __name__ == "__main__":
   parser.add_argument('--N',default = 130, help='number of episodes to use to train')
   parser.add_argument('--new_model', action='store_true', help='start a new model from scratch?')
   parser.add_argument('--epochs', default = 10, help='number of epochs to train for')
-  parser.add_argument('--env_name', help='environment for generalisation')
+  parser.add_argument('--env_name', type=str, help='name of environment', default="Breakout-v0")
   args = parser.parse_args()
   
   main(args)

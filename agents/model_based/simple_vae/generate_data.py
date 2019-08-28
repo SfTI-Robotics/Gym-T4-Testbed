@@ -12,7 +12,6 @@ import argparse
 
 ROLLOUT_DIR = './data/world_models/'
 
-
 def main(args):
 
     full_path = ROLLOUT_DIR + 'rollout_' + args.env_name
@@ -35,6 +34,17 @@ def main(args):
 
         s = 0
 
+        rollout_dir = './data/rollout/%s/' % current_env_name
+
+        if os.path.exists(rollout_dir):
+            file_list = [f for f in os.listdir(rollout_dir) if f.endswith('.npz')]
+            for f in file_list:
+                os.remove(os.path.join(rollout_dir, f))
+        else:
+            original_umask = os.umask(0)
+            os.makedirs(rollout_dir, mode=0o777)
+            os.umask(original_umask)
+        
         while s < total_episodes:
             
             rollout_file = os.path.join(full_path,  'rollout-%d.npz' % s) 
