@@ -1,6 +1,7 @@
 # Don't commit the contents of these folders
 output/
-**/rollout/**
+**/simple_vae/data/**
+**/rollout_pong/**
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -13,3 +14,5 @@ __pycache__/
 **/data/frames/**
 **/data/actions/**
 **/images/**
+*.h5
+*.jpg

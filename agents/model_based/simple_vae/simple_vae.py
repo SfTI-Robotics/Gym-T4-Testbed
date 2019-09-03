@@ -1,4 +1,4 @@
-from keras.layers import Input, Concatenate, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape
+from keras.layers import Input, Concatenate, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape, multiply
 from keras.models import Model
 import keras.backend as K
 from keras.optimizers import Adam
@@ -6,21 +6,21 @@ from keras.optimizers import Adam
 INPUT_DIM = (84,84,4) # 4 stacked frames
 Z_DIM = 32
 DENSE_SIZE = 1024
-ACTION_DIM = 4
+ACTION_DIM = 6
 LEARNING_RATE = 0.0001
 KL_TOLERANCE = 0.5
 BATCH_SIZE = 100
 
 def sampling(args):
     z_mean, z_log_var = args
-    epsilon = K.random_normal(shape=(K.shape(z_mean)[0], 32), mean=0., stddev=1.0)
+    epsilon = K.random_normal(shape=(K.shape(z_mean)[0], Z_DIM), mean=0., stddev=1.0)
     return z_mean + K.exp(z_log_var / 2) * epsilon
 
 class CVAE():
-    def __init__(self):
+    def __init__(self, action_dim):
         self.input_dim = INPUT_DIM
         self.z_dim = Z_DIM
-        self.action_dim = ACTION_DIM
+        self.action_dim = action_dim
         self.learning_rate = LEARNING_RATE
         self.kl_tolerance = KL_TOLERANCE   
         self.batch_size = BATCH_SIZE
@@ -49,6 +49,7 @@ class CVAE():
 
 
         action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
+        action_dense = Dense(DENSE_SIZE, name='action_dense')(action_input)
         # encoded = Concatenate()([h4, action_input])                     # 1028
 
 
@@ -63,7 +64,8 @@ class CVAE():
         z = Lambda(sampling, name='sampling')([z_mean, z_log_var])
 
         # # merge latent space with same action vector that was merged into observation
-        zc = Concatenate(axis=-1)([z, action_input])
+        # zc = Concatenate(axis=-1)([z, action_input])
+        # zc = Multiply([z,action_dense])
 
         
         ####################################################################
@@ -71,8 +73,9 @@ class CVAE():
         ####################################################################
 
 
-        decoder_dense = Dense(DENSE_SIZE, name='decoder_input')(zc)
-        decoder_reshape = Reshape((1,1,1024), name='unflatten')(decoder_dense)
+        decoder_dense = Dense(DENSE_SIZE, name='decoder_input')(z)
+        action_transformation = multiply([decoder_dense, action_dense])
+        decoder_reshape = Reshape((1,1,1024), name='unflatten')(action_transformation)
         decoder = Conv2DTranspose(128, 7, strides=2, activation='relu')(decoder_reshape)
         decoder_2 = Conv2DTranspose(64, 6, strides=2, activation ='relu')(decoder)
         decoder_3 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_2)

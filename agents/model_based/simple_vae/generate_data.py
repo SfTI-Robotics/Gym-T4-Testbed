@@ -10,10 +10,15 @@ from PIL import Image
 
 import argparse
 
-ROLLOUT_DIR = './data/rollout/'
+ROLLOUT_DIR = './data/'
 
 
 def main(args):
+
+    full_path = ROLLOUT_DIR + 'rollout_' + args.env_name
+
+    if not os.path.exists(full_path):
+        os.mkdir(full_path)
 
     env_name = args.env_name
     total_episodes = args.total_episodes
@@ -31,7 +36,7 @@ def main(args):
 
         while s < total_episodes:
             
-            rollout_file = os.path.join(ROLLOUT_DIR,  'rollout-%d.npz' % s) 
+            rollout_file = os.path.join(full_path,  'rollout-%d.npz' % s) 
 
             observation = env.reset()
             frame_queue = deque(maxlen=4)
@@ -59,7 +64,7 @@ def main(args):
                 
                 stacked_state = np.stack(frame_queue, axis=2)
                 obs_sequence.append(stacked_state)
-                action_sequence.append(encode_action(4,action))
+                action_sequence.append(encode_action(env.action_space.n,action))
 
                 observation, _, _, _ = env.step(action) # Take a random action  
                 t = t + 1
@@ -91,7 +96,7 @@ def preprocess_frame(frame):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=('Create new training data'))
-    parser.add_argument('--env_name', type=str, help='name of environment', default="Breakout-v0")
+    parser.add_argument('--env_name', type=str, help='name of environment', default="Pong-v0")
     parser.add_argument('--total_episodes', type=int, default=200,
                         help='total number of episodes to generate per worker')
     parser.add_argument('--time_steps', type=int, default=300,
