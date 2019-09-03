@@ -34,16 +34,16 @@ def main(args):
 
         s = 0
 
-        rollout_dir = './data/rollout/%s/' % current_env_name
+        # rollout_dir = './data/rollout/%s/' % current_env_name
 
-        if os.path.exists(rollout_dir):
-            file_list = [f for f in os.listdir(rollout_dir) if f.endswith('.npz')]
-            for f in file_list:
-                os.remove(os.path.join(rollout_dir, f))
-        else:
-            original_umask = os.umask(0)
-            os.makedirs(rollout_dir, mode=0o777)
-            os.umask(original_umask)
+        # if os.path.exists(rollout_dir):
+        #     file_list = [f for f in os.listdir(rollout_dir) if f.endswith('.npz')]
+        #     for f in file_list:
+        #         os.remove(os.path.join(rollout_dir, f))
+        # else:
+        #     original_umask = os.umask(0)
+        #     os.makedirs(rollout_dir, mode=0o777)
+        #     os.umask(original_umask)
         
         while s < total_episodes:
             
@@ -80,7 +80,7 @@ def main(args):
                 observation, _, _, _ = env.step(action) # Take a random action  
                 t = t + 1
 
-                next_sequence.append(preprocess_frame(observation))
+                next_sequence.append(converted_obs)
 
             print("Episode {} finished after {} timesteps".format(s, t))
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     parser.add_argument('--env_name', type=str, help='name of environment', default="Pong-v0")
     parser.add_argument('--total_episodes', type=int, default=200,
                         help='total number of episodes to generate per worker')
-    parser.add_argument('--time_steps', type=int, default=300,
+    parser.add_argument('--time_steps', type=int, default=100,
                         help='how many timesteps at start of episode?')
     parser.add_argument('--render', default=0, type=int,
                         help='render the env as data is generated')

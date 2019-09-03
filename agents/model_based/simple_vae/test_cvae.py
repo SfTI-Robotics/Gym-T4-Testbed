@@ -7,17 +7,18 @@ import imageio
 
 
 IMAGE_FOLDER = './images/'
-DATA_FILE = './data/rollout/breakout/rollout-1.npz'
 
 env_name = sys.argv[1]
-cvae = CVAE()
-cvae.set_weights('./cvae_weights.h5')
 
 data_file = './data/world_models/' + 'rollout_' + env_name + '/rollout-1.npz'
 
-obs_data = np.load(DATA_FILE)['obs']
-action_data = np.load(DATA_FILE)['actions']
-next_data = np.load(DATA_FILE)['next_frame']
+obs_data = np.load(data_file)['obs']
+action_data = np.load(data_file)['actions']
+next_data = np.load(data_file)['next_frame']
+
+cvae = CVAE(len(action_data[0]))
+print(len(action_data[0]))
+cvae.set_weights('./cvae_weights_mult_' + env_name + '.h5')
 
 for i in range(len(obs_data)):
     obs = obs_data[i]
