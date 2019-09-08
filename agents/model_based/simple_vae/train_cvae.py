@@ -5,11 +5,11 @@ import numpy as np
 import os
 import gym
 
-DIR_NAME = './data/'
+DIR_NAME = './data/world_models/'
 M=300
 
-SCREEN_SIZE_X = 84
-SCREEN_SIZE_Y = 84
+SCREEN_SIZE_X = 104
+SCREEN_SIZE_Y = 104
 
 def action_space_dimension(env_name):
   return gym.make(env_name).action_space.n
@@ -26,9 +26,9 @@ def import_data(N, action_dim, dir_name):
   if length_filelist < N:
     N = length_filelist
 
-  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4), dtype=np.float32)
+  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 3), dtype=np.float32)
   action = np.zeros((M*N, action_dim), dtype=np.float32)
-  next_frame = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 1), dtype=np.float32)
+  next_frame = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 3), dtype=np.float32)
 
   idx = 0
   file_count = 0
@@ -65,6 +65,7 @@ def main(args):
     epochs = int(args.epochs)
     action_dim = action_space_dimension(args.env_name)
     cvae = CVAE(action_dim)
+    # return
     dir_name = DIR_NAME + 'rollout_' + args.env_name + '/'
     weights_name = './cvae_weights_mult_' + args.env_name + '.h5'
 
@@ -85,7 +86,8 @@ def main(args):
 
     for epoch in range(epochs):
         print('EPOCH ' + str(epoch))
-        cvae.train(data[0],data[1],data[2])
+        # cvae.train(data[0],data[1],data[2])
+        cvae.train(data[0])
         cvae.save_weights(weights_name)
         
 

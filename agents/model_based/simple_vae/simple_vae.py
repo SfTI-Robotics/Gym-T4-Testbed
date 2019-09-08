@@ -1,23 +1,26 @@
-from keras.layers import Input, Concatenate, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape, multiply
+from keras.layers import Input, Concatenate, Conv2D, Flatten, Dense, Conv2DTranspose, Lambda, Reshape, multiply, ZeroPadding2D, ZeroPadding3D
 from keras.models import Model
 import keras.backend as K
 from keras.optimizers import Adam
 
-INPUT_DIM = (84,84,4) # 4 stacked frames
+INPUT_DIM = (104,104,3) # 4 stacked frames
 Z_DIM = 32
 DENSE_SIZE = 1024
-ACTION_DIM = 6
+ACTION_DIM = 32
 LEARNING_RATE = 0.0001
 KL_TOLERANCE = 0.5
-BATCH_SIZE = 100
+BATCH_SIZE = 32
 
 def sampling(args):
-    z_mean, z_log_var = args
-    epsilon = K.random_normal(shape=(K.shape(z_mean)[0], Z_DIM), mean=0., stddev=1.0)
-    return z_mean + K.exp(z_log_var / 2) * epsilon
+    z_mean, z_sigma = args
+    epsilon = K.random_normal(shape=K.shape(z_mean), mean=0., stddev=1.0)
+    return z_mean +  z_sigma * epsilon
+
+def convert_to_sigma(z_log_var):
+    return K.exp(z_log_var / 2)
 
 class CVAE():
-    def __init__(self, action_dim):
+    def __init__(self, action_dim=None):
         self.input_dim = INPUT_DIM
         self.z_dim = Z_DIM
         self.action_dim = action_dim
@@ -35,11 +38,10 @@ class CVAE():
         #                        Step 1: CONVOLUTION                       #
         ####################################################################
 
-        
         h = Conv2D(32, 6, strides=2, activation='relu')(vae_x)              # 40x40x32
         h1 = Conv2D(64, 6, strides=2, activation='relu')(h)                 # 18x18x64
         h2 = Conv2D(128, 6, strides=2, activation='relu')(h1)               # 7x7x128
-        h3 = Conv2D(256, 4, strides=2, activation='relu')(h2)               # 2x2x256
+        h3 = Conv2D(128, 4, strides=2, activation='relu')(h2)               # 2x2x256
         h4 = Flatten()(h3)                                                  # 1024
 
 
@@ -48,8 +50,8 @@ class CVAE():
         ####################################################################
 
 
-        action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
-        action_dense = Dense(DENSE_SIZE, name='action_dense')(action_input)
+        # action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
+        # action_dense = Dense(DENSE_SIZE, name='action_dense')(action_input)
         # encoded = Concatenate()([h4, action_input])                     # 1028
 
 
@@ -57,11 +59,10 @@ class CVAE():
         #                  Step 3: LATENT SPACE ENCODING                   #
         ####################################################################
         
-
-        # encoder_h = Dense(ENCODER_DIM, activation='relu')()
-        z_mean = Dense(self.z_dim, name='z_mean')(h4)                      
-        z_log_var = Dense(self.z_dim, name='z_log_var')(h4)                
-        z = Lambda(sampling, name='sampling')([z_mean, z_log_var])
+        # z_mean = Dense(1024, name='z_mean')(h4)                      
+        # z_log_var = Dense(self.z_dim, name='z_log_var')(h4)
+        # z_sigma = Lambda(convert_to_sigma, name='sigma')(z_log_var)                
+        # z = Lambda(sampling, name='sampling')([z_mean, z_sigma])
 
         # # merge latent space with same action vector that was merged into observation
         # zc = Concatenate(axis=-1)([z, action_input])
@@ -72,17 +73,19 @@ class CVAE():
         #                     Step 4: DECONVOLUTION                        #
         ####################################################################
 
-
-        decoder_dense = Dense(DENSE_SIZE, name='decoder_input')(z)
-        action_transformation = multiply([decoder_dense, action_dense])
-        decoder_reshape = Reshape((1,1,1024), name='unflatten')(action_transformation)
-        decoder = Conv2DTranspose(128, 7, strides=2, activation='relu')(decoder_reshape)
+        # decoder_dense = Dense(DENSE_SIZE)(h4)
+        # decoder_reshape = Reshape((1,1,1024), name='unflatten')(decoder_dense)
+        # action_transformation = multiply([h4, action_dense])
+        decoder_reshape = Reshape((3,3,128), name='unflatten')(h4)
+        decoder = Conv2DTranspose(128, 5, strides=2, activation='relu')(decoder_reshape)
         decoder_2 = Conv2DTranspose(64, 6, strides=2, activation ='relu')(decoder)
-        decoder_3 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_2)
+        # padding = ZeroPadding2D(padding=(1,0))(decoder_2)        
+        decoder_3 = Conv2DTranspose(32, 7, strides=2, activation ='relu')(decoder_2)
+        # padding_2 = ZeroPadding2D(padding=(3,1))(decoder_3)
         # decoder_4 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_3) 
-        decoder_out = Conv2DTranspose(1, 6, strides=2, activation='sigmoid')(decoder_3)
+        decoder_out = Conv2DTranspose(3, 8, strides=2, activation='sigmoid')(decoder_3)
         
-        vae_full = Model([vae_x,action_input],decoder_out)
+        vae_full = Model(vae_x,decoder_out)
 
 
         ####################################################################
@@ -93,14 +96,15 @@ class CVAE():
             r_loss = K.sum(K.square(y_true - y_pred), axis = [1,2,3])
             return r_loss
 
-        def vae_kl_loss(y_true, y_pred):
+        # def vae_kl_loss(y_true, y_pred):
 
-            kl_loss = - 0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis = 1)
-            kl_loss = K.maximum(kl_loss, KL_TOLERANCE * Z_DIM)
-            return kl_loss
+        #     kl_loss = - 0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis = 1)
+        #     kl_loss = K.maximum(kl_loss, KL_TOLERANCE * Z_DIM)
+        #     return kl_loss
 
         def vae_loss(y_true, y_pred):
-            return vae_r_loss(y_true, y_pred) + vae_kl_loss(y_true, y_pred)
+            return vae_r_loss(y_true, y_pred) 
+            # + vae_kl_loss(y_true, y_pred)
 
 
         ####################################################################
@@ -108,17 +112,23 @@ class CVAE():
         ####################################################################
         
         opti = Adam(lr=LEARNING_RATE)
-        vae_full.compile(optimizer=opti, loss = vae_loss,  metrics = [vae_r_loss, vae_kl_loss])
+        vae_full.compile(optimizer=opti, loss = vae_loss,  metrics = [vae_r_loss])
 
         print(vae_full.summary())
         return (vae_full)
     
-    def train(self, obs, action, next_frame):
-        input_data = [obs, action]
-        self.model.fit(x=input_data, y=next_frame,
-                shuffle=True,
-                epochs=1,
-                batch_size=self.batch_size)
+    def train(self, obs, action=None, next_frame=None):
+        if action is None:
+            self.model.fit(x=obs,y=obs, 
+                           shuffle=True, 
+                           epochs=1, 
+                           batch_size=self.batch_size)
+        else:
+            input_data = [obs, action]
+            self.model.fit(x=input_data, y=next_frame,
+                    shuffle=True,
+                    epochs=1,
+                    batch_size=self.batch_size)
     
     def set_weights(self, filepath):
         self.model.load_weights(filepath)
@@ -126,8 +136,11 @@ class CVAE():
     def save_weights(self, filepath):
         self.model.save_weights(filepath)
 
-    def predict(self, observation, action):
-        return self.model.predict([observation,action])
+    def predict(self, observation, action=None):
+        if action is not None:
+            return self.model.predict([observation,action])
+        else:
+            return self.model.predict(observation)
     
     def print_layer_shapes(self):
         self.model.summary()
