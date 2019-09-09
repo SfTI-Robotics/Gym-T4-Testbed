@@ -1,8 +1,0 @@
-numpy
-keras
-scikit-image
-opencv-python
-matplotlib
-imageio
-gym[atari]
-scipy

@@ -1,5 +1,5 @@
-/configs/Pong/config_dqn
-/configs/Pong/config_double_dqn
-/configs/Pong/config_dueling_dqn
-/configs/Pong/config_pg
+/Gym-T4-Testbed/configs/Pong/config_dqn
+/Gym-T4-Testbed/configs/Pong/config_double_dqn
+/Gym-T4-Testbed/configs/Pong/config_dueling_dqn
+/Gym-T4-Testbed/configs/Pong/config_pg
 #
