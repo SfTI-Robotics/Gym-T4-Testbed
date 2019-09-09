@@ -3,17 +3,20 @@ from random import shuffle
 import argparse
 import numpy as np
 import os
+import gym
 
-DIR_NAME = './data/rollout/'
-M=300
+DIR_NAME = './data/world_models/'
+M=150
 
-SCREEN_SIZE_X = 84
-SCREEN_SIZE_Y = 84
-ACTION_SPACE_Y = 4
+SCREEN_SIZE_X = 104
+SCREEN_SIZE_Y = 104
+
+def action_space_dimension(env_name):
+  return gym.make(env_name).action_space.n
 
 
-def import_data(N):
-  filelist = os.listdir(DIR_NAME)
+def import_data(N, action_dim, dir_name):
+  filelist = os.listdir(dir_name)
   shuffle(filelist)
   length_filelist = len(filelist)
 
@@ -23,18 +26,18 @@ def import_data(N):
   if length_filelist < N:
     N = length_filelist
 
-  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 4), dtype=np.float32)
-  action = np.zeros((M*N, ACTION_SPACE_Y), dtype=np.float32)
-  next_frame = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 1), dtype=np.float32)
+  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 12), dtype=np.float32)
+  action = np.zeros((M*N, action_dim), dtype=np.float32)
+  next_frame = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 3), dtype=np.float32)
 
   idx = 0
   file_count = 0
 
   for file in filelist:
     try:
-        obs_data = np.load(DIR_NAME + file)['obs']
-        action_data = np.load(DIR_NAME + file)['actions']
-        next_data = np.load(DIR_NAME + file)['next_frame']
+        obs_data = np.load(dir_name + file)['obs']
+        action_data = np.load(dir_name + file)['actions']
+        next_data = np.load(dir_name + file)['next_frame']
 
         observation[idx:(idx + M), :, :, :] = obs_data
         action[idx:(idx + M), :] = action_data
@@ -60,18 +63,21 @@ def main(args):
     new_model = args.new_model
     N = int(args.N)
     epochs = int(args.epochs)
-
-    cvae = CVAE()
+    action_dim = action_space_dimension(args.env_name)
+    cvae = CVAE(action_dim)
+    # return
+    dir_name = DIR_NAME + 'rollout_' + args.env_name + '/'
+    weights_name = './cvae_weights_mult_' + args.env_name + '.h5'
 
     if not new_model:
         try:
-            cvae.set_weights('./cvae_weights.h5')
+            cvae.set_weights(weights_name)
         except:
-            print("Either set --new_model or ensure ./models/weights.h5 exists")
+            print("Either set --new_model or ensure %s/weights.h5 exists" % model_dir)
             raise
 
     try:
-        data, N = import_data(N)
+        data, N = import_data(N,action_dim,dir_name)
     except:
         print('NO DATA FOUND')
         raise
@@ -80,8 +86,9 @@ def main(args):
 
     for epoch in range(epochs):
         print('EPOCH ' + str(epoch))
+        # cvae.train(data[0],data[1],data[2])
         cvae.train(data[0],data[1],data[2])
-        cvae.save_weights('./cvae_weights.h5')
+        cvae.save_weights(weights_name)
         
 
 if __name__ == "__main__":
@@ -89,7 +96,7 @@ if __name__ == "__main__":
   parser.add_argument('--N',default = 130, help='number of episodes to use to train')
   parser.add_argument('--new_model', action='store_true', help='start a new model from scratch?')
   parser.add_argument('--epochs', default = 10, help='number of epochs to train for')
+  parser.add_argument('--env_name', type=str, help='name of environment', default="Breakout-v0")
   args = parser.parse_args()
   
-  for i in range(3):
-    main(args)
+  main(args)
