@@ -1,6 +1,10 @@
 # Don't commit the contents of these folders
 output/
+**/simple_vae/data/**
+**/rollout_pong/**
 
+**/rollout/**
+**/images/**
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,3 +12,9 @@ __pycache__/
 *.pyc
 *~
 *.swp
+.vscode/
+**/data/frames/**
+**/data/actions/**
+**/images/**
+*.h5
+*.jpg
