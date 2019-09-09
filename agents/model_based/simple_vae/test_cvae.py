@@ -6,6 +6,10 @@ import os
 import imageio
 from generate_gif import create_gif
 
+def diff_image(actual, predicted):
+    diff = abs(actual - predicted)
+    return diff
+
 
 IMAGE_FOLDER = './images/'
 
@@ -38,8 +42,10 @@ for i in range(len(obs_data)):
     predicted_image = predicted_next[0, :, :, :]*255.
     # print(predicted_image.shape)
 
+    difference = diff_image(ground_truth,predicted_image)
+
     triple = np.concatenate(
-        (predicted_image, ground_truth), axis=1)
+        (predicted_image, ground_truth, difference), axis=1)
 
     cv2.imwrite(IMAGE_FOLDER + '%03d.png' % i, triple)
 
