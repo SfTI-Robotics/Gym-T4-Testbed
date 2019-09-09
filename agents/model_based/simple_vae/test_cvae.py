@@ -11,7 +11,7 @@ IMAGE_FOLDER = './images/'
 
 env_name = sys.argv[1]
 
-data_file = './data/world_models/' + 'rollout_' + env_name + '/rollout-193.npz'
+data_file = './data/world_models/' + 'rollout_' + env_name + '/rollout-190.npz'
 
 obs_data = np.load(data_file)['obs']
 action_data = np.load(data_file)['actions']
