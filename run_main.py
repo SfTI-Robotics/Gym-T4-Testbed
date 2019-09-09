@@ -20,9 +20,7 @@ seed(0)
 set_random_seed(0)
 
 
-# PATH = expanduser("~")
-# Hardcoded file path for docker image
-PATH = '/home'
+PATH = expanduser("~")
 MODEL_FILENAME = ''
 
 
