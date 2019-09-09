@@ -18,3 +18,4 @@ __pycache__/
 **/images/**
 *.h5
 *.jpg
+*.gif
