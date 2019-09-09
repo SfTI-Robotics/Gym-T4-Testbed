@@ -50,7 +50,7 @@ def main(args):
             rollout_file = os.path.join(full_path,  'rollout-%d.npz' % s) 
 
             observation = env.reset()
-            # frame_queue = deque(maxlen=4)
+            frame_queue = deque(maxlen=4)
             
 
             t = 0
@@ -66,21 +66,21 @@ def main(args):
                 
                 converted_obs = preprocess_frame(observation)
                 
-                # if t == 0:
-                #     for i in range(4):
-                #         frame_queue.append(converted_obs)
-                # else:
-                #     frame_queue.pop()
-                #     frame_queue.appendleft(converted_obs)
+                if t == 0:
+                    for i in range(4):
+                        frame_queue.append(converted_obs)
+                else:
+                    frame_queue.pop()
+                    frame_queue.appendleft(converted_obs)
                 
-                # stacked_state = np.stack(frame_queue, axis=2)
-                obs_sequence.append(converted_obs)
+                stacked_state = np.concatenate(frame_queue, axis=2)
+                obs_sequence.append(stacked_state)
                 action_sequence.append(encode_action(env.action_space.n,action))
 
                 observation, _, _, _ = env.step(action) # Take a random action  
                 t = t + 1
 
-                next_sequence.append(converted_obs)
+                next_sequence.append(preprocess_frame(observation))
 
             print("Episode {} finished after {} timesteps".format(s, t))
 

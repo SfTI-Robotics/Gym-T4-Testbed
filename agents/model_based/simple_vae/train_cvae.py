@@ -6,7 +6,7 @@ import os
 import gym
 
 DIR_NAME = './data/world_models/'
-M=300
+M=150
 
 SCREEN_SIZE_X = 104
 SCREEN_SIZE_Y = 104
@@ -26,7 +26,7 @@ def import_data(N, action_dim, dir_name):
   if length_filelist < N:
     N = length_filelist
 
-  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 3), dtype=np.float32)
+  observation = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 12), dtype=np.float32)
   action = np.zeros((M*N, action_dim), dtype=np.float32)
   next_frame = np.zeros((M*N, SCREEN_SIZE_X, SCREEN_SIZE_Y, 3), dtype=np.float32)
 
@@ -87,7 +87,7 @@ def main(args):
     for epoch in range(epochs):
         print('EPOCH ' + str(epoch))
         # cvae.train(data[0],data[1],data[2])
-        cvae.train(data[0])
+        cvae.train(data[0],data[1],data[2])
         cvae.save_weights(weights_name)
         
 

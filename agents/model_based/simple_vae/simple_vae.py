@@ -3,13 +3,12 @@ from keras.models import Model
 import keras.backend as K
 from keras.optimizers import Adam
 
-INPUT_DIM = (104,104,3) # 4 stacked frames
+INPUT_DIM = (104,104,12) # 4 stacked frames
 Z_DIM = 32
-DENSE_SIZE = 1024
-ACTION_DIM = 32
+DENSE_SIZE = 1152
 LEARNING_RATE = 0.0001
 KL_TOLERANCE = 0.5
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 
 def sampling(args):
     z_mean, z_sigma = args
@@ -50,8 +49,8 @@ class CVAE():
         ####################################################################
 
 
-        # action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
-        # action_dense = Dense(DENSE_SIZE, name='action_dense')(action_input)
+        action_input = Input(shape=(self.action_dim,), name='action_input')    # 4
+        action_dense = Dense(DENSE_SIZE, name='action_dense')(action_input)
         # encoded = Concatenate()([h4, action_input])                     # 1028
 
 
@@ -75,8 +74,8 @@ class CVAE():
 
         # decoder_dense = Dense(DENSE_SIZE)(h4)
         # decoder_reshape = Reshape((1,1,1024), name='unflatten')(decoder_dense)
-        # action_transformation = multiply([h4, action_dense])
-        decoder_reshape = Reshape((3,3,128), name='unflatten')(h4)
+        action_transformation = multiply([h4, action_dense])
+        decoder_reshape = Reshape((3,3,128), name='unflatten')(action_transformation)
         decoder = Conv2DTranspose(128, 5, strides=2, activation='relu')(decoder_reshape)
         decoder_2 = Conv2DTranspose(64, 6, strides=2, activation ='relu')(decoder)
         # padding = ZeroPadding2D(padding=(1,0))(decoder_2)        
@@ -85,7 +84,7 @@ class CVAE():
         # decoder_4 = Conv2DTranspose(32, 6, strides=2, activation ='relu')(decoder_3) 
         decoder_out = Conv2DTranspose(3, 8, strides=2, activation='sigmoid')(decoder_3)
         
-        vae_full = Model(vae_x,decoder_out)
+        vae_full = Model([vae_x,action_input],decoder_out)
 
 
         ####################################################################
