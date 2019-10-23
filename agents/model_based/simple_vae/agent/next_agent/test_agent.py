@@ -9,9 +9,10 @@ import time
 from collections import deque
 
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
-from world_model.load_world_model import load_world_model
+from predictive_model.load_predictive_model import load_predictive_model
 from utils import preprocess_frame, encode_action, preprocess_frame_dqn
 from simple_dqn import Agent
+
 
 plt.rcParams.update({'font.size': 35})
 plt.rcParams['figure.dpi'] = 400
@@ -21,18 +22,15 @@ plt.rcParams['figure.figsize'] = [16.0,12.0]
 def test_against_environment(env_name,num_runs,agent_name):
     env = gym.make(env_name)
     # env.seed(0)
-    weights_path = "./agent_weights_pong_max.h5"
     try:
-        predictor = load_world_model(env_name, env.action_space.n)
+        predictor = load_predictive_model(env_name, env.action_space.n)
         if agent_name == 'Next_agent':
             agent = StateAgent(env.action_space.n, env_name)
-            agent.set_weights(weights_path)
+            agent.set_weights()
         elif agent_name == 'DQN':
             agent = Agent(gamma=0.99, epsilon=0.00, alpha=0.0001,
                   input_dims=(104,80,4), n_actions=env.action_space.n, mem_size=25000,
-                  eps_min=0.00, batch_size=32, replace=1000, eps_dec=1e-5,
-                  q_eval_fname='Pong_q_network_21.h5', q_target_fname='Pong_q_next_21.h5',
-                  env_name=env_name)
+                  eps_min=0.00, batch_size=32, replace=1000, eps_dec=1e-5, env_name=env_name)
             agent.load_models()
     except:
         print ("Error loading model, check environment name and action space dimensions")
@@ -69,9 +67,8 @@ def test_against_environment(env_name,num_runs,agent_name):
                 agent_action = agent.choose_action(observation_states)
             else:
                 agent_action = env.action_space.sample()
-                
+            
             observation, reward, done, _ = env.step(agent_action)
-            # print(agent_action)
             total_reward += reward
             frame_count += 1
             total_steps += 1
@@ -130,19 +127,17 @@ def plot_time(env_name, num_runs, names, times, timing_steps):
     fig.savefig('graphs/{}_times.png'.format(env_name))
 
 def test_plot():
-    env_name = 'PonsgDeterministic-v4'
+    env_name = 'PongDeterministic-v4'
     num_runs = 5
     names = ['Random', 'DQN', 'Next State Agent']
     scores = [21,15,-21]
     plot_scores(env_name, num_runs, names, scores)
 
 
-
-
 if __name__ == "__main__":
 
     num_runs = 10
     env_name = "PongDeterministic-v4"
-    
+
     save_graph(env_name,num_runs,100)
     # test_plot()
