@@ -1,4 +1,4 @@
-from simple_vae import CVAE
+from predictive_model import AutoEncoder
 from random import shuffle
 import argparse
 import numpy as np
@@ -7,7 +7,11 @@ import gym
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 ROLLOUT_DIR = os.path.join(file_path, "data")
-MODEL_DIR = os.path.join(file_path, "models")
+MODEL_DIR = os.path.join(file_path, "models/")
+
+if not os.path.exists(MODEL_DIR):
+  os.umask(0o000)
+  os.makedirs(MODEL_DIR)
 
 M=200
 
@@ -70,14 +74,14 @@ def main(args):
     action_dim = action_space_dimension(args.env_name)
     informed = args.informed
 
-    predictive_model = CVAE(action_dim)
+    predictive_model = AutoEncoder(action_dim)
     
     if informed:
-      rollout_dir = ROLLOUT_DIR + '/informed_rollouts/rollout_' + args.env_name + '/'
+      rollout_dir = ROLLOUT_DIR + '/informed_rollout_' + args.env_name + '/'
     else:
-      rollout_dir = ROLLOUT_DIR + 'random/rollout_' + args.env_name + '/'
+      rollout_dir = ROLLOUT_DIR + '/random_rollout_' + args.env_name + '/'
       
-    weights_name = '%s/predictive_model_weights_%s.h5' % (MODEL_DIR, args.env_name)
+    weights_name = MODEL_DIR + 'predictive_model_weights_%s.h5' % args.env_name
 
     if not new_model:
         try:
